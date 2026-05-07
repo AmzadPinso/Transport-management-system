@@ -1,0 +1,122 @@
+﻿/* ===== STUDENT PAGE GLOBAL ===== */
+
+.student-container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* ===== PAGE TITLE ===== */
+
+.student-title {
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #0d6efd;
+}
+
+/* ===== TABLE DESIGN (INDEX) ===== */
+
+.student-table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .student-table thead {
+        background: linear-gradient(90deg, #0d6efd, #0a58ca);
+        color: white;
+    }
+
+    .student-table th {
+        padding: 15px;
+        font-weight: 600;
+    }
+
+    .student-table td {
+        vertical-align: middle;
+        padding: 12px;
+    }
+
+    .student-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+        .student-table tbody tr:hover {
+            background-color: #f2f7ff;
+            transform: scale(1.01);
+        }
+
+/* ===== BUTTONS ===== */
+
+.btn-custom {
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: #000;
+}
+
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+    .btn-delete:hover {
+        background-color: #bb2d3b;
+    }
+
+.btn-details {
+    background-color: #198754;
+    color: white;
+}
+
+    .btn-details:hover {
+        background-color: #157347;
+    }
+
+/* ===== FORM DESIGN (CREATE & EDIT) ===== */
+
+.student-form label {
+    font-weight: 600;
+}
+
+.student-form input {
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+    .student-form input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+    }
+
+/* ===== DETAILS CARD ===== */
+
+.details-card {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+}
+
+    .details-card p {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+/* ===== DELETE BOX ===== */
+
+.delete-box {
+    background-color: #fff3f3;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #dc3545;
+}

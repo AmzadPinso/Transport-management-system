@@ -1,0 +1,50 @@
+﻿@model montaherul.Models.StudentModel
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/student.css" />
+}
+
+<div class="student-container">
+
+    <h2 class="student-title">Student Details</h2>
+
+    <div class="details-card">
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Name</div>
+            <div class="col-sm-9">@Model.Name</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Age</div>
+            <div class="col-sm-9">@Model.Age</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Email</div>
+            <div class="col-sm-9">@Model.Email</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Address</div>
+            <div class="col-sm-9">@Model.Address</div>
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-action="Index" class="btn btn-secondary">
+            ← Back to List
+        </a>
+
+        <a asp-action="Edit" asp-route-id="@Model.Id"
+               class="btn btn-warning px-4">
+            Edit Student
+        </a>
+    </div>
+
+</div>

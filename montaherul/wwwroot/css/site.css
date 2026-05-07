@@ -1,0 +1,108 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+    background: linear-gradient(to right, #eef2f3, #d9e4f5);
+}
+
+.dashboard-card {
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-10px);
+    }
+
+.card-body i {
+    transition: transform 0.3s;
+}
+
+.dashboard-card:hover i {
+    transform: scale(1.2);
+}
+/* ===== NAVBAR STYLING ===== */
+
+.navbar {
+    background: linear-gradient(90deg, #0d6efd, #0a58ca) !important;
+    padding: 12px 20px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Brand */
+.navbar-brand {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff !important;
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+    .navbar-brand:hover {
+        color: #ffd43b !important;
+        transform: scale(1.05);
+    }
+
+/* Nav Links */
+.navbar .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    margin-right: 15px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+    /* Hover Effect */
+    .navbar .nav-link:hover {
+        color: #ffd43b !important;
+    }
+
+    /* Animated underline */
+    .navbar .nav-link::after {
+        content: "";
+        position: absolute;
+        width: 0%;
+        height: 2px;
+        left: 0;
+        bottom: -5px;
+        background-color: #ffd43b;
+        transition: width 0.3s;
+    }
+
+    .navbar .nav-link:hover::after {
+        width: 100%;
+    }
+
+    /* Active link effect */
+    .navbar .nav-link.active {
+        color: #ffd43b !important;
+    }
+
+/* Toggler button */
+.navbar-toggler {
+    border: none;
+}
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+/* Shadow effect */
+.box-shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

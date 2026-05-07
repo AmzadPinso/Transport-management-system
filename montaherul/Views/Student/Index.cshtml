@@ -1,0 +1,118 @@
+﻿@{
+    ViewData["Title"] = "Student List";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/student.css" />
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+}
+
+<div class="student-container">
+    <h2 class="student-title text-center">Student List</h2>
+
+    <a asp-action="Create" class="btn btn-primary mb-3">
+        + Add New Student
+    </a>
+
+    <!-- 🔍 Search + Page Size -->
+    <div class="d-flex justify-content-between mb-3">
+        <input type="text" id="searchBox" class="form-control w-25" placeholder="Search..." />
+
+        <select id="pageSizeSelect" class="form-control w-25">
+            <option value="5">5</option>
+            <option value="15" selected>15</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+
+    <!-- 📊 Table -->
+    <div id="student-table"></div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+
+    <script>
+        let table;
+
+        function initTable() {
+        table = new Tabulator("#student-table", {
+        layout: "fitColumns",
+        height: "660px",
+
+        // ✅ Remote Pagination
+        pagination: "remote",
+        paginationSize:15,
+
+        ajaxURL: "/api/student/paged",
+
+        ajaxParams: {
+        search: ""
+        },
+
+        // ✅ Build query string
+        ajaxURLGenerator: function (url, config, params) {
+   
+        let page = params.page || 1;
+        let size = params.size || 10000;
+
+        let sort = params.sorters?.[0];
+        let sortColumn = sort ? sort.field : "Id";
+        let sortDir = sort ? sort.dir : "asc";
+
+        return `${url}?pageNumber=${page}&pageSize=${size}&search=${params.search || ""}&sortColumn=${sortColumn}&sortDirection=${sortDir}`;
+        },
+
+        // ✅ Extract ONLY array from API response
+        ajaxResponse: function (url, params, response) {
+        size=response.totalRecords;
+
+        params.last_page = response.last_page;
+        return response.data;
+        },
+
+        // ✅ Map pagination (IMPORTANT)
+        paginationDataReceived: {
+
+        last_page: "last_page"
+        },
+
+        columns: [
+        { title: "Name", field: "name", headerSort: true },
+        { title: "Age", field: "age", hozAlign: "center", headerSort: true },
+        { title: "Email", field: "email", headerSort: true },
+        { title: "Address", field: "address", headerSort: true },
+
+        {
+        title: "Actions",
+        formatter: function (cell) {
+        let id = cell.getRow().getData().id;
+        return `
+        <a href="/Student/Edit/${id}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="/Student/Details/${id}" class="btn btn-sm btn-info">Details</a>
+        <a href="/Student/Delete/${id}" class="btn btn-sm btn-danger">Delete</a>
+        `;
+        }
+        }
+        ]
+        });
+        }
+
+        // 🔍 Search
+        document.getElementById("searchBox").addEventListener("keyup", function () {
+        table.setData("/api/student/paged", {
+        search: this.value
+        });
+        table.setPage(1); // reset page
+        });
+
+        // 📊 Page size change
+        document.getElementById("pageSizeSelect").addEventListener("change", function () {
+        table.setPageSize(parseInt(this.value));
+        });
+
+        // 🚀 Init
+        initTable();
+    </script>
+}

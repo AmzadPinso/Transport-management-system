@@ -1,0 +1,24 @@
+﻿@model CourseModel
+
+@* <h4>@(Model.Id == 0 ? "Create Course" : "Edit Course")</h4> *@
+
+<form asp-action="Save" method="post">
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)  <!-- Create/Edit detect করে -->
+    
+    <div class="form-group">
+        <label asp-for="CourseName"></label>
+        <input asp-for="CourseName" class="form-control" />
+        <span asp-validation-for="CourseName"></span>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="TeacherId"></label>
+        <select asp-for="TeacherId" asp-items="ViewBag.TeacherList" class="form-control">
+            <option value="0">Select Teacher</option>
+        </select>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Save Course</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

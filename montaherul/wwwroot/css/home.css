@@ -1,0 +1,27 @@
+﻿body {
+}
+/* HERO SECTION */
+.hero-section {
+    height: 90vh;
+    background: linear-gradient(135deg, #4e73df, #224abe);
+}
+
+/* FEATURES */
+.features-section {
+    background: #f8f9fc;
+}
+
+.feature-card {
+    border-radius: 15px;
+    transition: 0.3s;
+    background: white;
+}
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+    }
+
+/* CTA SECTION */
+.cta-section {
+    background: linear-gradient(135deg, #1e1e2f, #2c2c54);
+}

@@ -1,0 +1,138 @@
+﻿@model IEnumerable<montaherul.Models.CourseModel>
+
+<h1>Course List</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<div id="course-table"></div>
+
+@section Scripts {
+
+    <script>
+
+  
+
+        // Columns
+        var driverColumns = [
+            { title: "Course Name", field: "courseName", minWidth: 150, tooltip: true, headerFilter: "input" },
+            { title: "Teacher Name", field: "teacherName", minWidth: 180, tooltip: true, headerFilter: "input" },
+           
+            {
+                title: "Actions",
+                field: "id",
+                hozAlign: "center",
+                frozen: true, // Pin the action column
+                formatter: function (cell) {
+                    let html = "";
+
+                     html += `<i class="bi bi-pencil-square edit-btn me-2" style="cursor:pointer;"></i>`;
+
+                     html += `<i class="bi bi-trash delete-btn" style="cursor:pointer;"></i>`;
+                    return html;
+                },
+                cellClick: function(e, cell) {
+                    var driverId = parseInt(cell.getRow().getData().id);
+                    if (e.target.closest(".edit-btn")) editCourse(driverId);
+                    if (e.target.closest(".delete-btn")) deleteCourse(driverId);
+                }
+            }
+        ];
+        
+        var driverTable = new Tabulator("#course-table", {
+            dataTree: true,
+            minHeight: 300,
+            rowHeight: 40,
+            selectableRows: 1,
+            pagination: true,
+            paginationMode: "remote",
+            filterMode: "remote",
+            layout: "fitColumns",
+            paginationSize: 10,
+            paginationInitialPage: 1,
+            paginationSizeSelector: [5, 10, 25, 50, 100, 500, 1000],
+            paginationCounter: "rows",
+            ajaxURL: '@Url.Action("GetCourseList", "Course")' + '?IsGeneral=1',
+            ajaxConfig: "get",
+            ajaxContentType: "json",
+
+            ajaxResponse: function (url, params, response) {
+                driverTable.setMaxPage(response.last_page);
+                // //console.log("response.last_page", response.last_page);
+
+                dataLoadExpense = response.data;
+                ////console.log("dataLoadExpense abc:", dataLoadExpense);
+
+                return {
+
+                    data: dataLoadExpense,
+                    last_page: response.last_page,
+
+                };
+            },
+
+            columns: driverColumns,
+            dataBound: function () {
+                // Freeze the top 1 row (index 0) after the table is created
+                var rows = table.getRows();
+                if (rows.length > 0) {
+                    var cells = rows[0].getCells();
+                    cells.forEach(cell => {
+                        cell.freeze();
+                    });
+                }
+            },
+            ajaxURLGenerator: function (url, config, params) {
+                //return request url
+                let param = encodeURIComponent(JSON.stringify(params));
+                //console.log(param);
+                return url + "&searchquery=" + param; //encode parameters as a json object
+            },
+        });
+
+                function editCourse(id) {
+                    // Open the edit page in a new tab
+                    window.open(`/Course/Edit?id=${id}`, '_blank');
+                }
+
+                function deleteCourse(id) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var params = new URLSearchParams();
+                            params.append("id", id);
+
+                            fetch("@Url.Action("Delete", "Course")", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                                body: params
+                            })
+                                .then(response => {
+                                    if (response.ok) {
+                                        Swal.fire('Deleted!', 'Course has been deleted.', 'success')
+                                            .then(() => location.reload());
+                                    } else {
+                                        Swal.fire('Error!', 'There was a problem deleting the Course.', 'error');
+                                    }
+                                })
+                                .catch(error => Swal.fire('Error!', 'Unexpected error: ' + error, 'error'));
+                        }
+                    });
+                }
+        
+
+       
+
+        
+    </script>
+
+}
