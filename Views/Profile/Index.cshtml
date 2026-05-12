@@ -1,0 +1,172 @@
+@model Transport_Management_System.Models.User
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container py-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Sidebar Profile Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-body p-0">
+                    <div class="bg-primary py-5 text-center">
+                        <div class="avatar-xl bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 100px; height: 100px; font-size: 3rem; font-weight: bold;">
+                            @Model.UserName?.Substring(0, 1).ToUpper()
+                        </div>
+                        <h4 class="text-white fw-bold mb-0">@Model.UserName</h4>
+                        <span class="badge bg-white text-primary mt-2 rounded-pill">@(Model.Role?.RoleName ?? "User")</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item bg-transparent border-0 d-flex align-items-center mb-3">
+                                <i class="fa-solid fa-envelope text-primary me-3 fs-5"></i>
+                                <div>
+                                    <small class="text-muted d-block">Email</small>
+                                    <span class="fw-medium">@Model.Email</span>
+                                </div>
+                            </div>
+                            <div class="list-group-item bg-transparent border-0 d-flex align-items-center mb-3">
+                                <i class="fa-solid fa-calendar-check text-primary me-3 fs-5"></i>
+                                <div>
+                                    <small class="text-muted d-block">Member Since</small>
+                                    <span class="fw-medium">@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            </div>
+                            <div class="list-group-item bg-transparent border-0 d-flex align-items-center">
+                                <i class="fa-solid fa-clock-rotate-left text-primary me-3 fs-5"></i>
+                                <div>
+                                    <small class="text-muted d-block">Last Active</small>
+                                    <span class="fw-medium">@(Model.LastLogIN?.ToString("g") ?? "Never")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-pills nav-modern mb-4 bg-white p-2 rounded-4 shadow-sm" id="profileTabs" role="tablist">
+                <li class="nav-item flex-grow-1 text-center" role="presentation">
+                    <button class="nav-link active w-100 rounded-3 py-2 fw-bold" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab">
+                        <i class="fa-solid fa-user-gear me-2"></i>Personal Info
+                    </button>
+                </li>
+                <li class="nav-item flex-grow-1 text-center" role="presentation">
+                    <button class="nav-link w-100 rounded-3 py-2 fw-bold" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                        <i class="fa-solid fa-shield-halved me-2"></i>Security
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="profileTabsContent">
+                <!-- Personal Info Tab -->
+                <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4 p-md-5">
+                            <h5 class="fw-bold mb-4">Edit Personal Details</h5>
+                            <form asp-action="UpdateProfile">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" name="userName" class="form-control bg-light border-0" value="@Model.UserName" placeholder="Username" />
+                                            <label>Full Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" name="email" class="form-control bg-light border-0" value="@Model.Email" placeholder="Email" />
+                                            <label>Email Address</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea name="address" class="form-control bg-light border-0" style="height: 100px" placeholder="Address">@Model.Address</textarea>
+                                            <label>Physical Address</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary px-4 py-3 rounded-3 fw-bold mt-3">
+                                            <i class="fa-solid fa-floppy-disk me-2"></i>Update Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="tab-pane fade" id="security" role="tabpanel">
+                    <div class="card border-0 shadow-sm rounded-4 border-start border-4 border-warning">
+                        <div class="card-body p-4 p-md-5">
+                            <h5 class="fw-bold mb-1">Update Password</h5>
+                            <p class="text-muted small mb-4">Ensure your account is using a long, random password to stay secure.</p>
+                            
+                            <form asp-action="ChangePassword">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="password" name="currentPassword" class="form-control bg-light border-0" placeholder="Current Password" required />
+                                            <label>Current Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="password" name="newPassword" class="form-control bg-light border-0" placeholder="New Password" required />
+                                            <label>New Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="password" name="confirmPassword" class="form-control bg-light border-0" placeholder="Confirm Password" required />
+                                            <label>Confirm New Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-warning px-4 py-3 rounded-3 fw-bold mt-3 text-dark">
+                                            <i class="fa-solid fa-lock-open me-2"></i>Change My Password
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-modern .nav-link {
+        color: var(--bs-gray-600);
+        transition: all 0.3s ease;
+    }
+    .nav-modern .nav-link.active {
+        background-color: var(--bs-primary);
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+    }
+    .nav-modern .nav-link:hover:not(.active) {
+        background-color: var(--bs-gray-100);
+    }
+</style>

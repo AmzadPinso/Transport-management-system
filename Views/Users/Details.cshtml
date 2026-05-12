@@ -5,73 +5,92 @@
 }
 
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="mb-1">User Profile</h1>
-            <p class="text-muted">Viewing account details for <span class="fw-bold">@Model.UserName</span></p>
-        </div>
-        <div>
-            <a asp-action="Index" class="btn-modern btn-modern-secondary">
-                <i class="fa-solid fa-arrow-left"></i> Back to List
-            </a>
-        </div>
-    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-4 bg-dark d-flex align-items-center justify-content-center py-5">
+                            <div class="text-center text-white">
+                                <div class="avatar-xl bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem; font-weight: bold;">
+                                    @Model.UserName?.Substring(0, 1).ToUpper()
+                                </div>
+                                <h4 class="fw-bold mb-0">@Model.UserName</h4>
+                                @if (Model.Role != null)
+                                {
+                                    <span class="badge bg-primary mt-2 rounded-pill px-3">@Model.Role.RoleName</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-8 p-4 p-md-5">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <h2 class="fw-bold text-dark mb-1">Account Information</h2>
+                                    <p class="text-muted mb-0">Personal and system access details</p>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">User ID</small>
+                                    <span class="fw-bold text-primary">#@Model.UserId</span>
+                                </div>
+                            </div>
 
-    <div class="card-modern">
-        <div class="card-header-custom d-flex align-items-center justify-content-between">
-            <h5 class="mb-0">
-                <i class="fa-solid fa-user-gear me-2 text-primary"></i> Detailed Information
-            </h5>
-            @if (Model.Role != null)
-            {
-                var badgeClass = Model.Role.RoleName == "Admin" ? "badge-admin" : "badge-user";
-                <span class="badge-modern @badgeClass">
-                    <i class="fa-solid @(Model.Role.RoleName == "Admin" ? "fa-shield-halved" : "fa-user")"></i>
-                    @Model.Role.RoleName
-                </span>
-            }
-            else
-            {
-                <span class="badge-modern badge-default">No Role Assigned</span>
-            }
-        </div>
-        
-        <div class="card-body-custom">
-            <div class="row g-4">
-                <!-- User Basic Info -->
-                <div class="col-md-6">
-                    <div class="detail-item mb-4">
-                        <span class="detail-label"><i class="fa-solid fa-id-card"></i> User Name</span>
-                        <span class="detail-value">@Model.UserName</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label"><i class="fa-solid fa-envelope"></i> Email Address</span>
-                        <span class="detail-value">@Model.Email</span>
-                    </div>
-                </div>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3 h-100">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1"><i class="fa-solid fa-envelope me-2"></i>Email Address</small>
+                                        <p class="mb-0 text-dark fw-medium">@Model.Email</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3 h-100">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1"><i class="fa-solid fa-location-dot me-2"></i>Location</small>
+                                        <p class="mb-0 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Address) ? "Not Provided" : Model.Address)</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3 h-100">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1"><i class="fa-solid fa-clock-rotate-left me-2"></i>Last Login</small>
+                                        <p class="mb-0 text-dark fw-medium">@(Model.LastLogIN?.ToString("MMM dd, yyyy HH:mm") ?? "Never Logged In")</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3 h-100">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1"><i class="fa-solid fa-shield-halved me-2"></i>Security Role</small>
+                                        <p class="mb-0 text-dark fw-medium">@(Model.Role?.RoleName ?? "User")</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                <!-- User Additional Info -->
-                <div class="col-md-6">
-                    <div class="detail-item mb-4">
-                        <span class="detail-label"><i class="fa-solid fa-location-dot"></i> Physical Address</span>
-                        <span class="detail-value text-break">@(string.IsNullOrEmpty(Model.Address) ? "Not Provided" : Model.Address)</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label"><i class="fa-solid fa-clock-rotate-left"></i> Last Activity</span>
-                        <span class="detail-value">@(Model.LastLogIN?.ToString("MMM dd, yyyy HH:mm") ?? "Never")</span>
+                            <div class="mt-5 d-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm">
+                                    <i class="fa-solid fa-pen-to-square me-2"></i>Update Profile
+                                </a>
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-bold">
+                                    Back to Employees
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.UserId" class="btn btn-outline-danger px-4 py-2 rounded-3 fw-bold ms-auto">
+                                    <i class="fa-solid fa-trash me-2"></i>Delete
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <hr class="my-4 border-light">
-
-            <div class="d-flex gap-2">
-                <a asp-action="Edit" asp-route-id="@Model?.UserId" class="btn-modern btn-modern-primary">
-                    <i class="fa-solid fa-pen-to-square"></i> Edit Profile
-                </a>
-                <a asp-action="Delete" asp-route-id="@Model?.UserId" class="btn-modern btn-modern-danger">
-                    <i class="fa-solid fa-trash"></i> Remove User
-                </a>
+            <!-- Activity Card -->
+            <div class="card border-0 shadow-sm rounded-4 border-start border-4 border-primary">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fa-solid fa-user-check text-primary display-6"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-4">
+                            <h5 class="fw-bold text-dark mb-1">Account Active</h5>
+                            <p class="text-muted mb-0">This employee account is fully verified and has active access to the @(Model.Role?.RoleName == "Admin" ? "Administrative" : "Standard") portal.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

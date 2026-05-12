@@ -10,41 +10,54 @@
     int totalPages = ViewBag.TotalPages;
 }
 
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-5">
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h2 mb-1">User Management</h1>
-            <p class="text-muted small mb-0">System access control and user administration dashboard.</p>
+            <h1 class="h3 fw-bold mb-1">User Management</h1>
+            <p class="text-muted small mb-0">System access control and user administration.</p>
         </div>
-        <a asp-action="Create" class="btn-modern btn-modern-primary btn-modern-sm shadow-sm">
-            <i class="fa-solid fa-user-plus"></i> Create New User
+        <a asp-action="Create" class="btn-modern btn-modern-primary shadow-sm">
+            <i class="fa-solid fa-user-plus"></i> <span>Create New User</span>
         </a>
     </div>
 
-    <!-- Compact Search Section -->
-    <div class="search-card-compact p-3">
-        <form asp-action="Index" method="get" class="d-flex gap-2">
-            <div class="search-input-group flex-grow-1">
-                <i class="fa-solid fa-magnifying-glass search-icon-inside"></i>
-                <input type="text" name="search" value="@search" 
-                       class="form-control form-control-search" 
-                       placeholder="Search name, email or address..." />
-            </div>
-            <button type="submit" class="btn-modern btn-modern-primary btn-search-apply px-4">
-                <i class="fa-solid fa-filter me-1"></i> Apply
-            </button>
-            @if (!string.IsNullOrEmpty(search))
-            {
-                <a asp-action="Index" class="btn-modern btn-modern-secondary btn-search-apply px-3">
-                    <i class="fa-solid fa-xmark"></i>
-                </a>
-            }
-        </form>
+    <!-- Integrated Search Section -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                <div class="col-lg-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="search" value="@search" 
+                               class="form-control bg-light border-0 ps-0" 
+                               placeholder="Search name, email or address..." />
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <select name="roleId" class="form-select bg-light border-0" asp-items="ViewBag.RoleId">
+                        <option value="">All Roles</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 rounded-3">
+                        <i class="fa-solid fa-filter me-2"></i>Apply Filters
+                    </button>
+                    @if (!string.IsNullOrEmpty(search) || ViewBag.SelectedRoleId != null)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3 rounded-3" title="Clear Filters">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Table Section -->
-    <div class="table-container">
-        <table class="table table-modern mb-0">
+    <div class="table-container animate-fade-in-up">
+        <table class="table table-modern">
             <thead>
                 <tr>
                     <th>
@@ -67,23 +80,30 @@
                 {
                     <tr>
                         <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-folder-open d-block fs-2 mb-2 opacity-50"></i>
-                            No users match your search criteria.
+                            <i class="fa-solid fa-user-slash d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No users found matching your criteria.</p>
                         </td>
                     </tr>
                 }
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="fw-bold">@item.UserName</td>
-                        <td class="text-secondary">@item.Email</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    @item.UserName?.Substring(0, 1).ToUpper()
+                                </div>
+                                <span class="fw-bold">@item.UserName</span>
+                            </div>
+                        </td>
+                        <td class="text-muted">@item.Email</td>
                         <td>
                             @{
                                 var roleName = item.Role?.RoleName ?? "No Role";
-                                var badgeClass = roleName == "Admin" ? "badge-admin" : (roleName == "User" ? "badge-user" : "badge-default");
+                                var badgeClass = roleName == "Admin" ? "bg-primary-subtle text-primary" : "bg-secondary-subtle text-secondary";
                             }
-                            <span class="badge-modern @badgeClass">
-                                <i class="fa-solid @(roleName == "Admin" ? "fa-shield-halved" : "fa-user")"></i>
+                            <span class="badge rounded-pill @badgeClass px-3 py-2 border-0">
+                                <i class="fa-solid @(roleName == "Admin" ? "fa-shield-halved" : "fa-user") me-1"></i>
                                 @roleName
                             </span>
                         </td>
@@ -92,14 +112,14 @@
                         </td>
                         <td class="text-end">
                             <div class="d-flex justify-content-end gap-2">
-                                <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-warning rounded-pill" title="Edit">
-                                    <i class="fa-solid fa-pen"></i>
+                                <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-                                <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-info rounded-pill" title="Details">
-                                    <i class="fa-solid fa-eye"></i>
+                                <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-info border-0 rounded-circle p-2" title="View Details">
+                                    <i class="fa-solid fa-circle-info"></i>
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete">
-                                    <i class="fa-solid fa-trash"></i>
+                                <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" title="Delete">
+                                    <i class="fa-solid fa-trash-can"></i>
                                 </a>
                             </div>
                         </td>
@@ -109,27 +129,27 @@
         </table>
     </div>
 
-    <!-- Pagination -->
+    <!-- Modern Pagination -->
     @if (totalPages > 1)
     {
         <div class="d-flex justify-content-center mt-4">
             <nav>
-                <ul class="pagination">
+                <ul class="pagination pagination-modern gap-2">
                     <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
-                        <a class="page-link border-0 rounded-start shadow-sm" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)" asp-route-search="@search" asp-route-sortColumn="@sortColumn" asp-route-sortDirection="@sortDirection">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)" asp-route-search="@search" asp-route-sortColumn="@sortColumn" asp-route-sortDirection="@sortDirection">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                     </li>
                     
                     @for (int i = 1; i <= totalPages; i++)
                     {
-                        <li class="page-item mx-1">
-                            <a class="page-link border-0 shadow-sm rounded @(i == pageNumber ? "bg-primary text-white" : "bg-white text-dark")" asp-action="Index" asp-route-pageNumber="@i" asp-route-search="@search" asp-route-sortColumn="@sortColumn" asp-route-sortDirection="@sortDirection">@i</a>
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle @(i == pageNumber ? "bg-primary text-white" : "bg-white text-dark")" asp-action="Index" asp-route-pageNumber="@i" asp-route-search="@search" asp-route-sortColumn="@sortColumn" asp-route-sortDirection="@sortDirection">@i</a>
                         </li>
                     }
 
                     <li class="page-item @(pageNumber == totalPages ? "disabled" : "")">
-                        <a class="page-link border-0 rounded-end shadow-sm" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)" asp-route-search="@search" asp-route-sortColumn="@sortColumn" asp-route-sortDirection="@sortDirection">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)" asp-route-search="@search" asp-route-sortColumn="@sortColumn" asp-route-sortDirection="@sortDirection">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                     </li>

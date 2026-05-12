@@ -6,6 +6,7 @@ namespace Transport_Management_System.Repository.Interface
     {
         Task<(IEnumerable<User>, int)> GetUsersPagedAsync(
             string? search,
+            int? roleId,
             int pageNumber,
             int pageSize,
             string sortColumn,

@@ -1,48 +1,118 @@
 @model Transport_Management_System.Models.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Login";
+    Layout = null; // Use a clean layout for auth pages
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm mt-5">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Login</h2>
-                
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success">
-                        @TempData["SuccessMessage"]
-                    </div>
-                }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - TMS PRO</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .auth-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .form-control-auth {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            padding: 0.8rem 1.2rem;
+            border-radius: 0.75rem;
+        }
+        .form-control-auth:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+        .form-label-auth {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card animate-fade-in">
+        <div class="auth-logo">
+            <i class="fa-solid fa-truck-ramp-box me-2"></i>TMS PRO
+        </div>
+        
+        <h4 class="text-white fw-bold mb-1 text-center">Welcome Back</h4>
+        <p class="text-muted text-center mb-4 small">Enter your credentials to access your dashboard</p>
 
-                <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                </form>
-                <div class="mt-3 text-center">
-                    <p>Don't have an account? <a asp-action="Register">Register here</a></p>
-                </div>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success bg-success-subtle border-0 small text-success">
+                @TempData["SuccessMessage"]
             </div>
+        }
+
+        <form asp-action="Login" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+            
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label-auth"></label>
+                <div class="position-relative">
+                    <i class="fa-solid fa-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input asp-for="Email" type="email" class="form-control form-control-auth ps-5" placeholder="name@company.com" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger x-small"></span>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <label asp-for="Password" class="form-label-auth mb-1"></label>
+                    <a href="#" class="x-small text-primary text-decoration-none fw-bold">Forgot Password?</a>
+                </div>
+                <div class="position-relative">
+                    <i class="fa-solid fa-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input asp-for="Password" type="password" class="form-control form-control-auth ps-5" placeholder="••••••••" />
+                </div>
+                <span asp-validation-for="Password" class="text-danger x-small"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Sign In <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-4 text-center">
+            <p class="text-muted small mb-0">New to the platform? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Create Account</a></p>
         </div>
     </div>
-</div>
 
-@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+</body>
+</html>

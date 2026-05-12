@@ -34,5 +34,8 @@ namespace Transport_Management_System.Models
 
         [Display(Name = "Last LogIN")]
         public DateTime? LastLogIN { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
 }

@@ -1,0 +1,103 @@
+@model Transport_Management_System.Models.Vehicle
+
+@{
+    ViewData["Title"] = "Vehicle Details";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-4 bg-primary d-flex align-items-center justify-content-center py-5">
+                            <div class="text-center text-white">
+                                <div class="display-1 mb-3">
+                                    @if (Model.VehicleType == VehicleType.Bus || Model.VehicleType == VehicleType.MiniBus) { <i class="fa-solid fa-bus"></i> }
+                                    else if (Model.VehicleType == VehicleType.Truck) { <i class="fa-solid fa-truck"></i> }
+                                    else { <i class="fa-solid fa-car"></i> }
+                                </div>
+                                <h4 class="fw-bold mb-0">@Model.VehicleType</h4>
+                                <span class="badge bg-white text-primary mt-2 rounded-pill">ID: #@Model.VehicleId</span>
+                            </div>
+                        </div>
+                        <div class="col-md-8 p-4 p-md-5">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <h1 class="fw-bold text-dark mb-1">@Model.VehicleName</h1>
+                                    <p class="text-muted fs-5 mb-0">License Plate: <span class="text-primary fw-bold">@Model.VehicleNumber</span></p>
+                                </div>
+                                <div>
+                                    @switch (Model.Status)
+                                    {
+                                        case VehicleStatus.Active:
+                                            <span class="badge bg-success px-3 py-2 rounded-pill fs-6"><i class="fa-solid fa-circle-check me-2"></i>Active</span>
+                                            break;
+                                        case VehicleStatus.InMaintenance:
+                                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-6"><i class="fa-solid fa-screwdriver-wrench me-2"></i>Maintenance</span>
+                                            break;
+                                        case VehicleStatus.OutOfService:
+                                            <span class="badge bg-danger px-3 py-2 rounded-pill fs-6"><i class="fa-solid fa-circle-xmark me-2"></i>Offline</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-sm-6">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1">Passenger Capacity</small>
+                                        <h4 class="mb-0 text-dark">@Model.Capacity <small class="fs-6">Units</small></h4>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1">Last Service Date</small>
+                                        <h4 class="mb-0 text-dark">@Model.LastServiceDate.ToString("MMM dd, yyyy")</h4>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1">Registered On</small>
+                                        <p class="mb-0 text-dark fw-medium">@Model.CreatedAt.ToString("f")</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <small class="text-muted text-uppercase fw-bold d-block mb-1">Last Updated</small>
+                                        <p class="mb-0 text-dark fw-medium">@Model.UpdatedAt.ToString("f")</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 d-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@Model.VehicleId" class="btn btn-primary px-4 py-2 rounded-3 fw-bold">
+                                    <i class="fa-solid fa-pen-to-square me-2"></i>Edit Profile
+                                </a>
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-bold">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Future placeholder for Trip History or Maintenance Logs -->
+            <div class="card border-0 shadow-sm rounded-4 border-start border-4 border-info">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fa-solid fa-circle-info text-info display-6"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-4">
+                            <h5 class="fw-bold text-dark mb-1">Coming Soon: Trip History</h5>
+                            <p class="text-muted mb-0">Detailed logs of all trips made by this vehicle will appear here once the Trip Management module is implemented in Week 4.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

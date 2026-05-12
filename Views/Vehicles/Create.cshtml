@@ -1,0 +1,89 @@
+@model Transport_Management_System.Models.Vehicle
+
+@{
+    ViewData["Title"] = "Add New Vehicle";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary py-4 text-center">
+                    <h3 class="text-white fw-bold mb-0">
+                        <i class="fa-solid fa-truck-fast me-2"></i>Register New Vehicle
+                    </h3>
+                    <p class="text-white-50 mb-0">Enter the vehicle details to add it to the fleet</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3" role="alert"></div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="VehicleName" class="form-control bg-light border-0" placeholder="e.g. Express Bus" />
+                                    <label asp-for="VehicleName"></label>
+                                    <span asp-validation-for="VehicleName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="VehicleNumber" class="form-control bg-light border-0" placeholder="e.g. ABC-1234" />
+                                    <label asp-for="VehicleNumber"></label>
+                                    <span asp-validation-for="VehicleNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="VehicleType" class="form-select bg-light border-0" asp-items="Html.GetEnumSelectList<VehicleType>()">
+                                        <option value="">Select Type</option>
+                                    </select>
+                                    <label asp-for="VehicleType"></label>
+                                    <span asp-validation-for="VehicleType" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Capacity" class="form-control bg-light border-0" placeholder="Number of seats/weight" />
+                                    <label asp-for="Capacity"></label>
+                                    <span asp-validation-for="Capacity" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="Status" class="form-select bg-light border-0" asp-items="Html.GetEnumSelectList<VehicleStatus>()"></select>
+                                    <label asp-for="Status"></label>
+                                    <span asp-validation-for="Status" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="LastServiceDate" class="form-control bg-light border-0" type="date" />
+                                    <label asp-for="LastServiceDate"></label>
+                                    <span asp-validation-for="LastServiceDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-5 opacity-10">
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary px-5 py-3 rounded-3 shadow-sm flex-grow-1 fw-bold">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Save Vehicle
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 py-3 rounded-3 fw-bold">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

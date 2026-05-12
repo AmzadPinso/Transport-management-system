@@ -137,4 +137,4 @@ C:\Users\amzad\source\repos\Transport Management System\Transport Management Sys
 C:\Users\amzad\source\repos\Transport Management System\Transport Management System\obj\Debug\net8.0\Transport Management System.pdb
 C:\Users\amzad\source\repos\Transport Management System\Transport Management System\obj\Debug\net8.0\Transport Management System.genruntimeconfig.cache
 C:\Users\amzad\source\repos\Transport Management System\Transport Management System\obj\Debug\net8.0\ref\Transport Management System.dll
-C:\Users\amzad\source\repos\Transport Management System\Transport Management System\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\amzad\source\repos\Transport Management System\Transport Management System\obj\Debug\net8.0\Transport Management System.sourcelink.json

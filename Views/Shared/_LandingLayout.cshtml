@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TMS PRO</title>
+    
+    <!-- CSS Bundles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icon Sets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- Custom Design System -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="landing-page">
+    <nav class="landing-nav">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="/" class="landing-brand">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+                <span>TMS PRO</span>
+            </a>
+            <div class="nav-links d-none d-md-flex gap-4 align-items-center">
+                <a href="#features" class="nav-link-landing">Features</a>
+                <a href="#about" class="nav-link-landing">About</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Dashboard" asp-action="Index" class="btn-landing-primary">Dashboard</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="nav-link-landing">Login</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn-landing-primary">Register</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="landing-footer">
+        <div class="container text-center py-5">
+            <div class="mb-4">
+                <a href="/" class="landing-brand justify-content-center">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                    <span>TMS PRO</span>
+                </a>
+            </div>
+            <p class="text-muted mb-4">Empowering global logistics with smart tracking and coordination.</p>
+            <div class="d-flex justify-content-center gap-4 mb-4">
+                <a href="#" class="text-muted"><i class="fa-brands fa-twitter fs-4"></i></a>
+                <a href="#" class="text-muted"><i class="fa-brands fa-linkedin fs-4"></i></a>
+                <a href="#" class="text-muted"><i class="fa-brands fa-github fs-4"></i></a>
+            </div>
+            <div class="border-top pt-4">
+                <p class="text-muted small mb-0">&copy; 2026 TMS PRO. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -25,12 +25,14 @@ namespace Transport_Management_System.Repository.Application
 
         public async Task<(IEnumerable<User>, int)> GetUsersPagedAsync(
             string? search,
+            int? roleId,
             int pageNumber,
             int pageSize,
             string sortColumn,
             string sortDirection)
         {
             var searchParam = new SqlParameter("@Search", search ?? (object)DBNull.Value);
+            var roleParam = new SqlParameter("@RoleId", roleId ?? (object)DBNull.Value);
             var pageParam = new SqlParameter("@PageNumber", pageNumber);
             var sizeParam = new SqlParameter("@PageSize", pageSize);
             var sortColumnParam = new SqlParameter("@SortColumn", sortColumn ?? "UserId");
@@ -44,11 +46,9 @@ namespace Transport_Management_System.Repository.Application
             };
 
             // Using FromSqlRaw to execute the stored procedure
-            // Note: EF Core requires the returned entity type to be tracked or AsNoTracking
-            // We need to ensure the stored procedure returns all columns of User entity (and ideally Role info via JOIN if we want it)
             var data = await _context.Users
-                .FromSqlRaw("EXEC dbo.GetUsersPagedWithSearch @PageNumber, @PageSize, @Search, @SortColumn, @SortDirection, @TotalRecords OUTPUT",
-                    pageParam, sizeParam, searchParam, sortColumnParam, sortDirectionParam, totalParam)
+                .FromSqlRaw("EXEC dbo.GetUsersPagedWithSearch @PageNumber, @PageSize, @Search, @RoleId, @SortColumn, @SortDirection, @TotalRecords OUTPUT",
+                    pageParam, sizeParam, searchParam, roleParam, sortColumnParam, sortDirectionParam, totalParam)
                 .AsNoTracking()
                 .ToListAsync();
 

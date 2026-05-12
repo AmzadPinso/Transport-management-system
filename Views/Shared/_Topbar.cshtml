@@ -1,0 +1,78 @@
+<header class="topbar">
+    <div class="topbar-left">
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+        <div class="search-wrapper d-none d-md-block">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search for shipments, drivers, routes...">
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <button id="theme-toggle" class="topbar-btn" title="Toggle Dark/Light Mode">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+        
+        <div class="dropdown">
+            <button class="topbar-btn position-relative" data-bs-toggle="dropdown">
+                <i class="fa-solid fa-bell"></i>
+                <span class="notification-dot"></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end card-modern p-0 shadow-lg border-0 mt-2" style="width: 320px;">
+                <div class="card-header-modern bg-primary text-white py-3">
+                    <h6 class="mb-0">Notifications</h6>
+                </div>
+                <div class="card-body-modern p-0" style="max-height: 300px; overflow-y: auto;">
+                    <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-start gap-3">
+                        <div class="bg-success-subtle text-success rounded-circle p-2">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1 small fw-bold text-main">Vehicle VR-402 Arrived</p>
+                            <p class="mb-0 x-small text-muted">2 minutes ago</p>
+                        </div>
+                    </a>
+                    <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-start gap-3">
+                        <div class="bg-warning-subtle text-warning rounded-circle p-2">
+                            <i class="fa-solid fa-gas-pump"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1 small fw-bold text-main">Fuel Alert: Truck B-50</p>
+                            <p class="mb-0 x-small text-muted">45 minutes ago</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="p-2 text-center border-top">
+                    <a href="#" class="small text-primary fw-bold text-decoration-none">View All Notifications</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <a href="#" class="user-profile" data-bs-toggle="dropdown">
+                <div class="user-avatar">
+                    @(User.Identity.IsAuthenticated ? User.Identity.Name?.Substring(0, 1).ToUpper() : "G")
+                </div>
+                <div class="user-info d-none d-lg-flex">
+                    <span class="user-name">@(User.Identity.IsAuthenticated ? User.Identity.Name : "Guest")</span>
+                    <span class="user-role">@(User.IsInRole("Admin") ? "System Admin" : "User")</span>
+                </div>
+                <i class="fa-solid fa-chevron-down ms-2 small text-muted"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end card-modern shadow-lg border-0 mt-2 p-2">
+                <li><a class="dropdown-item rounded-2 py-2" asp-controller="Profile" asp-action="Index"><i class="fa-solid fa-user-circle me-2"></i>My Profile</a></li>
+                <li><a class="dropdown-item rounded-2 py-2" href="#"><i class="fa-solid fa-cog me-2"></i>Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li><a class="dropdown-item rounded-2 py-2 text-danger" asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+                }
+                else
+                {
+                    <li><a class="dropdown-item rounded-2 py-2" asp-controller="Account" asp-action="Login"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</header>

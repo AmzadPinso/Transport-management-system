@@ -1,0 +1,39 @@
+@model Transport_Management_System.Models.Role
+
+@{
+    ViewData["Title"] = "Delete Role";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="fa-solid fa-shield-halved text-danger display-1 opacity-25"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-3">Delete Role?</h2>
+                    <p class="text-muted fs-5 mb-4">
+                        Are you sure you want to remove the <span class="text-danger fw-bold">@Model.RoleName</span> role?
+                    </p>
+                    
+                    <div class="alert alert-warning rounded-3 text-start small mb-4">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>Warning: Deleting a role that is currently assigned to users may cause system access issues.
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger py-3 rounded-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-trash-can me-2"></i>Yes, Delete Role
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary py-3 rounded-3 fw-bold">
+                                No, Keep Role
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

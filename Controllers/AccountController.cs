@@ -50,7 +50,9 @@ namespace Transport_Management_System.Controllers
                     UserName = model.UserName,
                     Email = model.Email,
                     Address = model.Address,
-                    RoleId = 2 // Hardcoded "User" role ID from AppDbContext seed data
+                    RoleId = 2, // Hardcoded "User" role ID from AppDbContext seed data
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
 
                 // Hash password

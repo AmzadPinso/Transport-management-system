@@ -1,0 +1,80 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <a asp-controller="Dashboard" asp-action="Index" class="sidebar-brand">
+            <i class="fa-solid fa-truck-ramp-box"></i>
+            <span>TMS PRO</span>
+        </a>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="nav-group-label">Navigation</div>
+        <a href="/" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Home Section</span>
+        </a>
+        <a asp-controller="Dashboard" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="nav-group-label">Operations</div>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-truck-moving"></i>
+            <span>Fleet</span>
+        </a>
+        <a asp-controller="Roles" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Roles" ? "active" : "")">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Role Management</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-id-card"></i>
+            <span>Drivers</span>
+        </a>
+        <a asp-controller="Vehicles" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vehicles" ? "active" : "")">
+            <i class="fa-solid fa-car-side"></i>
+            <span>Vehicles</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-box-archive"></i>
+            <span>Shipments</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-route"></i>
+            <span>Routes</span>
+        </a>
+
+        <div class="nav-group-label">Management</div>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+            <span>Maintenance</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-gas-pump"></i>
+            <span>Fuel Tracking</span>
+        </a>
+        <a asp-controller="Users" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")">
+            <i class="fa-solid fa-users"></i>
+            <span>Employees</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Bookings</span>
+        </a>
+
+        <div class="nav-group-label">Insights</div>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-file-contract"></i>
+            <span>Reports</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Analytics</span>
+        </a>
+
+        <div class="nav-group-label">System</div>
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-gears"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+</aside>

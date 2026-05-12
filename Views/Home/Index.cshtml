@@ -1,5 +1,6 @@
 @{
     ViewData["Title"] = "Modern Transport Management";
+    Layout = "_LandingLayout";
 }
 
 <div class="hero-section">
@@ -13,28 +14,37 @@
                     efficient routing, and seamless user coordination. Elevate your business efficiency today.
                 </p>
                 <div class="cta-group animate-fade-in-up delay-3">
-                    <a asp-controller="Account" asp-action="Register" class="btn-cta-primary">
-                        Get Started <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                    <a asp-controller="Account" asp-action="Login" class="btn-cta-secondary">
-                        Login to Dashboard
-                    </a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Dashboard" asp-action="Index" class="btn-cta-primary">
+                            Go to Dashboard <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" class="btn-cta-primary">
+                            Get Started <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a asp-controller="Account" asp-action="Login" class="btn-cta-secondary">
+                            Member Login
+                        </a>
+                    }
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="hero-illustration animate-fade-in-up delay-2">
-                    <img src="~/images/hero-illustration.png" alt="Logistics Illustration" />
+                    <img src="~/images/hero-illustration.png" alt="Logistics Illustration" class="img-fluid" />
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<section class="features-section">
+<section id="features" class="features-section py-5">
     <div class="container">
-        <div class="section-title text-center mb-5">
+        <div class="section-title text-center mb-5 animate-fade-in-up">
             <span class="section-tag">Key Modules</span>
-            <h2>Powerful Features for Modern Logistics</h2>
+            <h2 class="fw-bold">Powerful Features for Modern Logistics</h2>
             <p class="text-muted mx-auto" style="max-width: 550px; font-size: 0.95rem;">
                 Everything you need to manage your fleet, track routes, and coordinate teams in one unified platform.
             </p>
@@ -42,59 +52,59 @@
         
         <div class="row g-4">
             <!-- Vehicle Management -->
-            <div class="col-md-4">
-                <div class="feature-card-premium">
-                    <div class="feature-icon-wrapper">
+            <div class="col-md-4 animate-fade-in-up delay-1">
+                <div class="card-modern p-4 text-center h-100">
+                    <div class="mb-4 text-primary fs-1">
                         <i class="fa-solid fa-truck-fast"></i>
                     </div>
-                    <h3>Vehicle Management</h3>
-                    <p>Track maintenance, fuel efficiency, and fleet status with real-time updates and automated alerts.</p>
+                    <h4 class="fw-bold">Vehicle Management</h4>
+                    <p class="text-muted small">Track maintenance, fuel efficiency, and fleet status with real-time updates and automated alerts.</p>
                 </div>
             </div>
 
             <!-- Route Tracking -->
-            <div class="col-md-4">
-                <div class="feature-card-premium">
-                    <div class="feature-icon-wrapper">
+            <div class="col-md-4 animate-fade-in-up delay-2">
+                <div class="card-modern p-4 text-center h-100">
+                    <div class="mb-4 text-secondary fs-1">
                         <i class="fa-solid fa-map-location-dot"></i>
                     </div>
-                    <h3>Route Tracking</h3>
-                    <p>Optimize delivery paths, reduce transit times, and monitor real-time vehicle locations on interactive maps.</p>
+                    <h4 class="fw-bold">Route Tracking</h4>
+                    <p class="text-muted small">Optimize delivery paths, reduce transit times, and monitor real-time vehicle locations on interactive maps.</p>
                 </div>
             </div>
 
             <!-- User Management -->
-            <div class="col-md-4">
-                <div class="feature-card-premium">
-                    <div class="feature-icon-wrapper">
+            <div class="col-md-4 animate-fade-in-up delay-3">
+                <div class="card-modern p-4 text-center h-100">
+                    <div class="mb-4 text-accent fs-1">
                         <i class="fa-solid fa-users-gear"></i>
                     </div>
-                    <h3>User Management</h3>
-                    <p>Assign roles, manage driver schedules, and coordinate team members with a secure, centralized dashboard.</p>
+                    <h4 class="fw-bold">User Management</h4>
+                    <p class="text-muted small">Assign roles, manage driver schedules, and coordinate team members with a secure, centralized dashboard.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="stats-section text-center">
+<section class="stats-section text-center py-5 bg-main">
     <div class="container">
         <div class="row g-4">
-            <div class="col-md-3 stat-item">
-                <h2>500+</h2>
-                <p>Vehicles Tracked</p>
+            <div class="col-md-3">
+                <h2 class="fw-bold text-primary">500+</h2>
+                <p class="text-muted small">Vehicles Tracked</p>
             </div>
-            <div class="col-md-3 stat-item">
-                <h2>1.2M</h2>
-                <p>Miles Optimized</p>
+            <div class="col-md-3">
+                <h2 class="fw-bold text-primary">1.2M</h2>
+                <p class="text-muted small">Miles Optimized</p>
             </div>
-            <div class="col-md-3 stat-item">
-                <h2>99.9%</h2>
-                <p>Uptime Guaranteed</p>
+            <div class="col-md-3">
+                <h2 class="fw-bold text-primary">99.9%</h2>
+                <p class="text-muted small">Uptime Guaranteed</p>
             </div>
-            <div class="col-md-3 stat-item">
-                <h2>24/7</h2>
-                <p>Support Ready</p>
+            <div class="col-md-3">
+                <h2 class="fw-bold text-primary">24/7</h2>
+                <p class="text-muted small">Support Ready</p>
             </div>
         </div>
     </div>

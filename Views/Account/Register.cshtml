@@ -1,60 +1,140 @@
 @model Transport_Management_System.Models.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Register";
+    Layout = null; // Clean layout for auth
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm mt-5">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Register</h2>
-                
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
-                    <div class="mb-3">
-                        <label asp-for="UserName" class="form-label"></label>
-                        <input asp-for="UserName" class="form-control" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - TMS PRO</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 2rem 0;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 550px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .auth-logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-control-auth {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            padding: 0.7rem 1.2rem;
+            border-radius: 0.75rem;
+        }
+        .form-control-auth:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+        .form-label-auth {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card animate-fade-in">
+        <div class="auth-logo">
+            <i class="fa-solid fa-truck-ramp-box me-2"></i>TMS PRO
+        </div>
+        
+        <h4 class="text-white fw-bold mb-1 text-center">Create Account</h4>
+        <p class="text-muted text-center mb-4 small">Join the enterprise logistics platform</p>
 
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+            
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label asp-for="UserName" class="form-label-auth mb-1"></label>
+                    <div class="position-relative">
+                        <i class="fa-solid fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input asp-for="UserName" class="form-control form-control-auth ps-5" placeholder="johndoe" />
                     </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Address" class="form-label"></label>
-                        <textarea asp-for="Address" class="form-control" rows="2"></textarea>
-                        <span asp-validation-for="Address" class="text-danger"></span>
-                    </div>
-
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </div>
-                </form>
-                <div class="mt-3 text-center">
-                    <p>Already have an account? <a asp-action="Login">Login here</a></p>
+                    <span asp-validation-for="UserName" class="text-danger x-small"></span>
                 </div>
             </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label-auth mb-1"></label>
+                <div class="position-relative">
+                    <i class="fa-solid fa-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input asp-for="Email" type="email" class="form-control form-control-auth ps-5" placeholder="name@company.com" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger x-small"></span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Password" class="form-label-auth mb-1"></label>
+                    <div class="position-relative">
+                        <i class="fa-solid fa-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input asp-for="Password" type="password" class="form-control form-control-auth ps-5" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger x-small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ConfirmPassword" class="form-label-auth mb-1"></label>
+                    <div class="position-relative">
+                        <i class="fa-solid fa-shield-check position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control form-control-auth ps-5" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger x-small"></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Address" class="form-label-auth mb-1"></label>
+                <div class="position-relative">
+                    <i class="fa-solid fa-location-dot position-absolute top-0 start-0 mt-3 ms-3 text-muted"></i>
+                    <textarea asp-for="Address" class="form-control form-control-auth ps-5" rows="2" placeholder="Company address"></textarea>
+                </div>
+                <span asp-validation-for="Address" class="text-danger x-small"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Create Account <i class="fa-solid fa-circle-check ms-2"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-4 text-center">
+            <p class="text-muted small mb-0">Already have an account? <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Sign In</a></p>
         </div>
     </div>
-</div>
 
-@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+</body>
+</html>

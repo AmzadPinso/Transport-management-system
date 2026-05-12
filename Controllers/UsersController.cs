@@ -25,12 +25,16 @@ namespace Transport_Management_System.Controllers
         // GET: Users
         public async Task<IActionResult> Index(
             string? search,
+            int? roleId,
             int pageNumber = 1,
             int pageSize = 10,
             string sortColumn = "UserId",
             string sortDirection = "ASC")
         {
-            var (users, totalRecords) = await _userRepo.GetUsersPagedAsync(search, pageNumber, pageSize, sortColumn, sortDirection);
+            var (users, totalRecords) = await _userRepo.GetUsersPagedAsync(search, roleId, pageNumber, pageSize, sortColumn, sortDirection);
+
+            ViewBag.RoleId = new SelectList(await _roleRepo.GetAllAsync(), "Id", "RoleName", roleId);
+            ViewBag.SelectedRoleId = roleId;
 
             ViewBag.Search = search;
             ViewBag.PageNumber = pageNumber;
@@ -116,12 +120,9 @@ namespace Transport_Management_System.Controllers
                     existingUser.Email = user.Email;
                     existingUser.Address = user.Address;
                     existingUser.RoleId = user.RoleId;
+                    existingUser.UpdatedAt = DateTime.Now;
 
-                    // 3. Handle password update securely
-                    if (!string.IsNullOrEmpty(NewPassword))
-                    {
-                        existingUser.PasswordHash = _passwordHasher.HashPassword(existingUser, NewPassword);
-                    }
+                    existingUser.UpdatedAt = DateTime.Now;
 
                     // 4. Save changes (EF will detect modifications on 'existingUser')
                     await _userRepo.SaveAsync();
