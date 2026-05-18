@@ -47,7 +47,7 @@ namespace Transport_Management_System.Models
 
         [Display(Name = "Assigned Vehicle")]
         public int? AssignedVehicleId { get; set; }
-
+             //dhoin
         [ForeignKey("AssignedVehicleId")]
         public Vehicle? AssignedVehicle { get; set; }
 //shamserHeda
