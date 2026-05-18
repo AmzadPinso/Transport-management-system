@@ -1,0 +1,47 @@
+@model Transport_Management_System.Models.Driver
+
+@{
+    ViewData["Title"] = "Delete Driver";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="fa-solid fa-id-card text-danger display-1 opacity-25"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-3">Remove Driver?</h2>
+                    <p class="text-muted fs-5 mb-4">
+                        Are you sure you want to permanently remove <span class="text-danger fw-bold">@Model.FullName</span> from the system?
+                    </p>
+                    
+                    <div class="alert alert-danger bg-danger-subtle text-danger border-0 rounded-3 text-start small mb-4 p-4">
+                        <h6 class="fw-bold mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i>Warning</h6>
+                        <ul class="mb-0 ps-3">
+                            <li>This action cannot be undone.</li>
+                            <li>All history related to this driver will be permanently lost.</li>
+                            @if(Model.AssignedVehicleId != null)
+                            {
+                                <li class="fw-bold mt-2">Vehicle @Model.AssignedVehicle?.VehicleNumber will become unassigned.</li>
+                            }
+                        </ul>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="DriverId" />
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-danger py-3 px-4 rounded-3 fw-bold flex-grow-1 shadow-sm">
+                                <i class="fa-solid fa-trash-can me-2"></i>Yes, Remove Driver
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary py-3 px-4 rounded-3 fw-bold flex-grow-1">
+                                No, Keep Driver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

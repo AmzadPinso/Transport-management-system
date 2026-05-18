@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register Repositories
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
 // Configure Authentication

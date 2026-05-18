@@ -38,6 +38,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/amzad/source/repos/Transport Management System/Transport Management System/Views/Drivers/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/amzad/source/repos/Transport Management System/Transport Management System/Views/Drivers/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyc1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/amzad/source/repos/Transport Management System/Transport Management System/Views/Drivers/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/amzad/source/repos/Transport Management System/Transport Management System/Views/Drivers/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyc1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/amzad/source/repos/Transport Management System/Transport Management System/Views/Drivers/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/amzad/source/repos/Transport Management System/Transport Management System/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

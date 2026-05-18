@@ -1,0 +1,133 @@
+@model Transport_Management_System.Models.Driver
+@using Transport_Management_System.Models
+
+@{
+    ViewData["Title"] = "Register Driver";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-primary py-4 text-center">
+                    <h3 class="text-white fw-bold mb-0">
+                        <i class="fa-solid fa-id-card me-2"></i>Register New Driver
+                    </h3>
+                    <p class="text-white-50 mb-0">Enter the details to add a new driver to the fleet</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3" role="alert"></div>
+
+                        <div class="row g-4">
+                            <!-- Personal Info Section -->
+                            <div class="col-md-12">
+                                <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">
+                                    <i class="fa-solid fa-user me-2"></i>Personal Information
+                                </h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="FullName" class="form-control bg-light border-0" placeholder="Full Name" />
+                                    <label asp-for="FullName"></label>
+                                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="PhoneNumber" type="tel" class="form-control bg-light border-0" placeholder="Phone Number" />
+                                    <label asp-for="PhoneNumber"></label>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Email" type="email" class="form-control bg-light border-0" placeholder="Email (Optional)" />
+                                    <label asp-for="Email"></label>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="ExperienceYears" type="number" min="0" class="form-control bg-light border-0" placeholder="Years of Experience" />
+                                    <label asp-for="ExperienceYears"></label>
+                                    <span asp-validation-for="ExperienceYears" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <textarea asp-for="Address" class="form-control bg-light border-0" style="height: 80px" placeholder="Address"></textarea>
+                                    <label asp-for="Address"></label>
+                                    <span asp-validation-for="Address" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <!-- License & Work Info Section -->
+                            <div class="col-md-12 mt-5">
+                                <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">
+                                    <i class="fa-solid fa-id-badge me-2"></i>License & Assignment
+                                </h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="LicenseNumber" class="form-control bg-light border-0" placeholder="License Number" />
+                                    <label asp-for="LicenseNumber"></label>
+                                    <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="LicenseExpiryDate" type="date" class="form-control bg-light border-0" />
+                                    <label asp-for="LicenseExpiryDate"></label>
+                                    <span asp-validation-for="LicenseExpiryDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AvailabilityStatus" class="form-label text-muted small fw-bold mb-1">Availability Status</label>
+                                    <select asp-for="AvailabilityStatus" class="form-select border-0 shadow-sm bg-light py-2" asp-items="Html.GetEnumSelectList<DriverAvailabilityStatus>()"></select>
+                                    <span asp-validation-for="AvailabilityStatus" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AssignedVehicleId" class="form-label text-muted small fw-bold mb-1">Assign Vehicle</label>
+                                    <select asp-for="AssignedVehicleId" class="form-select border-0 shadow-sm bg-light py-2" asp-items="ViewBag.AssignedVehicleId">
+                                        <option value="">-- No Vehicle Assigned --</option>
+                                    </select>
+                                    <span asp-validation-for="AssignedVehicleId" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input asp-for="JoiningDate" type="date" class="form-control bg-light border-0" />
+                                    <label asp-for="JoiningDate"></label>
+                                    <span asp-validation-for="JoiningDate" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex gap-3 pt-5 mt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-5 py-3 rounded-3 shadow-sm fw-bold">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Register Driver
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 py-3 rounded-3 fw-bold">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

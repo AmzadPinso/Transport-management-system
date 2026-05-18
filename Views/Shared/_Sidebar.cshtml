@@ -26,7 +26,7 @@
             <i class="fa-solid fa-shield-halved"></i>
             <span>Role Management</span>
         </a>
-        <a href="#" class="sidebar-link">
+        <a asp-controller="Drivers" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Drivers" ? "active" : "")">
             <i class="fa-solid fa-id-card"></i>
             <span>Drivers</span>
         </a>

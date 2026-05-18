@@ -39,15 +39,28 @@
 
     <div class="stat-card">
         <div>
-            <p class="stat-label">Active Drivers</p>
-            <h3 class="stat-value">86</h3>
+            <p class="stat-label">Drivers Overview</p>
+            <h3 class="stat-value">@ViewBag.TotalDrivers</h3>
             <div class="stat-trend trend-up">
-                <i class="fa-solid fa-arrow-up"></i>
-                <span>2 new drivers today</span>
+                <i class="fa-solid fa-user-check"></i>
+                <span>@ViewBag.AvailableDrivers Available, @ViewBag.DriversOnTrip On Trip</span>
             </div>
+            @if(ViewBag.ExpiredLicenses > 0 || ViewBag.ExpiringLicenses > 0)
+            {
+                <div class="mt-2 pt-2 border-top border-light x-small fw-bold">
+                    @if(ViewBag.ExpiredLicenses > 0)
+                    {
+                        <span class="text-danger me-2"><i class="fa-solid fa-triangle-exclamation"></i> @ViewBag.ExpiredLicenses Expired</span>
+                    }
+                    @if(ViewBag.ExpiringLicenses > 0)
+                    {
+                        <span class="text-warning text-dark"><i class="fa-solid fa-clock"></i> @ViewBag.ExpiringLicenses Expiring Soon</span>
+                    }
+                </div>
+            }
         </div>
         <div class="stat-icon bg-success-subtle text-success">
-            <i class="fa-solid fa-user-check"></i>
+            <i class="fa-solid fa-id-card"></i>
         </div>
     </div>
 
