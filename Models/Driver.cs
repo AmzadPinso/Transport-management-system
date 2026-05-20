@@ -12,7 +12,7 @@ namespace Transport_Management_System.Models
         [StringLength(150)]
         [Display(Name = "Full Name")]
         public string FullName { get; set; } = string.Empty;
-
+//hi
         [Required(ErrorMessage = "Phone Number is required")]
         [Phone]
         [StringLength(20)]
