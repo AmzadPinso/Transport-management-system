@@ -6,17 +6,14 @@
 }
 
 <div class="container-fluid py-4">
-    <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1">Driver Management</h2>
-            <p class="text-muted mb-0">Manage your transport staff, track licenses, and monitor availability.</p>
+            <h1 class="h3 fw-bold mb-1">Driver Management</h1>
+            <p class="text-muted small mb-0">Manage your transport staff, track licenses, and monitor availability.</p>
         </div>
-        <div>
-            <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm fw-bold">
-                <i class="fa-solid fa-plus me-2"></i> Register Driver
-            </a>
-        </div>
+        <a asp-action="Create" class="btn-modern btn-modern-primary shadow-sm">
+            <i class="fa-solid fa-user-plus"></i> <span>Register Driver</span>
+        </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -30,16 +27,18 @@
     <!-- Search & Filter Card -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-4">
-            <form asp-action="Index" method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label text-muted small fw-bold mb-1">Search Drivers</label>
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                <div class="col-lg-4">
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                        <input type="text" name="search" class="form-control bg-light border-0" placeholder="Name, Phone, License..." value="@ViewBag.Search">
+                        <span class="input-group-text bg-light border-0 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search" 
+                               class="form-control bg-light border-0 ps-0" 
+                               placeholder="Search name, phone or license..." />
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted small fw-bold mb-1">Availability Status</label>
+                <div class="col-lg-3">
                     <select name="availabilityStatus" class="form-select bg-light border-0">
                         <option value="">All Statuses</option>
                         <option value="1" selected="@(ViewBag.AvailabilityStatus == (DriverAvailabilityStatus?)1 ? "selected" : null)">Available</option>
@@ -48,8 +47,7 @@
                         <option value="4" selected="@(ViewBag.AvailabilityStatus == (DriverAvailabilityStatus?)4 ? "selected" : null)">Unavailable</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted small fw-bold mb-1">License Status</label>
+                <div class="col-lg-3">
                     <select name="licenseStatus" class="form-select bg-light border-0">
                         <option value="">All Licenses</option>
                         <option value="valid" selected="@(ViewBag.LicenseStatus == "valid" ? "selected" : null)">Valid</option>
@@ -57,161 +55,175 @@
                         <option value="expired" selected="@(ViewBag.LicenseStatus == "expired" ? "selected" : null)">Expired</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-dark w-100 rounded-3 py-2 fw-bold shadow-sm">
+                <div class="col-lg-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 rounded-3">
                         <i class="fa-solid fa-filter me-2"></i>Filter
                     </button>
+                    @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.AvailabilityStatus != null || !string.IsNullOrEmpty(ViewBag.LicenseStatus))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3 rounded-3" title="Clear Filters">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    }
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Drivers Table Card -->
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="py-3 px-4 rounded-start-4">
-                                <a asp-action="Index" asp-route-sortColumn="FullName" asp-route-sortDirection="@(ViewBag.SortColumn == "FullName" && ViewBag.SortDirection == "asc" ? "desc" : "asc")" class="text-dark text-decoration-none">
-                                    Driver Details <i class="fa-solid fa-sort ms-1 text-muted"></i>
-                                </a>
-                            </th>
-                            <th class="py-3">Contact</th>
-                            <th class="py-3">
-                                <a asp-action="Index" asp-route-sortColumn="License" asp-route-sortDirection="@(ViewBag.SortColumn == "License" && ViewBag.SortDirection == "asc" ? "desc" : "asc")" class="text-dark text-decoration-none">
-                                    License Info <i class="fa-solid fa-sort ms-1 text-muted"></i>
-                                </a>
-                            </th>
-                            <th class="py-3">Assigned Vehicle</th>
-                            <th class="py-3">
-                                <a asp-action="Index" asp-route-sortColumn="Status" asp-route-sortDirection="@(ViewBag.SortColumn == "Status" && ViewBag.SortDirection == "asc" ? "desc" : "asc")" class="text-dark text-decoration-none">
-                                    Status <i class="fa-solid fa-sort ms-1 text-muted"></i>
-                                </a>
-                            </th>
-                            <th class="py-3 px-4 rounded-end-4 text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="text-muted">
-                                        <i class="fa-solid fa-id-card display-4 mb-3 opacity-50"></i>
-                                        <h5>No Drivers Found</h5>
-                                        <p>Try adjusting your search criteria or register a new driver.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            foreach (var item in Model)
+    <!-- Table Section -->
+    <div class="table-container animate-fade-in-up">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="FullName" asp-route-sortDirection="@(ViewBag.SortColumn == "FullName" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            Driver @(ViewBag.SortColumn == "FullName" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th>Contact</th>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="License" asp-route-sortDirection="@(ViewBag.SortColumn == "License" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            License @(ViewBag.SortColumn == "License" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th>Assigned Vehicle</th>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="Status" asp-route-sortDirection="@(ViewBag.SortColumn == "Status" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            Status @(ViewBag.SortColumn == "Status" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-user-slash d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No drivers found matching your criteria.</p>
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    var daysUntilExpiry = (item.LicenseExpiryDate - DateTime.Now).TotalDays;
+                    var licenseBadgeClass = daysUntilExpiry < 0 ? "bg-danger" : (daysUntilExpiry <= 30 ? "bg-warning text-dark" : "bg-success");
+                    var licenseStatusText = daysUntilExpiry < 0 ? "Expired" : (daysUntilExpiry <= 30 ? "Expiring Soon" : "Valid");
+
+                    var statusBadgeClass = item.AvailabilityStatus switch
+                    {
+                        DriverAvailabilityStatus.Available => "bg-success-subtle text-success",
+                        DriverAvailabilityStatus.OnTrip => "bg-primary-subtle text-primary",
+                        DriverAvailabilityStatus.OnLeave => "bg-warning-subtle text-warning",
+                        _ => "bg-secondary-subtle text-secondary"
+                    };
+
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem; background-color: var(--bs-primary-bg-subtle); color: var(--bs-primary);">
+                                    @item.FullName.Substring(0, 1).ToUpper()
+                                </div>
+                                <div>
+                                    <div class="fw-bold">@item.FullName</div>
+                                    <div class="small text-muted">Exp: @item.ExperienceYears Yrs</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="small fw-medium"><i class="fa-solid fa-phone me-1 text-muted"></i>@item.PhoneNumber</div>
+                            <div class="small text-muted">@item.Email</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold mb-1">@item.LicenseNumber</div>
+                            <span class="badge rounded-pill @licenseBadgeClass border-0">
+                                @licenseStatusText (@item.LicenseExpiryDate.ToString("MMM dd, yyyy"))
+                            </span>
+                        </td>
+                        <td>
+                            @if (item.AssignedVehicle != null)
                             {
-                                var daysUntilExpiry = (item.LicenseExpiryDate - DateTime.Now).TotalDays;
-                                var licenseBadgeClass = daysUntilExpiry < 0 ? "bg-danger" : (daysUntilExpiry <= 30 ? "bg-warning text-dark" : "bg-success");
-                                var licenseStatusText = daysUntilExpiry < 0 ? "Expired" : (daysUntilExpiry <= 30 ? "Expiring Soon" : "Valid");
-
-                                var statusBadgeClass = item.AvailabilityStatus switch
-                                {
-                                    DriverAvailabilityStatus.Available => "bg-success-subtle text-success border-success",
-                                    DriverAvailabilityStatus.OnTrip => "bg-primary-subtle text-primary border-primary",
-                                    DriverAvailabilityStatus.OnLeave => "bg-warning-subtle text-warning border-warning",
-                                    _ => "bg-secondary-subtle text-secondary border-secondary"
-                                };
-
-                                <tr>
-                                    <td class="px-4 py-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
-                                                @item.FullName.Substring(0, 1).ToUpper()
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold text-dark">@item.FullName</div>
-                                                <div class="small text-muted">Exp: @item.ExperienceYears Yrs</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="small fw-medium"><i class="fa-solid fa-phone me-2 text-muted"></i>@item.PhoneNumber</div>
-                                        <div class="small text-muted">@item.Email</div>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold mb-1">@item.LicenseNumber</div>
-                                        <span class="badge @licenseBadgeClass rounded-pill">
-                                            @licenseStatusText (@item.LicenseExpiryDate.ToString("MMM dd, yyyy"))
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if (item.AssignedVehicle != null)
-                                        {
-                                            <span class="badge bg-light text-dark border">
-                                                <i class="fa-solid fa-truck me-1"></i> @item.AssignedVehicle.VehicleNumber
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted small italic">Unassigned</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <span class="badge border @statusBadgeClass rounded-pill px-3 py-2">
-                                            @item.AvailabilityStatus
-                                        </span>
-                                    </td>
-                                    <td class="px-4 text-end">
-                                        <div class="btn-group shadow-sm rounded-3">
-                                            <a asp-action="Details" asp-route-id="@item.DriverId" class="btn btn-sm btn-light border" title="Details">
-                                                <i class="fa-solid fa-eye text-primary"></i>
-                                            </a>
-                                            <a asp-action="Edit" asp-route-id="@item.DriverId" class="btn btn-sm btn-light border" title="Edit">
-                                                <i class="fa-solid fa-pen text-warning"></i>
-                                            </a>
-                                            <a asp-action="Delete" asp-route-id="@item.DriverId" class="btn btn-sm btn-light border" title="Delete">
-                                                <i class="fa-solid fa-trash text-danger"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <span class="badge rounded-pill bg-light text-dark border-0">
+                                    <i class="fa-solid fa-truck me-1"></i> @item.AssignedVehicle.VehicleNumber
+                                </span>
                             }
-                        }
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            @if (ViewBag.TotalPages > 1)
-            {
-                <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center rounded-bottom-4">
-                    <span class="text-muted small">Showing Page @ViewBag.PageNumber of @ViewBag.TotalPages (@ViewBag.TotalRecords Total Records)</span>
-                    <nav aria-label="Driver pagination">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" asp-action="Index" 
-                                   asp-route-pageNumber="@(ViewBag.PageNumber - 1)" 
-                                   asp-route-pageSize="@ViewBag.PageSize"
-                                   asp-route-search="@ViewBag.Search"
-                                   asp-route-availabilityStatus="@ViewBag.AvailabilityStatus"
-                                   asp-route-licenseStatus="@ViewBag.LicenseStatus"
-                                   asp-route-sortColumn="@ViewBag.SortColumn"
-                                   asp-route-sortDirection="@ViewBag.SortDirection">Previous</a>
-                            </li>
-                            <li class="page-item @(ViewBag.PageNumber == ViewBag.TotalPages ? "disabled" : "")">
-                                <a class="page-link" asp-action="Index" 
-                                   asp-route-pageNumber="@(ViewBag.PageNumber + 1)" 
-                                   asp-route-pageSize="@ViewBag.PageSize"
-                                   asp-route-search="@ViewBag.Search"
-                                   asp-route-availabilityStatus="@ViewBag.AvailabilityStatus"
-                                   asp-route-licenseStatus="@ViewBag.LicenseStatus"
-                                   asp-route-sortColumn="@ViewBag.SortColumn"
-                                   asp-route-sortDirection="@ViewBag.SortDirection">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            }
-        </div>
+                            else
+                            {
+                                <span class="text-muted small fst-italic">Unassigned</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill @statusBadgeClass px-3 py-2 border-0">
+                                @item.AvailabilityStatus
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.DriverId" class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.DriverId" class="btn btn-sm btn-outline-info border-0 rounded-circle p-2" title="View Details">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.DriverId" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" title="Delete">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
+            
+    <!-- Modern Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination pagination-modern gap-2">
+                    <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" 
+                           asp-route-pageNumber="@(ViewBag.PageNumber - 1)" 
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-availabilityStatus="@ViewBag.AvailabilityStatus"
+                           asp-route-licenseStatus="@ViewBag.LicenseStatus"
+                           asp-route-sortColumn="@ViewBag.SortColumn"
+                           asp-route-sortDirection="@ViewBag.SortDirection">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle @(i == ViewBag.PageNumber ? "bg-primary text-white" : "bg-white text-dark")" asp-action="Index" 
+                               asp-route-pageNumber="@i" 
+                               asp-route-pageSize="@ViewBag.PageSize"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-availabilityStatus="@ViewBag.AvailabilityStatus"
+                               asp-route-licenseStatus="@ViewBag.LicenseStatus"
+                               asp-route-sortColumn="@ViewBag.SortColumn"
+                               asp-route-sortDirection="@ViewBag.SortDirection">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.PageNumber == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" 
+                           asp-route-pageNumber="@(ViewBag.PageNumber + 1)" 
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-availabilityStatus="@ViewBag.AvailabilityStatus"
+                           asp-route-licenseStatus="@ViewBag.LicenseStatus"
+                           asp-route-sortColumn="@ViewBag.SortColumn"
+                           asp-route-sortDirection="@ViewBag.SortDirection">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
 </div>

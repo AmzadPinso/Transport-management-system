@@ -10,27 +10,26 @@
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="card-header bg-dark py-4 text-center">
                     <h3 class="text-white fw-bold mb-0">
-                        <i class="fa-solid fa-pen-to-square me-2 text-primary"></i>Modify Vehicle
+                        <i class="fa-solid fa-pen-to-square me-2 text-warning"></i>Edit Vehicle Details
                     </h3>
-                    <p class="text-white-50 mb-0">Updating details for @Model.VehicleName (@Model.VehicleNumber)</p>
+                    <p class="text-white-50 mb-0">Updating details for @Model.VehicleNumber</p>
                 </div>
                 <div class="card-body p-4 p-md-5">
                     <form asp-action="Edit">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3" role="alert"></div>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
                         <input type="hidden" asp-for="VehicleId" />
-                        <input type="hidden" asp-for="CreatedAt" />
 
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input asp-for="VehicleName" class="form-control bg-light border-0" />
+                                    <input asp-for="VehicleName" class="form-control bg-light border-0" placeholder="e.g. Express Bus" />
                                     <label asp-for="VehicleName"></label>
                                     <span asp-validation-for="VehicleName" class="text-danger small"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input asp-for="VehicleNumber" class="form-control bg-light border-0" />
+                                    <input asp-for="VehicleNumber" class="form-control bg-light border-0" placeholder="e.g. ABC-1234" />
                                     <label asp-for="VehicleNumber"></label>
                                     <span asp-validation-for="VehicleNumber" class="text-danger small"></span>
                                 </div>
@@ -45,7 +44,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input asp-for="Capacity" class="form-control bg-light border-0" />
+                                    <input asp-for="Capacity" class="form-control bg-light border-0" placeholder="Number of seats/weight" />
                                     <label asp-for="Capacity"></label>
                                     <span asp-validation-for="Capacity" class="text-danger small"></span>
                                 </div>
@@ -60,7 +59,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input asp-for="LastServiceDate" class="form-control bg-light border-0" type="date" value="@Model.LastServiceDate.ToString("yyyy-MM-dd")" />
+                                    <input asp-for="LastServiceDate" class="form-control bg-light border-0" type="date" />
                                     <label asp-for="LastServiceDate"></label>
                                     <span asp-validation-for="LastServiceDate" class="text-danger small"></span>
                                 </div>
@@ -70,11 +69,11 @@
                         <hr class="my-5 opacity-10">
 
                         <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-dark px-5 py-3 rounded-3 shadow-sm flex-grow-1 fw-bold">
-                                <i class="fa-solid fa-check-double me-2 text-primary"></i>Update Information
+                            <button type="submit" class="btn btn-dark px-5 py-3 rounded-3 shadow-sm flex-grow-1 fw-bold text-warning">
+                                <i class="fa-solid fa-check-double me-2"></i>Update Vehicle
                             </button>
                             <a asp-action="Index" class="btn btn-outline-secondary px-4 py-3 rounded-3 fw-bold">
-                                Back to Fleet
+                                Cancel
                             </a>
                         </div>
                     </form>
