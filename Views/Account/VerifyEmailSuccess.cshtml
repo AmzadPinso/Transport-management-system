@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "Email Verification Status";
+    Layout = null;
+    var status = ViewBag.Status as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - TMS PRO</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .auth-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+        }
+        .status-icon {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .icon-success {
+            color: var(--success);
+        }
+        .icon-error {
+            color: var(--danger);
+        }
+        .icon-info {
+            color: var(--info);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card animate-fade-in">
+        <div class="auth-logo">
+            <i class="fa-solid fa-truck-ramp-box me-2"></i>TMS PRO
+        </div>
+        
+        @if (status == "Success")
+        {
+            <i class="fa-solid fa-circle-check status-icon icon-success"></i>
+            <h4 class="text-white fw-bold mb-2">Verification Successful!</h4>
+            <p class="text-muted small mb-4">Your email address has been successfully verified. Your account is now fully active.</p>
+            <div class="d-grid gap-2">
+                <a asp-action="Login" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Sign In to Dashboard <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                </a>
+            </div>
+        }
+        else if (status == "AlreadyVerified")
+        {
+            <i class="fa-solid fa-circle-info status-icon icon-info"></i>
+            <h4 class="text-white fw-bold mb-2">Already Verified</h4>
+            <p class="text-muted small mb-4">Your email address was already verified. You can log in to your dashboard anytime.</p>
+            <div class="d-grid gap-2">
+                <a asp-action="Login" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Sign In <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                </a>
+            </div>
+        }
+        else if (status == "ExpiredOrInvalid")
+        {
+            <i class="fa-solid fa-circle-xmark status-icon icon-error"></i>
+            <h4 class="text-white fw-bold mb-2">Link Expired or Invalid</h4>
+            <p class="text-muted small mb-4">The verification link is invalid or has expired (links expire after 24 hours). Please log in to request a new link.</p>
+            <div class="d-grid gap-2">
+                <a asp-action="Login" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Back to Login <i class="fa-solid fa-arrow-left ms-2"></i>
+                </a>
+            </div>
+        }
+        else
+        {
+            <i class="fa-solid fa-circle-exclamation status-icon icon-error"></i>
+            <h4 class="text-white fw-bold mb-2">Verification Failed</h4>
+            <p class="text-muted small mb-4">We were unable to verify your email. The link may be broken or corrupted.</p>
+            <div class="d-grid gap-2">
+                <a asp-action="Login" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Back to Login <i class="fa-solid fa-arrow-left ms-2"></i>
+                </a>
+            </div>
+        }
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

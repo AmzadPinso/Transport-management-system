@@ -1,0 +1,116 @@
+@model Transport_Management_System.Models.ViewModels.VerifyOtpViewModel
+@{
+    ViewData["Title"] = "Verify Code";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Code - TMS PRO</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .auth-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+        }
+        .form-control-auth {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            padding: 0.8rem 1.2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 0.5rem;
+            font-weight: 700;
+        }
+        .form-control-auth:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+        .form-label-auth {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card animate-fade-in">
+        <div class="auth-logo">
+            <i class="fa-solid fa-truck-ramp-box me-2"></i>TMS PRO
+        </div>
+        
+        <h4 class="text-white fw-bold mb-1">Enter Verification Code</h4>
+        <p class="text-muted mb-4 small">We've sent a 6-digit verification code to <br/><strong class="text-light">@Model.Email</strong></p>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success bg-success-subtle border-0 small text-success text-start mb-3">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form asp-action="VerifyOtp" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 text-start"></div>
+            
+            <input type="hidden" asp-for="Email" />
+
+            <div class="mb-4">
+                <label asp-for="Otp" class="form-label-auth mb-2">6-Digit OTP Code</label>
+                <input asp-for="Otp" type="text" maxlength="6" class="form-control form-control-auth" placeholder="000000" autocomplete="off" />
+                <span asp-validation-for="Otp" class="text-danger x-small text-start d-block mt-1"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-modern justify-content-center py-2 shadow-lg">
+                    Verify Code <i class="fa-solid fa-circle-check ms-2"></i>
+                </button>
+            </div>
+        </form>
+
+        <form asp-action="ForgotPassword" method="post" class="mt-3">
+            <input type="hidden" name="Email" value="@Model.Email" />
+            <button type="submit" class="btn btn-link text-primary text-decoration-none small fw-bold p-0">
+                Resend Verification Code
+            </button>
+        </form>
+
+        <div class="mt-4 text-center">
+            <a asp-action="ForgotPassword" class="text-primary fw-bold text-decoration-none small"><i class="fa-solid fa-arrow-left-long me-2"></i> Try another email</a>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+</body>
+</html>

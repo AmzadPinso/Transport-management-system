@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "Verify Email";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Email - TMS PRO</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .auth-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+        }
+        .icon-pulse-blue {
+            font-size: 4rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        @@keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card animate-fade-in">
+        <div class="auth-logo">
+            <i class="fa-solid fa-truck-ramp-box me-2"></i>TMS PRO
+        </div>
+        
+        <i class="fa-solid fa-envelope-open-text icon-pulse-blue"></i>
+        
+        <h4 class="text-white fw-bold mb-2">Verify Your Email</h4>
+        <p class="text-muted small mb-4">We've sent a verification link to your email address: <br/><strong class="text-light">@ViewBag.Email</strong></p>
+
+        <p class="text-muted small mb-4">Please check your inbox (and spam folder) and click the link to activate your account.</p>
+
+        <form asp-action="ResendVerificationEmail" method="post" class="mb-3">
+            <input type="hidden" name="email" value="@ViewBag.Email" />
+            <button type="submit" class="btn btn-outline-primary btn-modern w-100 justify-content-center py-2">
+                <i class="fa-solid fa-rotate-right me-2"></i> Resend Verification Email
+            </button>
+        </form>
+
+        <div class="mt-4 text-center">
+            <a asp-action="Login" class="text-primary fw-bold text-decoration-none small"><i class="fa-solid fa-arrow-left-long me-2"></i> Back to Sign In</a>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

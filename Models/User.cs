@@ -35,6 +35,18 @@ namespace Transport_Management_System.Models
         [Display(Name = "Last LogIN")]
         public DateTime? LastLogIN { get; set; }
 
+        public bool IsEmailVerified { get; set; } = false;
+
+        public string? EmailVerificationToken { get; set; }
+
+        public DateTime? EmailVerificationTokenExpiry { get; set; }
+
+        public string? PasswordResetOtp { get; set; }
+
+        public DateTime? PasswordResetOtpExpiry { get; set; }
+
+        public int PasswordResetOtpAttempts { get; set; } = 0;
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
