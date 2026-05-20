@@ -30,6 +30,12 @@ BEGIN
         u.Address,
         u.RoleId,
         u.LastLogIN,
+        u.IsEmailVerified,
+        u.EmailVerificationToken,
+        u.EmailVerificationTokenExpiry,
+        u.PasswordResetOtp,
+        u.PasswordResetOtpExpiry,
+        u.PasswordResetOtpAttempts,
         u.CreatedAt,
         u.UpdatedAt
     FROM Users u
