@@ -38,7 +38,11 @@
             <i class="fa-solid fa-box-archive"></i>
             <span>Shipments</span>
         </a>
-        <a href="#" class="sidebar-link">
+        <a asp-controller="Stations" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stations" ? "active" : "")">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Stations</span>
+        </a>
+        <a asp-controller="Routes" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" ? "active" : "")">
             <i class="fa-solid fa-route"></i>
             <span>Routes</span>
         </a>

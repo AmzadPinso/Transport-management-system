@@ -1,0 +1,96 @@
+@model Transport_Management_System.Models.ViewModels.RouteFormViewModel
+@using Transport_Management_System.Models
+
+@{
+    ViewData["Title"] = "Edit Route";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary py-4 text-center">
+                    <h3 class="text-white fw-bold mb-0">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>Edit Route Details
+                    </h3>
+                    <p class="text-white-50 mb-0">Update transit settings for <strong>@Model.RouteName</strong></p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
+                        <input type="hidden" asp-for="RouteId" />
+
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input asp-for="RouteName" class="form-control bg-light border-0" placeholder="Route Name" />
+                                    <label asp-for="RouteName"></label>
+                                    <span asp-validation-for="RouteName" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="OriginStationId" class="form-label text-muted small fw-bold mb-1">Origin Station</label>
+                                    <select asp-for="OriginStationId" class="form-select border-0 shadow-sm bg-light py-2" asp-items="ViewBag.Stations">
+                                        <option value="">-- Select Origin --</option>
+                                    </select>
+                                    <span asp-validation-for="OriginStationId" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DestinationStationId" class="form-label text-muted small fw-bold mb-1">Destination Station</label>
+                                    <select asp-for="DestinationStationId" class="form-select border-0 shadow-sm bg-light py-2" asp-items="ViewBag.Stations">
+                                        <option value="">-- Select Destination --</option>
+                                    </select>
+                                    <span asp-validation-for="DestinationStationId" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="DistanceKm" type="number" step="0.1" min="0.1" class="form-control bg-light border-0" placeholder="Distance in km" />
+                                    <label asp-for="DistanceKm"></label>
+                                    <span asp-validation-for="DistanceKm" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="EstimatedDurationMinutes" type="number" min="1" class="form-control bg-light border-0" placeholder="Duration in minutes" />
+                                    <label asp-for="EstimatedDurationMinutes"></label>
+                                    <span asp-validation-for="EstimatedDurationMinutes" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Status" class="form-label text-muted small fw-bold mb-1">Route Status</label>
+                                    <select asp-for="Status" class="form-select border-0 shadow-sm bg-light py-2" asp-items="Html.GetEnumSelectList<RouteStatus>()"></select>
+                                    <span asp-validation-for="Status" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-10">
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary px-5 py-3 rounded-3 shadow-sm flex-grow-1 fw-bold">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 py-3 rounded-3 fw-bold">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

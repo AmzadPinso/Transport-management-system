@@ -66,29 +66,29 @@
 
     <div class="stat-card">
         <div class="stat-card-content">
-            <p class="stat-label">Ongoing Deliveries</p>
-            <h3 class="stat-value">42</h3>
-            <div class="stat-trend trend-down">
-                <i class="fa-solid fa-arrow-down"></i>
-                <span>1.2% delayed</span>
+            <p class="stat-label">Total Routes</p>
+            <h3 class="stat-value">@ViewBag.TotalRoutes</h3>
+            <div class="stat-trend trend-up">
+                <i class="fa-solid fa-route"></i>
+                <span>@ViewBag.ActiveRoutes Active Routes</span>
             </div>
         </div>
-        <div class="stat-icon bg-info-subtle text-info">
-            <i class="fa-solid fa-clock-rotate-left"></i>
+        <div class="stat-icon bg-warning-subtle text-warning">
+            <i class="fa-solid fa-route"></i>
         </div>
     </div>
 
     <div class="stat-card">
         <div class="stat-card-content">
-            <p class="stat-label">Monthly Revenue</p>
-            <h3 class="stat-value">$84.2k</h3>
+            <p class="stat-label">Total Stations</p>
+            <h3 class="stat-value">@ViewBag.TotalStations</h3>
             <div class="stat-trend trend-up">
-                <i class="fa-solid fa-arrow-up"></i>
-                <span>12.5% increase</span>
+                <i class="fa-solid fa-location-dot"></i>
+                <span>@ViewBag.ActiveStations Active Hubs</span>
             </div>
         </div>
-        <div class="stat-icon bg-warning-subtle text-warning">
-            <i class="fa-solid fa-dollar-sign"></i>
+        <div class="stat-icon bg-info-subtle text-info">
+            <i class="fa-solid fa-location-dot"></i>
         </div>
     </div>
 </div>

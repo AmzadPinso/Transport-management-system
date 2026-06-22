@@ -1,0 +1,219 @@
+@model IEnumerable<Transport_Management_System.Models.Station>
+
+@{
+    ViewData["Title"] = "Station Management";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Station Management</h1>
+            <p class="text-muted small mb-0">Add, update, and manage your physical logistics hubs and transit stations.</p>
+        </div>
+        <a asp-action="Create" class="btn-modern btn-modern-primary shadow-sm text-decoration-none">
+            <i class="fa-solid fa-plus me-2"></i><span>Add Station</span>
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Search & Filter Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                <div class="col-lg-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search" 
+                               class="form-control bg-light border-0 ps-0" 
+                               placeholder="Search station name, city, district or address..." />
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <select name="isActive" class="form-select bg-light border-0">
+                        <option value="">All Statuses</option>
+                        <option value="true" selected="@(ViewBag.IsActive == true ? "selected" : null)">Active Only</option>
+                        <option value="false" selected="@(ViewBag.IsActive == false ? "selected" : null)">Inactive Only</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 rounded-3">
+                        <i class="fa-solid fa-filter me-2"></i>Filter
+                    </button>
+                    @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.IsActive != null)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3 rounded-3" title="Clear Filters">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container animate-fade-in-up">
+        <table class="table table-modern align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="name" asp-route-sortDirection="@(ViewBag.SortColumn == "name" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            Station Name @(ViewBag.SortColumn == "name" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="city" asp-route-sortDirection="@(ViewBag.SortColumn == "city" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            City @(ViewBag.SortColumn == "city" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="district" asp-route-sortDirection="@(ViewBag.SortColumn == "district" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            District @(ViewBag.SortColumn == "district" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th>Address</th>
+                    <th>
+                        <a class="text-decoration-none text-muted" asp-action="Index" asp-route-sortColumn="status" asp-route-sortDirection="@(ViewBag.SortColumn == "status" && ViewBag.SortDirection == "asc" ? "desc" : "asc")">
+                            Status @(ViewBag.SortColumn == "status" ? (ViewBag.SortDirection == "asc" ? "↑" : "↓") : "")
+                        </a>
+                    </th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-location-dot d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No stations found matching your criteria.</p>
+                        </td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    var statusBadgeClass = item.IsActive ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger";
+                    var statusText = item.IsActive ? "Active" : "Inactive";
+
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem; background-color: var(--bs-primary-bg-subtle); color: var(--bs-primary);">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-light">@item.StationName</div>
+                                    <div class="small text-muted">@item.Description</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="text-light">@item.City</span></td>
+                        <td><span class="text-muted">@(item.District ?? "N/A")</span></td>
+                        <td><span class="text-muted small">@item.Address</span></td>
+                        <td>
+                            <form asp-action="ToggleStatus" asp-route-id="@item.StationId" method="post" class="d-inline">
+                                <button type="submit" class="badge rounded-pill @statusBadgeClass px-3 py-2 border-0" title="Click to toggle active status">
+                                    @statusText
+                                </button>
+                            </form>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.StationId" class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.StationId">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal-@item.StationId" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content bg-dark border-secondary rounded-4">
+                                        <div class="modal-header border-bottom border-secondary">
+                                            <h5 class="modal-title text-light fw-bold"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Confirm Delete</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-start text-muted py-4">
+                                            Are you sure you want to delete the station <strong class="text-light">@item.StationName</strong>? This action cannot be undone.
+                                        </div>
+                                        <div class="modal-footer border-top border-secondary">
+                                            <button type="button" class="btn btn-outline-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+                                            <form asp-action="Delete" asp-route-id="@item.StationId" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-danger rounded-3 px-4">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+            
+    <!-- Modern Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination pagination-modern gap-2">
+                    <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" 
+                           asp-route-pageNumber="@(ViewBag.PageNumber - 1)" 
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-isActive="@ViewBag.IsActive"
+                           asp-route-sortColumn="@ViewBag.SortColumn"
+                           asp-route-sortDirection="@ViewBag.SortDirection">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle @(i == ViewBag.PageNumber ? "bg-primary text-white" : "bg-white text-dark")" asp-action="Index" 
+                               asp-route-pageNumber="@i" 
+                               asp-route-pageSize="@ViewBag.PageSize"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-isActive="@ViewBag.IsActive"
+                               asp-route-sortColumn="@ViewBag.SortColumn"
+                               asp-route-sortDirection="@ViewBag.SortDirection">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.PageNumber == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" 
+                           asp-route-pageNumber="@(ViewBag.PageNumber + 1)" 
+                           asp-route-pageSize="@ViewBag.PageSize"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-isActive="@ViewBag.IsActive"
+                           asp-route-sortColumn="@ViewBag.SortColumn"
+                           asp-route-sortDirection="@ViewBag.SortDirection">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

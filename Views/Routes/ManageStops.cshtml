@@ -1,0 +1,134 @@
+@model Transport_Management_System.Models.Route
+
+@{
+    ViewData["Title"] = $"Manage Stops: {Model.RouteName}";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Routes</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.RouteId" class="text-decoration-none">Route Details</a></li>
+                    <li class="breadcrumb-item active text-white">Manage Intermediate Stops</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold mb-0">Manage Intermediate Stops</h1>
+            <p class="text-muted small">Route: <strong>@Model.RouteName</strong> (@Model.OriginStation?.StationName → @Model.DestinationStation?.StationName)</p>
+        </div>
+        <a asp-action="Details" asp-route-id="@Model.RouteId" class="btn btn-outline-light rounded-3">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Details
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Add Stop Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 bg-dark-subtle mb-4">
+                <div class="card-header bg-transparent border-bottom border-secondary py-3">
+                    <h5 class="fw-bold text-light mb-0"><i class="fa-solid fa-plus text-primary me-2"></i>Add Stop</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="AddStop" method="post">
+                        <input type="hidden" name="routeId" value="@Model.RouteId" />
+
+                        <div class="form-group mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Select Station</label>
+                            <select name="stationId" class="form-select border-0 bg-light py-2" asp-items="ViewBag.Stations" required>
+                                <option value="">-- Choose Station --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label text-muted small fw-bold mb-1">Sequence Order</label>
+                            <input name="sequenceOrder" type="number" min="1" value="@(Model.IntermediateStops.Count + 1)" class="form-control border-0 bg-light py-2" required />
+                            <div class="form-text text-muted x-small">Determines the chronological order of this transit stop.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold">
+                            <i class="fa-solid fa-circle-plus me-2"></i>Add Stop
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Stops List & Reordering -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 bg-dark-subtle">
+                <div class="card-header bg-transparent border-bottom border-secondary py-3">
+                    <h5 class="fw-bold text-light mb-0"><i class="fa-solid fa-list-ol text-warning me-2"></i>Current Stops & Reordering</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.IntermediateStops.Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-map-pin d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No intermediate stops defined for this route.</p>
+                            <p class="small text-muted">Use the form on the left to add your first stop.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="UpdateStopsOrder" method="post">
+                            <input type="hidden" name="routeId" value="@Model.RouteId" />
+                            
+                            <table class="table table-modern align-middle mb-4">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 15%">Sequence</th>
+                                        <th>Station Name</th>
+                                        <th>Location</th>
+                                        <th style="width: 25%" class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var stops = Model.IntermediateStops.OrderBy(s => s.SequenceOrder).ToList();
+                                    }
+                                    @for (int i = 0; i < stops.Count; i++)
+                                    {
+                                        var stop = stops[i];
+                                        <tr>
+                                            <td>
+                                                <input type="number" name="stopOrders[@stop.IntermediateStopId]" value="@stop.SequenceOrder" min="1" class="form-control border-0 bg-light py-1 text-center font-monospace" />
+                                            </td>
+                                            <td><span class="text-light fw-bold">@stop.Station?.StationName</span></td>
+                                            <td><span class="text-muted small">@stop.Station?.City, @stop.Station?.District</span></td>
+                                            <td class="text-end">
+                                                <button type="submit" asp-action="RemoveStop" asp-route-stopId="@stop.IntermediateStopId" asp-route-routeId="@Model.RouteId" class="btn btn-sm btn-outline-danger border-0 rounded-pill px-3 py-1" onclick="return confirm('Remove this stop?')">
+                                                    <i class="fa-solid fa-xmark me-1"></i>Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            <button type="submit" class="btn btn-warning text-dark rounded-3 px-4 fw-bold">
+                                <i class="fa-solid fa-arrows-rotate me-2"></i>Update Order/Sequence
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
