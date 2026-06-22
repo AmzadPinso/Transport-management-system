@@ -12,17 +12,20 @@ namespace Transport_Management_System.Controllers
         private readonly IRouteRepository _routeRepo;
         private readonly IStationRepository _stationRepo;
         private readonly ITripRepository _tripRepo;
+        private readonly IBookingRepository _bookingRepo;
 
         public DashboardController(
             IDriverRepository driverRepo,
             IRouteRepository routeRepo,
             IStationRepository stationRepo,
-            ITripRepository tripRepo)
+            ITripRepository tripRepo,
+            IBookingRepository bookingRepo)
         {
             _driverRepo = driverRepo;
             _routeRepo = routeRepo;
             _stationRepo = stationRepo;
             _tripRepo = tripRepo;
+            _bookingRepo = bookingRepo;
         }
 
         public async Task<IActionResult> Index()
@@ -54,6 +57,13 @@ namespace Transport_Management_System.Controllers
             ViewBag.DelayedTrips = trips.Count(t => t.Status == TripStatus.Delayed);
             ViewBag.CancelledTrips = trips.Count(t => t.Status == TripStatus.Cancelled);
             ViewBag.ReadyForDispatchTrips = trips.Count(t => t.Status == TripStatus.ReadyForDispatch);
+
+            // Booking & Revenue Statistics
+            ViewBag.TotalBookings = await _bookingRepo.GetTotalBookingsCountAsync();
+            ViewBag.ConfirmedBookings = await _bookingRepo.GetBookingsCountByStatusAsync(BookingStatus.Confirmed);
+            ViewBag.PendingBookings = await _bookingRepo.GetBookingsCountByStatusAsync(BookingStatus.Pending);
+            ViewBag.CancelledBookings = await _bookingRepo.GetBookingsCountByStatusAsync(BookingStatus.Cancelled);
+            ViewBag.TotalRevenue = await _bookingRepo.GetTotalRevenueAsync();
 
             return View();
         }

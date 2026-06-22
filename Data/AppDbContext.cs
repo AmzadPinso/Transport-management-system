@@ -20,6 +20,7 @@ namespace Transport_Management_System.Data
         public DbSet<PickupPoint> PickupPoints { get; set; }
         public DbSet<DropOffPoint> DropOffPoints { get; set; }
         public DbSet<Trip> Trips { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,23 @@ namespace Transport_Management_System.Data
                 .WithMany()
                 .HasForeignKey(t => t.DriverId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Booking relationships
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Trip)
+                .WithMany()
+                .HasForeignKey(b => b.TripId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Booking>()
+                .HasIndex(b => b.BookingReference)
+                .IsUnique();
 
             // Configure One-to-Many relationship
             modelBuilder.Entity<User>()

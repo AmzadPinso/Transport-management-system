@@ -64,10 +64,21 @@
             <i class="fa-solid fa-users"></i>
             <span>Employees</span>
         </a>
-        <a href="#" class="sidebar-link">
-            <i class="fa-solid fa-calendar-check"></i>
-            <span>Bookings</span>
+        <a asp-controller="Bookings" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Bookings" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+            <i class="fa-solid fa-ticket"></i>
+            <span>Book Trip</span>
         </a>
+        <a asp-controller="Bookings" asp-action="History" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Bookings" && ViewContext.RouteData.Values["Action"]?.ToString() == "History" ? "active" : "")">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>My Bookings</span>
+        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="AdminBookings" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "AdminBookings" ? "active" : "")">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Manage Bookings</span>
+            </a>
+        }
 
         <div class="nav-group-label">Insights</div>
         <a href="#" class="sidebar-link">

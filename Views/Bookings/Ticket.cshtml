@@ -1,0 +1,207 @@
+@model Transport_Management_System.Models.Booking
+
+@{
+    ViewData["Title"] = $"Ticket - {Model.BookingReference}";
+}
+
+<div class="container py-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a asp-action="History" class="btn btn-outline-secondary rounded-3 px-3">
+                    <i class="fa-solid fa-arrow-left me-2"></i>My Bookings
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-primary rounded-3 px-3">
+                    <i class="fa-solid fa-print me-2"></i>Print Ticket
+                </button>
+            </div>
+
+            <!-- Ticket Card -->
+            <div id="printable-ticket" class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <!-- Header Band -->
+                <div class="ticket-header p-4 text-white"
+                     style="background: linear-gradient(135deg, #4f46e5, #0ea5e9);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fa-solid fa-truck-ramp-box fs-4"></i>
+                                <span class="fw-bold fs-5">TMS PRO</span>
+                            </div>
+                            <div class="opacity-75 small">Smart Transport Management System</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small opacity-75">BOOKING REFERENCE</div>
+                            <div class="fw-bold fs-4 font-monospace">@Model.BookingReference</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Banner -->
+                <div class="px-4 py-2 text-center fw-bold small
+                    @(Model.Status == BookingStatus.Confirmed ? "bg-success-subtle text-success" :
+                      Model.Status == BookingStatus.Cancelled ? "bg-danger-subtle text-danger" :
+                      Model.Status == BookingStatus.Completed ? "bg-primary-subtle text-primary" :
+                      "bg-warning-subtle text-warning")">
+                    <i class="fa-solid fa-circle-dot me-1"></i>
+                    BOOKING STATUS: @Model.Status.ToString().ToUpper()
+                </div>
+
+                <!-- Ticket Body -->
+                <div class="card-body p-4">
+
+                    <!-- Route -->
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-4">
+                        <div class="text-center">
+                            <div class="text-muted small">FROM</div>
+                            <div class="fw-bold fs-5">@Model.Trip?.Route?.OriginStation?.StationName</div>
+                            <div class="text-muted small">@Model.Trip?.Route?.OriginStation?.City</div>
+                        </div>
+                        <div class="text-center px-3">
+                            <i class="fa-solid fa-bus text-primary fs-3 d-block mb-1"></i>
+                            <div class="text-muted small">@Model.Trip?.Route?.DistanceKm km</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-muted small">TO</div>
+                            <div class="fw-bold fs-5">@Model.Trip?.Route?.DestinationStation?.StationName</div>
+                            <div class="text-muted small">@Model.Trip?.Route?.DestinationStation?.City</div>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Divider -->
+                    <div class="ticket-tear d-flex align-items-center gap-2 my-3">
+                        <div class="flex-grow-1 border-top border-dashed border-secondary opacity-50"></div>
+                        <i class="fa-solid fa-scissors text-muted opacity-50"></i>
+                        <div class="flex-grow-1 border-top border-dashed border-secondary opacity-50"></div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 h-100">
+                                <div class="text-muted small text-uppercase mb-1">Passenger</div>
+                                <div class="fw-bold">@Model.User?.UserName</div>
+                                <div class="text-muted small">@Model.User?.Email</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 h-100 text-center">
+                                <div class="text-muted small text-uppercase mb-1">Seat</div>
+                                <div class="fw-bold display-6 text-primary">@Model.SeatNumber</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 border rounded-3">
+                                <div class="text-muted small text-uppercase mb-1">Date</div>
+                                <div class="fw-bold small">@Model.Trip?.DepartureDate.ToString("MMM dd, yyyy")</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 border rounded-3">
+                                <div class="text-muted small text-uppercase mb-1">Departs</div>
+                                <div class="fw-bold small">@(Model.Trip != null ? DateTime.Today.Add(Model.Trip.DepartureTime).ToString("hh:mm tt") : "-")</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 border rounded-3">
+                                <div class="text-muted small text-uppercase mb-1">Arrives</div>
+                                <div class="fw-bold small">@Model.Trip?.EstimatedArrivalTime.ToString("hh:mm tt")</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3">
+                                <div class="text-muted small text-uppercase mb-1">Vehicle</div>
+                                <div class="fw-bold small">@Model.Trip?.Vehicle?.VehicleName</div>
+                                <div class="text-muted small">@Model.Trip?.Vehicle?.VehicleNumber</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3">
+                                <div class="text-muted small text-uppercase mb-1">Driver</div>
+                                <div class="fw-bold small">@Model.Trip?.Driver?.FullName</div>
+                                <div class="text-muted small">@Model.Trip?.Driver?.PhoneNumber</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Status Footer -->
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3
+                        @(Model.PaymentStatus == PaymentStatus.Paid ? "bg-success-subtle" : "bg-warning-subtle")">
+                        <div>
+                            <div class="fw-bold small">Payment Status</div>
+                            <div class="text-muted small">Booked on @Model.BookingDate.ToString("MMM dd, yyyy hh:mm tt")</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge rounded-pill px-3 py-2 fw-bold
+                                @(Model.PaymentStatus == PaymentStatus.Paid ? "bg-success" :
+                                  Model.PaymentStatus == PaymentStatus.Refunded ? "bg-info" :
+                                  Model.PaymentStatus == PaymentStatus.Failed ? "bg-danger" :
+                                  "bg-warning text-dark")">
+                                @Model.PaymentStatus
+                            </span>
+                            @if (Model.TotalAmount > 0)
+                            {
+                                <div class="fw-bold fs-5 mt-1">৳@Model.TotalAmount.ToString("N0")</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Footer -->
+                <div class="bg-dark text-white text-center py-3 small opacity-75">
+                    TMS PRO — Smart Transport Management System &nbsp;|&nbsp; Thank you for travelling with us!
+                </div>
+            </div>
+
+            <!-- Cancel Booking -->
+            @if (Model.Status != BookingStatus.Cancelled && Model.Status != BookingStatus.Completed && !User.IsInRole("Admin"))
+            {
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-danger rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                        <i class="fa-solid fa-circle-xmark me-2"></i>Cancel This Booking
+                    </button>
+                </div>
+
+                <!-- Cancel Modal -->
+                <div class="modal fade" id="cancelModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 border-0 shadow-lg">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold">Cancel Booking?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-muted">This action cannot be undone. Please provide a reason.</p>
+                                <form asp-controller="Bookings" asp-action="Cancel" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                    <textarea name="reason" class="form-control form-control-modern mb-3" rows="2"
+                                              placeholder="Reason for cancellation..."></textarea>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-light flex-grow-1 rounded-3" data-bs-dismiss="modal">Keep Booking</button>
+                                        <button type="submit" class="btn btn-danger flex-grow-1 rounded-3 fw-bold">Confirm Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn, nav, .alert, button { display: none !important; }
+        #printable-ticket { box-shadow: none !important; }
+    }
+</style>

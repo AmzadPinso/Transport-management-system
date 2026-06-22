@@ -1,0 +1,128 @@
+@model Transport_Management_System.Models.ViewModels.BookingConfirmViewModel
+
+@{
+    ViewData["Title"] = "Confirm Your Booking";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-10">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a asp-controller="Bookings" asp-action="SelectSeat" asp-route-id="@Model.TripId"
+                   class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h3 fw-bold mb-1">Confirm Booking</h1>
+                    <p class="text-muted small mb-0">Review your booking details before confirming.</p>
+                </div>
+            </div>
+
+            <!-- Booking Summary Card -->
+            <div class="card border-0 shadow rounded-4 mb-4 overflow-hidden">
+                <div class="bg-primary text-white p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fa-solid fa-ticket-simple fs-3 mb-2 d-block opacity-75"></i>
+                            <h4 class="fw-bold mb-0">Booking Summary</h4>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-1 fw-bold">@Model.SeatNumber</div>
+                            <small class="opacity-75">Your Seat</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Route Visualization -->
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-4">
+                        <div class="text-center">
+                            <div class="fw-bold">@Model.Trip?.Route?.OriginStation?.StationName</div>
+                            <small class="text-muted">@Model.Trip?.Route?.OriginStation?.City</small>
+                        </div>
+                        <div class="text-center flex-grow-1 mx-3">
+                            <i class="fa-solid fa-arrow-right-long text-primary fs-4"></i>
+                            <div class="text-muted small">@Model.Trip?.Route?.DistanceKm km</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="fw-bold">@Model.Trip?.Route?.DestinationStation?.StationName</div>
+                            <small class="text-muted">@Model.Trip?.Route?.DestinationStation?.City</small>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <span class="text-muted small d-block">PASSENGER</span>
+                                <strong class="d-block">@Model.PassengerName</strong>
+                                <small class="text-muted">@Model.PassengerEmail</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <span class="text-muted small d-block">TRIP</span>
+                                <strong class="d-block">@Model.Trip?.TripName</strong>
+                                <small class="text-muted">#TRP-@Model.TripId</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="text-muted small d-block">DATE</span>
+                                <strong class="small">@Model.Trip?.DepartureDate.ToString("MMM dd, yyyy")</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="text-muted small d-block">DEPARTS</span>
+                                <strong class="small">@(Model.Trip != null ? DateTime.Today.Add(Model.Trip.DepartureTime).ToString("hh:mm tt") : "-")</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="text-muted small d-block">VEHICLE</span>
+                                <strong class="small">@Model.Trip?.Vehicle?.VehicleNumber</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 mb-4">
+                        <span class="fw-bold text-dark">Total Amount</span>
+                        <span class="fs-4 fw-bold text-success">
+                            @(Model.Trip?.TicketPrice > 0 ? $"৳{Model.Trip.TicketPrice:N0}" : "FREE")
+                        </span>
+                    </div>
+
+                    <!-- Confirm Form -->
+                    <form asp-action="Confirm" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="TripId" value="@Model.TripId" />
+                        <input type="hidden" name="SeatNumber" value="@Model.SeatNumber" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Remarks / Special Requests (Optional)</label>
+                            <textarea name="Remarks" class="form-control form-control-modern" rows="2"
+                                      placeholder="Any special requests or notes..."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <a asp-action="SelectSeat" asp-route-id="@Model.TripId"
+                               class="btn btn-light border flex-grow-1 py-3 rounded-3 fw-bold">
+                                Back
+                            </a>
+                            <button type="submit" class="btn btn-success flex-grow-1 py-3 rounded-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-circle-check me-2"></i>Confirm Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <p class="text-center text-muted small">
+                <i class="fa-solid fa-shield-halved me-1"></i>
+                Your booking is secure. Payment is collected on departure.
+            </p>
+        </div>
+    </div>
+</div>

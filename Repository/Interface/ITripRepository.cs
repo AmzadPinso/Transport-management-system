@@ -13,6 +13,11 @@ namespace Transport_Management_System.Repository.Interface
             int pageNumber,
             int pageSize);
 
+        Task<IEnumerable<Trip>> GetAvailableTripsAsync(
+            int? originStationId,
+            int? destinationStationId,
+            DateTime? departureDate);
+
         Task<bool> HasVehicleConflictAsync(int vehicleId, DateTime departure, DateTime arrival, int? excludeTripId = null);
         Task<bool> HasDriverConflictAsync(int driverId, DateTime departure, DateTime arrival, int? excludeTripId = null);
     }

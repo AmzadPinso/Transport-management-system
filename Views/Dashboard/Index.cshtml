@@ -153,6 +153,66 @@
     </div>
 </div>
 
+<!-- Booking & Ticketing Summary -->
+<h4 class="mt-4 mb-3 animate-fade-in delay-1 fw-bold"><i class="fa-solid fa-ticket text-primary me-2"></i>Booking & Ticketing Summary</h4>
+<div class="stats-grid animate-fade-in delay-1 mb-4">
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Total Bookings</p>
+            <h3 class="stat-value">@ViewBag.TotalBookings</h3>
+            <div class="stat-trend text-muted small">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Overall passenger reservations</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-primary-subtle text-primary">
+            <i class="fa-solid fa-ticket"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Confirmed Bookings</p>
+            <h3 class="stat-value">@ViewBag.ConfirmedBookings</h3>
+            <div class="stat-trend text-success small">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Ready for departure</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-success-subtle text-success">
+            <i class="fa-solid fa-check-double"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Pending & Cancelled</p>
+            <h3 class="stat-value">@ViewBag.PendingBookings</h3>
+            <div class="stat-trend text-danger small">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <span>@ViewBag.CancelledBookings Cancelled bookings</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-warning-subtle text-warning">
+            <i class="fa-solid fa-spinner"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Total Revenue</p>
+            <h3 class="stat-value">৳@(((decimal)ViewBag.TotalRevenue).ToString("N0"))</h3>
+            <div class="stat-trend text-success small">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Collected from paid bookings</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-info-subtle text-info">
+            <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Row -->
 <div class="row animate-fade-in delay-2 mb-4">
     <div class="col-lg-8 mb-4 mb-lg-0">

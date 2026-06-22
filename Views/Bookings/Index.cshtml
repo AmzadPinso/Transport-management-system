@@ -1,0 +1,181 @@
+@model Transport_Management_System.Models.ViewModels.TripSearchViewModel
+
+@{
+    ViewData["Title"] = "Search & Book Trips";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Book a Trip</h1>
+            <p class="text-muted small mb-0">Search available routes and book your seat instantly.</p>
+        </div>
+        <a asp-controller="Bookings" asp-action="History" class="btn-modern btn-modern-primary shadow-sm">
+            <i class="fa-solid fa-ticket"></i> <span>My Bookings</span>
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Search Card -->
+    <div class="card border-0 shadow rounded-4 mb-5">
+        <div class="card-body p-5">
+            <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-magnifying-glass me-2"></i>Find Available Trips</h5>
+            <form asp-action="Index" method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">From</label>
+                        <select name="originStationId" class="form-select form-control-modern">
+                            <option value="">Any Origin</option>
+                            @foreach (var station in Model.Stations)
+                            {
+                                <option value="@station.StationId" selected="@(Model.OriginStationId == station.StationId)">
+                                    @station.StationName — @station.City
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">To</label>
+                        <select name="destinationStationId" class="form-select form-control-modern">
+                            <option value="">Any Destination</option>
+                            @foreach (var station in Model.Stations)
+                            {
+                                <option value="@station.StationId" selected="@(Model.DestinationStationId == station.StationId)">
+                                    @station.StationName — @station.City
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">Departure Date</label>
+                        <input type="date" name="departureDate"
+                               value="@Model.DepartureDate?.ToString("yyyy-MM-dd")"
+                               class="form-control form-control-modern" />
+                    </div>
+                    <div class="col-lg-3 col-md-6 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1 py-3 rounded-3 fw-bold">
+                            <i class="fa-solid fa-magnifying-glass me-2"></i>Search Trips
+                        </button>
+                        @if (Model.OriginStationId.HasValue || Model.DestinationStationId.HasValue || Model.DepartureDate.HasValue)
+                        {
+                            <a asp-action="Index" class="btn btn-outline-secondary px-3 rounded-3" title="Clear">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    @if (Model.SearchResults != null)
+    {
+        if (Model.SearchResults.Any())
+        {
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-list-ul text-primary me-2"></i>Available Trips</h4>
+            <div class="row g-4">
+                @foreach (var trip in Model.SearchResults)
+                {
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 trip-card">
+                            <div class="card-body p-4">
+                                <!-- Route Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 small fw-bold mb-2">
+                                            <i class="fa-solid fa-route me-1"></i>@trip.Route?.RouteName
+                                        </span>
+                                        <h5 class="fw-bold mb-0">@trip.TripName</h5>
+                                    </div>
+                                    @if (trip.TicketPrice > 0)
+                                    {
+                                        <div class="text-end">
+                                            <div class="fs-4 fw-bold text-success">৳@trip.TicketPrice.ToString("N0")</div>
+                                            <small class="text-muted">per seat</small>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-bold">FREE</span>
+                                    }
+                                </div>
+
+                                <!-- Route Stations -->
+                                <div class="d-flex align-items-center gap-2 mb-3 p-3 bg-light rounded-3">
+                                    <div class="text-center">
+                                        <i class="fa-solid fa-location-dot text-danger mb-1 fs-5"></i>
+                                        <div class="fw-bold small">@trip.Route?.OriginStation?.StationName</div>
+                                        <div class="text-muted" style="font-size:.75rem">@trip.Route?.OriginStation?.City</div>
+                                    </div>
+                                    <div class="flex-grow-1 text-center">
+                                        <i class="fa-solid fa-arrow-right-long text-muted fs-5"></i>
+                                        <div class="text-muted" style="font-size:.7rem">@trip.Route?.DistanceKm km</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fa-solid fa-location-dot text-success mb-1 fs-5"></i>
+                                        <div class="fw-bold small">@trip.Route?.DestinationStation?.StationName</div>
+                                        <div class="text-muted" style="font-size:.75rem">@trip.Route?.DestinationStation?.City</div>
+                                    </div>
+                                </div>
+
+                                <!-- Trip Details Row -->
+                                <div class="row g-2 mb-4">
+                                    <div class="col-4 text-center p-2 bg-light rounded-3">
+                                        <i class="fa-solid fa-calendar text-primary mb-1 d-block"></i>
+                                        <div class="fw-bold small">@trip.DepartureDate.ToString("MMM dd")</div>
+                                        <div class="text-muted" style="font-size:.72rem">Date</div>
+                                    </div>
+                                    <div class="col-4 text-center p-2 bg-light rounded-3">
+                                        <i class="fa-solid fa-clock text-primary mb-1 d-block"></i>
+                                        <div class="fw-bold small">@DateTime.Today.Add(trip.DepartureTime).ToString("hh:mm tt")</div>
+                                        <div class="text-muted" style="font-size:.72rem">Departs</div>
+                                    </div>
+                                    <div class="col-4 text-center p-2 bg-light rounded-3">
+                                        <i class="fa-solid fa-couch text-success mb-1 d-block"></i>
+                                        <div class="fw-bold small text-success">@trip.AvailableCapacity</div>
+                                        <div class="text-muted" style="font-size:.72rem">Seats Left</div>
+                                    </div>
+                                </div>
+
+                                <!-- Driver & Vehicle -->
+                                <div class="d-flex align-items-center gap-2 mb-4 text-muted small">
+                                    <i class="fa-solid fa-truck"></i>
+                                    <span>@trip.Vehicle?.VehicleName (@trip.Vehicle?.VehicleNumber)</span>
+                                    <span class="mx-2">|</span>
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <span>@trip.Driver?.FullName</span>
+                                </div>
+
+                                <a asp-controller="Bookings" asp-action="SelectSeat" asp-route-id="@trip.TripId"
+                                   class="btn btn-primary w-100 rounded-3 py-2.5 fw-bold">
+                                    <i class="fa-solid fa-couch me-2"></i>Select Seat & Book
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 my-4">
+                <i class="fa-solid fa-bus-simple d-block fs-1 mb-3 text-muted opacity-50"></i>
+                <h5 class="fw-bold text-muted">No trips found</h5>
+                <p class="text-muted">Try changing your search filters or departure date.</p>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .trip-card { transition: transform .2s ease, box-shadow .2s ease; }
+    .trip-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.12) !important; }
+</style>

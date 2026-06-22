@@ -141,5 +141,39 @@ namespace Transport_Management_System.Repository.Application
 
             return false;
         }
+
+        public async Task<IEnumerable<Trip>> GetAvailableTripsAsync(
+            int? originStationId,
+            int? destinationStationId,
+            DateTime? departureDate)
+        {
+            var query = _context.Trips
+                .Include(t => t.Route)
+                    .ThenInclude(r => r.OriginStation)
+                .Include(t => t.Route)
+                    .ThenInclude(r => r.DestinationStation)
+                .Include(t => t.Vehicle)
+                .Include(t => t.Driver)
+                .Where(t => (t.Status == TripStatus.Scheduled || t.Status == TripStatus.ReadyForDispatch)
+                            && t.AvailableCapacity > 0)
+                .AsQueryable();
+
+            if (originStationId.HasValue)
+                query = query.Where(t => t.Route.OriginStationId == originStationId.Value);
+
+            if (destinationStationId.HasValue)
+                query = query.Where(t => t.Route.DestinationStationId == destinationStationId.Value);
+
+            if (departureDate.HasValue)
+            {
+                var date = departureDate.Value.Date;
+                query = query.Where(t => t.DepartureDate.Date == date);
+            }
+
+            return await query
+                .OrderBy(t => t.DepartureDate)
+                .ThenBy(t => t.DepartureTime)
+                .ToListAsync();
+        }
     }
 }

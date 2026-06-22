@@ -1,0 +1,195 @@
+@model IEnumerable<Transport_Management_System.Models.Booking>
+
+@{
+    ViewData["Title"] = "Booking Management";
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Booking Management</h1>
+            <p class="text-muted small mb-0">Monitor, filter, and manage all system bookings.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Stats Row -->
+    <div class="stats-grid animate-fade-in delay-1 mb-4">
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Total Bookings</p>
+                <h3 class="stat-value">@ViewBag.TotalBookings</h3>
+            </div>
+            <div class="stat-icon bg-primary-subtle text-primary"><i class="fa-solid fa-ticket"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Confirmed</p>
+                <h3 class="stat-value">@ViewBag.ConfirmedBookings</h3>
+            </div>
+            <div class="stat-icon bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Pending</p>
+                <h3 class="stat-value">@ViewBag.PendingBookings</h3>
+            </div>
+            <div class="stat-icon bg-warning-subtle text-warning"><i class="fa-solid fa-clock"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Revenue (Paid)</p>
+                <h3 class="stat-value">৳@((decimal)ViewBag.TotalRevenue).ToString("N0")</h3>
+            </div>
+            <div class="stat-icon bg-info-subtle text-info"><i class="fa-solid fa-bangladeshi-taka-sign"></i></div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                <div class="col-lg-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="search" value="@ViewBag.Search"
+                               class="form-control bg-light border-0 ps-0" placeholder="Reference, name, email..." />
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <select name="status" class="form-select bg-light border-0" asp-items="Html.GetEnumSelectList<BookingStatus>()">
+                        <option value="">All Statuses</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <select name="paymentStatus" class="form-select bg-light border-0" asp-items="Html.GetEnumSelectList<PaymentStatus>()">
+                        <option value="">All Payments</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control bg-light border-0" placeholder="From" />
+                </div>
+                <div class="col-lg-2">
+                    <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control bg-light border-0" placeholder="To" />
+                </div>
+                <div class="col-lg-1 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary rounded-3 w-100" title="Filter"><i class="fa-solid fa-filter"></i></button>
+                    @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.SelectedStatus != null || ViewBag.SelectedPayment != null)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-3" title="Clear"><i class="fa-solid fa-xmark"></i></a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container animate-fade-in-up">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Passenger</th>
+                    <th>Trip / Route</th>
+                    <th>Seat</th>
+                    <th>Booked On</th>
+                    <th>Booking Status</th>
+                    <th>Payment</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var b in Model)
+                    {
+                        <tr>
+                            <td><span class="fw-bold text-primary font-monospace small">@b.BookingReference</span></td>
+                            <td>
+                                <div class="fw-medium">@b.User?.UserName</div>
+                                <div class="small text-muted">@b.User?.Email</div>
+                            </td>
+                            <td>
+                                <div class="fw-medium small">@b.Trip?.TripName</div>
+                                <div class="text-muted" style="font-size:.72rem">
+                                    @b.Trip?.Route?.OriginStation?.StationName <i class="fa-solid fa-arrow-right-long mx-1"></i> @b.Trip?.Route?.DestinationStation?.StationName
+                                </div>
+                            </td>
+                            <td><span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2">@b.SeatNumber</span></td>
+                            <td class="small text-muted">@b.BookingDate.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @switch (b.Status)
+                                {
+                                    case BookingStatus.Confirmed: <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">Confirmed</span> break;
+                                    case BookingStatus.Pending:   <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">Pending</span>   break;
+                                    case BookingStatus.Cancelled: <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2">Cancelled</span>   break;
+                                    case BookingStatus.Completed: <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">Completed</span> break;
+                                }
+                            </td>
+                            <td>
+                                @switch (b.PaymentStatus)
+                                {
+                                    case PaymentStatus.Paid:      <span class="badge bg-success text-white rounded-pill px-3 py-2">Paid</span>     break;
+                                    case PaymentStatus.Pending:   <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Pending</span> break;
+                                    case PaymentStatus.Refunded:  <span class="badge bg-info text-white rounded-pill px-3 py-2">Refunded</span>  break;
+                                    case PaymentStatus.Failed:    <span class="badge bg-danger text-white rounded-pill px-3 py-2">Failed</span>   break;
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@b.BookingId"
+                                   class="btn btn-sm btn-outline-info border-0 rounded-circle p-2" title="View Details">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-ticket-simple d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No bookings found matching your filters.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination gap-2">
+                    <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link border-0 rounded-circle shadow-sm @(i == pageNumber ? "bg-primary text-white" : "bg-white text-dark")"
+                               asp-action="Index" asp-route-pageNumber="@i">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(pageNumber == totalPages ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

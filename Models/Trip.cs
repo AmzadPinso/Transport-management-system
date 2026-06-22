@@ -53,6 +53,11 @@ namespace Transport_Management_System.Models
         [Display(Name = "Available Capacity")]
         public int AvailableCapacity { get; set; }
 
+        [Range(0, 99999, ErrorMessage = "Ticket price must be a positive value")]
+        [Display(Name = "Ticket Price (BDT)")]
+        [DataType(DataType.Currency)]
+        public decimal TicketPrice { get; set; } = 0;
+
         [Required]
         public TripStatus Status { get; set; } = TripStatus.Scheduled;
 
