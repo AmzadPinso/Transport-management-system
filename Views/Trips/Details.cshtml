@@ -1,0 +1,289 @@
+@model Transport_Management_System.Models.Trip
+
+@{
+    ViewData["Title"] = "Trip Dispatch Details";
+}
+
+<div class="container py-4">
+    <!-- Header/Back Nav -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Back to List">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="h3 fw-bold mb-1">@Model.TripName</h1>
+                <p class="text-muted small mb-0">Trip ID: #TRP-@Model.TripId | Created on @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.TripId" class="btn btn-outline-primary px-4 rounded-3 fw-bold">
+                <i class="fa-solid fa-pen-to-square me-2"></i>Edit Schedule
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Status Lifecycle Progress Timeline -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-4 text-secondary small text-uppercase tracking-wider">Trip Lifecycle State</h5>
+            <div class="row text-center position-relative">
+                <!-- Progress Line background -->
+                <div class="position-absolute start-0 end-0 top-50 translate-middle-y d-none d-md-block" style="height: 4px; background-color: var(--border); z-index: 1;"></div>
+                
+                @{
+                    int step = 1;
+                    if (Model.Status == TripStatus.ReadyForDispatch) step = 2;
+                    else if (Model.Status == TripStatus.Ongoing || Model.Status == TripStatus.Delayed) step = 3;
+                    else if (Model.Status == TripStatus.Completed || Model.Status == TripStatus.Cancelled) step = 4;
+                }
+
+                <div class="col-md-3 z-3 position-relative mb-3 mb-md-0">
+                    <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center shadow-sm @(step >= 1 ? "bg-primary text-white" : "bg-light text-muted")" style="width: 45px; height: 45px; z-index: 2;">
+                        <i class="fa-solid fa-calendar"></i>
+                    </div>
+                    <div class="mt-2 fw-bold small">Scheduled</div>
+                </div>
+
+                <div class="col-md-3 z-3 position-relative mb-3 mb-md-0">
+                    <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center shadow-sm @(step >= 2 ? "bg-primary text-white" : "bg-light text-muted")" style="width: 45px; height: 45px; z-index: 2;">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <div class="mt-2 fw-bold small">Ready for Dispatch</div>
+                </div>
+
+                <div class="col-md-3 z-3 position-relative mb-3 mb-md-0">
+                    <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center shadow-sm @(step >= 3 ? "bg-primary text-white" : "bg-light text-muted")" style="width: 45px; height: 45px; z-index: 2;">
+                        <i class="fa-solid fa-truck-moving"></i>
+                    </div>
+                    <div class="mt-2 fw-bold small">@((Model.Status == TripStatus.Delayed) ? "Delayed" : "Ongoing")</div>
+                </div>
+
+                <div class="col-md-3 z-3 position-relative mb-3 mb-md-0">
+                    <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center shadow-sm @(step >= 4 ? (Model.Status == TripStatus.Cancelled ? "bg-danger text-white" : "bg-success text-white") : "bg-light text-muted")" style="width: 45px; height: 45px; z-index: 2;">
+                        <i class="fa-solid @(Model.Status == TripStatus.Cancelled ? "fa-circle-xmark" : "fa-circle-check")"></i>
+                    </div>
+                    <div class="mt-2 fw-bold small">@((Model.Status == TripStatus.Cancelled) ? "Cancelled" : "Completed")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="row g-4">
+        <!-- Details Column -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4"><i class="fa-solid fa-circle-info text-primary me-2"></i>Schedule Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-muted d-block small">Departure Date</span>
+                            <strong class="fs-5">@Model.DepartureDate.ToString("MMMM dd, yyyy")</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted d-block small">Departure Time</span>
+                            <strong class="fs-5">@DateTime.Today.Add(Model.DepartureTime).ToString("hh:mm tt")</strong>
+                        </div>
+                        <div class="col-md-12 border-top pt-3">
+                            <span class="text-muted d-block small">Estimated Arrival Time</span>
+                            <strong class="fs-5">@Model.EstimatedArrivalTime.ToString("MMMM dd, yyyy | hh:mm tt")</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Route Info -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4"><i class="fa-solid fa-route text-primary me-2"></i>Route Assignment</h5>
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-3">
+                        <div>
+                            <span class="small text-muted d-block">ROUTE NAME</span>
+                            <strong>@Model.Route?.RouteName</strong>
+                        </div>
+                        <div>
+                            <span class="small text-muted d-block">TOTAL STOPS</span>
+                            <span class="badge bg-secondary rounded-pill">@(Model.Route?.DistanceKm ?? 0) km</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-5 text-center p-3 bg-primary-subtle rounded-3">
+                            <i class="fa-solid fa-location-dot text-primary mb-2 fs-4"></i>
+                            <span class="d-block text-muted small">Origin</span>
+                            <strong class="d-block">@Model.Route?.OriginStation?.StationName</strong>
+                            <small class="text-muted">@Model.Route?.OriginStation?.Address</small>
+                        </div>
+                        <div class="col-sm-2 d-flex align-items-center justify-content-center py-3">
+                            <i class="fa-solid fa-chevron-right text-muted fs-4 d-none d-sm-block"></i>
+                            <i class="fa-solid fa-chevron-down text-muted fs-4 d-block d-sm-none"></i>
+                        </div>
+                        <div class="col-sm-5 text-center p-3 bg-success-subtle rounded-3">
+                            <i class="fa-solid fa-location-dot text-success mb-2 fs-4"></i>
+                            <span class="d-block text-muted small">Destination</span>
+                            <strong class="d-block">@Model.Route?.DestinationStation?.StationName</strong>
+                            <small class="text-muted">@Model.Route?.DestinationStation?.Address</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remarks -->
+            @if (!string.IsNullOrEmpty(Model.Remarks))
+            {
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-comment-dots text-primary me-2"></i>Remarks</h5>
+                        <p class="mb-0 text-dark">@Model.Remarks</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Right Column (Vehicle, Driver, Dispatch Panel) -->
+        <div class="col-lg-4">
+            <!-- Dispatch Panel -->
+            <div class="card border-0 shadow shadow-sm rounded-4 mb-4 bg-dark text-white">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3 text-secondary small text-uppercase tracking-wider">Dispatch Operations</h5>
+                    <div class="mb-4">
+                        <span class="text-muted d-block small">CURRENT STATUS</span>
+                        <span class="fs-4 fw-bold text-warning">@Model.Status</span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        @if (Model.Status == TripStatus.Scheduled)
+                        {
+                            <form asp-action="UpdateStatus" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.TripId" />
+                                <input type="hidden" name="status" value="@TripStatus.ReadyForDispatch" />
+                                <button type="submit" class="btn btn-info w-100 py-2.5 rounded-3 fw-bold text-white">
+                                    <i class="fa-solid fa-truck-ramp-box me-2"></i>Mark Ready for Dispatch
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == TripStatus.ReadyForDispatch)
+                        {
+                            <form asp-action="UpdateStatus" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.TripId" />
+                                <input type="hidden" name="status" value="@TripStatus.Ongoing" />
+                                <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3 fw-bold">
+                                    <i class="fa-solid fa-truck-moving me-2"></i>Start Trip (Dispatch)
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == TripStatus.Ongoing)
+                        {
+                            <form asp-action="UpdateStatus" method="post" class="mb-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.TripId" />
+                                <input type="hidden" name="status" value="@TripStatus.Completed" />
+                                <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3 fw-bold">
+                                    <i class="fa-solid fa-circle-check me-2"></i>Complete Trip
+                                </button>
+                            </form>
+
+                            <form asp-action="UpdateStatus" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.TripId" />
+                                <input type="hidden" name="status" value="@TripStatus.Delayed" />
+                                <button type="submit" class="btn btn-warning w-100 py-2.5 rounded-3 fw-bold text-dark">
+                                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Mark Delayed
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == TripStatus.Delayed)
+                        {
+                            <form asp-action="UpdateStatus" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.TripId" />
+                                <input type="hidden" name="status" value="@TripStatus.Completed" />
+                                <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3 fw-bold">
+                                    <i class="fa-solid fa-circle-check me-2"></i>Complete Trip
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == TripStatus.Scheduled || Model.Status == TripStatus.ReadyForDispatch || Model.Status == TripStatus.Delayed)
+                        {
+                            <form asp-action="UpdateStatus" method="post" class="mt-2 pt-2 border-top border-secondary">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.TripId" />
+                                <input type="hidden" name="status" value="@TripStatus.Cancelled" />
+                                <button type="submit" class="btn btn-outline-danger w-100 py-2.5 rounded-3 fw-bold">
+                                    <i class="fa-solid fa-circle-xmark me-2"></i>Cancel Trip
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == TripStatus.Completed || Model.Status == TripStatus.Cancelled)
+                        {
+                            <div class="alert alert-secondary mb-0 text-center rounded-3 bg-secondary bg-opacity-25 border-0">
+                                <i class="fa-solid fa-lock me-2"></i>Trip operations are locked.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3 text-secondary small text-uppercase tracking-wider">Assigned Vehicle</h5>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="user-avatar" style="width: 45px; height: 45px; font-size: 1.1rem; background-color: var(--bs-primary-bg-subtle); color: var(--bs-primary);">
+                            <i class="fa-solid fa-truck"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">@Model.Vehicle?.VehicleName</h6>
+                            <small class="text-muted">@Model.Vehicle?.VehicleNumber</small>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3 row">
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Vehicle Capacity</span>
+                            <strong>@Model.Vehicle?.Capacity Seats</strong>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Available Capacity</span>
+                            <strong class="text-success">@Model.AvailableCapacity Seats</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3 text-secondary small text-uppercase tracking-wider">Assigned Driver</h5>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="user-avatar" style="width: 45px; height: 45px; font-size: 1.1rem; background-color: var(--bs-success-bg-subtle); color: var(--bs-success);">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">@Model.Driver?.FullName</h6>
+                            <small class="text-muted">Lic: @Model.Driver?.LicenseNumber</small>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3">
+                        <span class="text-muted small d-block">Contact Phone</span>
+                        <strong>@Model.Driver?.PhoneNumber</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

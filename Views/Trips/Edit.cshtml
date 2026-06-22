@@ -1,0 +1,115 @@
+@model Transport_Management_System.Models.ViewModels.TripFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Trip Schedule";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Header -->
+            <div class="mb-4 d-flex align-items-center gap-3">
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Back to List">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h3 fw-bold mb-1">Edit Trip Schedule</h1>
+                    <p class="text-muted small mb-0">Modify details, swap drivers or vehicles, and update timings for trip #TRP-@Model.TripId.</p>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-5">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="TripId" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4 p-3 bg-danger-subtle rounded-3 small"></div>
+
+                        <!-- Trip Name -->
+                        <div class="mb-4">
+                            <label asp-for="TripName" class="form-label fw-bold text-dark"></label>
+                            <input asp-for="TripName" class="form-control form-control-modern" placeholder="e.g., Trip #104 - Express" />
+                            <span asp-validation-for="TripName" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Route Assignment -->
+                        <div class="mb-4">
+                            <label asp-for="RouteId" class="form-label fw-bold text-dark"></label>
+                            <select asp-for="RouteId" class="form-select form-control-modern" asp-items="ViewBag.Routes">
+                                <option value="">-- Select Route --</option>
+                            </select>
+                            <span asp-validation-for="RouteId" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Vehicle & Driver Row -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="VehicleId" class="form-label fw-bold text-dark"></label>
+                                <select asp-for="VehicleId" class="form-select form-control-modern" asp-items="ViewBag.Vehicles">
+                                    <option value="">-- Assign Vehicle --</option>
+                                </select>
+                                <span asp-validation-for="VehicleId" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="DriverId" class="form-label fw-bold text-dark"></label>
+                                <select asp-for="DriverId" class="form-select form-control-modern" asp-items="ViewBag.Drivers">
+                                    <option value="">-- Assign Driver --</option>
+                                </select>
+                                <span asp-validation-for="DriverId" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Dates/Times Row -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="DepartureDate" class="form-label fw-bold text-dark"></label>
+                                <input asp-for="DepartureDate" type="date" class="form-control form-control-modern" />
+                                <span asp-validation-for="DepartureDate" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="DepartureTime" class="form-label fw-bold text-dark"></label>
+                                <input asp-for="DepartureTime" type="time" class="form-control form-control-modern" />
+                                <span asp-validation-for="DepartureTime" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <!-- Estimated Arrival Time -->
+                        <div class="mb-4">
+                            <label asp-for="EstimatedArrivalTime" class="form-label fw-bold text-dark"></label>
+                            <input asp-for="EstimatedArrivalTime" type="datetime-local" class="form-control form-control-modern" value="@Model.EstimatedArrivalTime.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="EstimatedArrivalTime" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Trip Status Dropdown (Available in Edit Mode) -->
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label fw-bold text-dark"></label>
+                            <select asp-for="Status" class="form-select form-control-modern" asp-items="Html.GetEnumSelectList<TripStatus>()">
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Remarks / Notes -->
+                        <div class="mb-4">
+                            <label asp-for="Remarks" class="form-label fw-bold text-dark">Remarks / Notes</label>
+                            <textarea asp-for="Remarks" class="form-control form-control-modern" rows="3" placeholder="Add remarks..."></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-3 justify-content-end mt-5 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-light border px-4 py-2.5 rounded-3 fw-bold">Cancel</a>
+                            <button type="submit" class="btn-modern btn-modern-primary px-5 py-2.5 shadow-sm rounded-3">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

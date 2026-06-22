@@ -1,0 +1,64 @@
+@model Transport_Management_System.Models.Trip
+
+@{
+    ViewData["Title"] = "Delete Trip Schedule";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow rounded-4 overflow-hidden">
+                <!-- Header Alert -->
+                <div class="bg-danger text-white text-center py-4">
+                    <i class="fa-solid fa-triangle-exclamation fs-1 mb-2 d-block"></i>
+                    <h3 class="fw-bold h4 mb-0">Delete Trip Schedule?</h3>
+                </div>
+
+                <div class="card-body p-4">
+                    <p class="text-muted text-center mb-4">Are you sure you want to permanently delete this trip schedule? This action cannot be undone.</p>
+
+                    <!-- Details Box -->
+                    <div class="bg-light rounded-3 p-3 mb-4">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <span class="text-muted small d-block text-uppercase">Trip Name</span>
+                                <strong class="text-dark">@Model.TripName</strong>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small d-block text-uppercase">Departure Date</span>
+                                <strong class="text-dark">@Model.DepartureDate.ToString("yyyy-MM-dd")</strong>
+                            </div>
+                            <div class="col-12 border-top pt-2">
+                                <span class="text-muted small d-block text-uppercase">Assigned Route</span>
+                                <strong class="text-dark">@Model.Route?.RouteName</strong>
+                            </div>
+                            <div class="col-6 border-top pt-2">
+                                <span class="text-muted small d-block text-uppercase">Vehicle</span>
+                                <strong class="text-dark">@Model.Vehicle?.VehicleName (@Model.Vehicle?.VehicleNumber)</strong>
+                            </div>
+                            <div class="col-6 border-top pt-2">
+                                <span class="text-muted small d-block text-uppercase">Driver</span>
+                                <strong class="text-dark">@Model.Driver?.FullName</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Form -->
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="TripId" />
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger py-2.5 rounded-3 fw-bold">
+                                <i class="fa-solid fa-trash-can me-2"></i>Yes, Delete Trip
+                            </button>
+                            <a asp-action="Index" class="btn btn-light border py-2.5 rounded-3 fw-bold">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

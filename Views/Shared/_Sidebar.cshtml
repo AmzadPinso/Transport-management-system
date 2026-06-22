@@ -46,6 +46,10 @@
             <i class="fa-solid fa-route"></i>
             <span>Routes</span>
         </a>
+        <a asp-controller="Trips" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Trips" ? "active" : "")">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Trips</span>
+        </a>
 
         <div class="nav-group-label">Management</div>
         <a href="#" class="sidebar-link">

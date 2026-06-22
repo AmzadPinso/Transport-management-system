@@ -11,15 +11,18 @@ namespace Transport_Management_System.Controllers
         private readonly IDriverRepository _driverRepo;
         private readonly IRouteRepository _routeRepo;
         private readonly IStationRepository _stationRepo;
+        private readonly ITripRepository _tripRepo;
 
         public DashboardController(
             IDriverRepository driverRepo,
             IRouteRepository routeRepo,
-            IStationRepository stationRepo)
+            IStationRepository stationRepo,
+            ITripRepository tripRepo)
         {
             _driverRepo = driverRepo;
             _routeRepo = routeRepo;
             _stationRepo = stationRepo;
+            _tripRepo = tripRepo;
         }
 
         public async Task<IActionResult> Index()
@@ -29,6 +32,7 @@ namespace Transport_Management_System.Controllers
             var drivers = await _driverRepo.GetAllAsync();
             var routes = await _routeRepo.GetAllAsync();
             var stations = await _stationRepo.GetAllAsync();
+            var trips = await _tripRepo.GetAllAsync();
             var now = DateTime.Now;
 
             ViewBag.TotalDrivers = drivers.Count();
@@ -41,6 +45,15 @@ namespace Transport_Management_System.Controllers
             ViewBag.ActiveRoutes = routes.Count(r => r.Status == RouteStatus.Active);
             ViewBag.TotalStations = stations.Count();
             ViewBag.ActiveStations = stations.Count(s => s.IsActive);
+
+            // Trip Statistics
+            ViewBag.TotalTrips = trips.Count();
+            ViewBag.ScheduledTrips = trips.Count(t => t.Status == TripStatus.Scheduled);
+            ViewBag.OngoingTrips = trips.Count(t => t.Status == TripStatus.Ongoing);
+            ViewBag.CompletedTrips = trips.Count(t => t.Status == TripStatus.Completed);
+            ViewBag.DelayedTrips = trips.Count(t => t.Status == TripStatus.Delayed);
+            ViewBag.CancelledTrips = trips.Count(t => t.Status == TripStatus.Cancelled);
+            ViewBag.ReadyForDispatchTrips = trips.Count(t => t.Status == TripStatus.ReadyForDispatch);
 
             return View();
         }

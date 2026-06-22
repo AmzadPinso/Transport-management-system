@@ -1,0 +1,247 @@
+@model IEnumerable<Transport_Management_System.Models.Trip>
+
+@{
+    ViewData["Title"] = "Trip Scheduling & Dispatch";
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Trip Schedules & Dispatch</h1>
+            <p class="text-muted small mb-0">Monitor, schedule, and dispatch fleet vehicles and drivers on active routes.</p>
+        </div>
+        <a asp-action="Create" class="btn-modern btn-modern-primary shadow-sm">
+            <i class="fa-solid fa-plus"></i> <span>Schedule New Trip</span>
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Search and Filter Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                <!-- Search input -->
+                <div class="col-lg-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search" 
+                               class="form-control bg-light border-0 ps-0" 
+                               placeholder="Search trip, route, driver..." />
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="col-lg-2">
+                    <select name="status" class="form-select bg-light border-0" asp-items="Html.GetEnumSelectList<TripStatus>()">
+                        <option value="">All Statuses</option>
+                    </select>
+                </div>
+
+                <!-- Driver Filter -->
+                <div class="col-lg-2">
+                    <select name="driverId" class="form-select bg-light border-0" asp-items="ViewBag.DriversList">
+                        <option value="">All Drivers</option>
+                    </select>
+                </div>
+
+                <!-- Vehicle Filter -->
+                <div class="col-lg-2">
+                    <select name="vehicleId" class="form-select bg-light border-0" asp-items="ViewBag.VehiclesList">
+                        <option value="">All Vehicles</option>
+                    </select>
+                </div>
+
+                <!-- Departure Date Filter -->
+                <div class="col-lg-2">
+                    <input type="date" name="departureDate" value="@ViewBag.SelectedDepartureDate" class="form-control bg-light border-0" />
+                </div>
+
+                <!-- Actions -->
+                <div class="col-lg-1 d-flex gap-1 justify-content-end">
+                    <button type="submit" class="btn btn-primary rounded-3 w-100" title="Apply Filters">
+                        <i class="fa-solid fa-filter"></i>
+                    </button>
+                    @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.SelectedStatus != null || ViewBag.SelectedDriverId != null || ViewBag.SelectedVehicleId != null || !string.IsNullOrEmpty(ViewBag.SelectedDepartureDate))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-3" title="Clear Filters">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trips Table Container -->
+    <div class="table-container animate-fade-in-up">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>Trip Details</th>
+                    <th>Route Details</th>
+                    <th>Vehicle Details</th>
+                    <th>Driver Details</th>
+                    <th>Departure Schedule</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- Trip Name -->
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem; background-color: var(--bs-primary-bg-subtle); color: var(--bs-primary);">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">@item.TripName</div>
+                                        <div class="small text-muted">ID: #TRP-@item.TripId</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Route -->
+                            <td>
+                                <div class="fw-bold">@item.Route?.RouteName</div>
+                                <div class="small text-muted">
+                                    @item.Route?.OriginStation?.StationName <i class="fa-solid fa-arrow-right-long mx-1 text-primary"></i> @item.Route?.DestinationStation?.StationName
+                                </div>
+                            </td>
+
+                            <!-- Vehicle -->
+                            <td>
+                                <div class="fw-medium text-dark">@item.Vehicle?.VehicleName</div>
+                                <div class="small text-muted">No: @item.Vehicle?.VehicleNumber</div>
+                            </td>
+
+                            <!-- Driver -->
+                            <td>
+                                <div class="fw-medium text-dark">@item.Driver?.FullName</div>
+                                <div class="small text-muted">Ph: @item.Driver?.PhoneNumber</div>
+                            </td>
+
+                            <!-- Schedule Time -->
+                            <td>
+                                <div class="fw-bold">@item.DepartureDate.ToString("MMM dd, yyyy")</div>
+                                <div class="small text-muted">
+                                    @DateTime.Today.Add(item.DepartureTime).ToString("hh:mm tt")
+                                </div>
+                            </td>
+
+                            <!-- Status Badge -->
+                            <td>
+                                @switch (item.Status)
+                                {
+                                    case TripStatus.Scheduled:
+                                        <span class="badge rounded-pill bg-light text-dark border px-3 py-2"><i class="fa-solid fa-calendar me-1"></i> Scheduled</span>
+                                        break;
+                                    case TripStatus.ReadyForDispatch:
+                                        <span class="badge rounded-pill bg-info-subtle text-info border-0 px-3 py-2"><i class="fa-solid fa-truck-ramp-box me-1"></i> Ready</span>
+                                        break;
+                                    case TripStatus.Ongoing:
+                                        <span class="badge rounded-pill bg-success-subtle text-success border-0 px-3 py-2"><i class="fa-solid fa-truck-moving me-1"></i> Ongoing</span>
+                                        break;
+                                    case TripStatus.Completed:
+                                        <span class="badge rounded-pill bg-success text-white border-0 px-3 py-2"><i class="fa-solid fa-circle-check me-1"></i> Completed</span>
+                                        break;
+                                    case TripStatus.Cancelled:
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger border-0 px-3 py-2"><i class="fa-solid fa-circle-xmark me-1"></i> Cancelled</span>
+                                        break;
+                                    case TripStatus.Delayed:
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning border-0 px-3 py-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Delayed</span>
+                                        break;
+                                }
+                            </td>
+
+                            <!-- Action buttons -->
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Edit Trip">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-info border-0 rounded-circle p-2" title="View Details / Dispatch">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" title="Delete Trip">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-calendar-xmark d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No trips found matching the selected criteria.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modern Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination pagination-modern gap-2">
+                    <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" 
+                           asp-route-pageNumber="@(pageNumber - 1)" 
+                           asp-route-search="@ViewBag.Search" 
+                           asp-route-status="@ViewBag.SelectedStatus"
+                           asp-route-driverId="@ViewBag.SelectedDriverId"
+                           asp-route-vehicleId="@ViewBag.SelectedVehicleId"
+                           asp-route-departureDate="@ViewBag.SelectedDepartureDate">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle @(i == pageNumber ? "bg-primary text-white" : "bg-white text-dark")" 
+                               asp-action="Index" 
+                               asp-route-pageNumber="@i" 
+                               asp-route-search="@ViewBag.Search" 
+                               asp-route-status="@ViewBag.SelectedStatus"
+                               asp-route-driverId="@ViewBag.SelectedDriverId"
+                               asp-route-vehicleId="@ViewBag.SelectedVehicleId"
+                               asp-route-departureDate="@ViewBag.SelectedDepartureDate">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(pageNumber == totalPages ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index" 
+                           asp-route-pageNumber="@(pageNumber + 1)" 
+                           asp-route-search="@ViewBag.Search" 
+                           asp-route-status="@ViewBag.SelectedStatus"
+                           asp-route-driverId="@ViewBag.SelectedDriverId"
+                           asp-route-vehicleId="@ViewBag.SelectedVehicleId"
+                           asp-route-departureDate="@ViewBag.SelectedDepartureDate">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

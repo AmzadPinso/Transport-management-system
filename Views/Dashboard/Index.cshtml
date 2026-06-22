@@ -93,6 +93,66 @@
     </div>
 </div>
 
+<!-- Trip Operations KPI Grid -->
+<h4 class="mt-4 mb-3 animate-fade-in delay-1 fw-bold"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Trip Operations Summary</h4>
+<div class="stats-grid animate-fade-in delay-1 mb-4">
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Total Trips</p>
+            <h3 class="stat-value">@ViewBag.TotalTrips</h3>
+            <div class="stat-trend text-muted small">
+                <i class="fa-solid fa-route"></i>
+                <span>Active operational trips</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-primary-subtle text-primary">
+            <i class="fa-solid fa-calendar-days"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Scheduled & Ready</p>
+            <h3 class="stat-value">@(ViewBag.ScheduledTrips + ViewBag.ReadyForDispatchTrips)</h3>
+            <div class="stat-trend text-muted small">
+                <i class="fa-solid fa-clock"></i>
+                <span>@ViewBag.ScheduledTrips Scheduled, @ViewBag.ReadyForDispatchTrips Ready</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-info-subtle text-info">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Ongoing / Delayed</p>
+            <h3 class="stat-value">@ViewBag.OngoingTrips</h3>
+            <div class="stat-trend text-warning small">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>@ViewBag.DelayedTrips Delayed Trips</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-warning-subtle text-warning">
+            <i class="fa-solid fa-truck-fast"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Completed & Cancelled</p>
+            <h3 class="stat-value">@ViewBag.CompletedTrips</h3>
+            <div class="stat-trend text-danger small">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <span>@ViewBag.CancelledTrips Cancelled Trips</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-success-subtle text-success">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Row -->
 <div class="row animate-fade-in delay-2 mb-4">
     <div class="col-lg-8 mb-4 mb-lg-0">

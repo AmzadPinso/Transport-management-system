@@ -19,10 +19,30 @@ namespace Transport_Management_System.Data
         public DbSet<IntermediateStop> IntermediateStops { get; set; }
         public DbSet<PickupPoint> PickupPoints { get; set; }
         public DbSet<DropOffPoint> DropOffPoints { get; set; }
+        public DbSet<Trip> Trips { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Configure Trip relationships to avoid multiple cascade path issues
+            modelBuilder.Entity<Trip>()
+                .HasOne(t => t.Route)
+                .WithMany()
+                .HasForeignKey(t => t.RouteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Trip>()
+                .HasOne(t => t.Vehicle)
+                .WithMany()
+                .HasForeignKey(t => t.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Trip>()
+                .HasOne(t => t.Driver)
+                .WithMany()
+                .HasForeignKey(t => t.DriverId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure One-to-Many relationship
             modelBuilder.Entity<User>()
