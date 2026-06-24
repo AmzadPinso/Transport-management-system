@@ -144,12 +144,12 @@
                                 <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem; background-color: var(--bs-primary-bg-subtle); color: var(--bs-primary);">
                                     <i class="fa-solid fa-route"></i>
                                 </div>
-                                <div class="fw-bold text-light">@item.RouteName</div>
+                                <div class="fw-bold text-dark">@item.RouteName</div>
                             </div>
                         </td>
-                        <td><span class="text-light">@(item.OriginStation?.StationName ?? "N/A")</span></td>
-                        <td><span class="text-light">@(item.DestinationStation?.StationName ?? "N/A")</span></td>
-                        <td><span class="text-light fw-bold">@item.DistanceKm km</span></td>
+                        <td><span class="text-dark">@(item.OriginStation?.StationName ?? "N/A")</span></td>
+                        <td><span class="text-dark">@(item.DestinationStation?.StationName ?? "N/A")</span></td>
+                        <td><span class="text-dark fw-bold">@item.DistanceKm km</span></td>
                         <td><span class="text-muted small">@durationStr</span></td>
                         <td>
                             <span class="badge rounded-pill @statusBadgeClass px-3 py-2 border-0">

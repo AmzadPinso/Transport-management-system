@@ -124,6 +124,7 @@ namespace Transport_Management_System.Controllers
                     DepartureDate = model.DepartureDate,
                     DepartureTime = model.DepartureTime,
                     EstimatedArrivalTime = model.EstimatedArrivalTime,
+                    TicketPrice = model.TicketPrice,
                     AvailableCapacity = vehicle?.Capacity ?? 0,
                     Status = TripStatus.Scheduled,
                     Remarks = model.Remarks,
@@ -160,6 +161,7 @@ namespace Transport_Management_System.Controllers
                 DepartureDate = trip.DepartureDate,
                 DepartureTime = trip.DepartureTime,
                 EstimatedArrivalTime = trip.EstimatedArrivalTime,
+                TicketPrice = trip.TicketPrice,
                 Remarks = trip.Remarks,
                 Status = trip.Status
             };
@@ -212,6 +214,7 @@ namespace Transport_Management_System.Controllers
                 trip.DepartureDate = model.DepartureDate;
                 trip.DepartureTime = model.DepartureTime;
                 trip.EstimatedArrivalTime = model.EstimatedArrivalTime;
+                trip.TicketPrice = model.TicketPrice;
                 trip.Remarks = model.Remarks;
                 trip.Status = model.Status;
                 trip.UpdatedAt = DateTime.Now;

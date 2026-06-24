@@ -42,6 +42,11 @@ namespace Transport_Management_System.Models.ViewModels
         [StringLength(500, ErrorMessage = "Remarks cannot exceed 500 characters")]
         public string? Remarks { get; set; }
 
+        [Required(ErrorMessage = "Ticket Price is required")]
+        [Display(Name = "Ticket Price (৳)")]
+        [Range(0, 10000, ErrorMessage = "Ticket Price must be between 0 and 10000")]
+        public decimal TicketPrice { get; set; } = 0;
+
         [Display(Name = "Trip Status")]
         public TripStatus Status { get; set; } = TripStatus.Scheduled;
     }

@@ -110,7 +110,7 @@
                                             <td>
                                                 <input type="number" name="stopOrders[@stop.IntermediateStopId]" value="@stop.SequenceOrder" min="1" class="form-control border-0 bg-light py-1 text-center font-monospace" />
                                             </td>
-                                            <td><span class="text-light fw-bold">@stop.Station?.StationName</span></td>
+                                            <td><span class="text-dark fw-bold">@stop.Station?.StationName</span></td>
                                             <td><span class="text-muted small">@stop.Station?.City, @stop.Station?.District</span></td>
                                             <td class="text-end">
                                                 <button type="submit" asp-action="RemoveStop" asp-route-stopId="@stop.IntermediateStopId" asp-route-routeId="@Model.RouteId" class="btn btn-sm btn-outline-danger border-0 rounded-pill px-3 py-1" onclick="return confirm('Remove this stop?')">
@@ -122,7 +122,7 @@
                                 </tbody>
                             </table>
 
-                            <button type="submit" class="btn btn-warning text-dark rounded-3 px-4 fw-bold">
+                            <button type="submit" class="btn btn-warning text-light rounded-3 px-4 fw-bold">
                                 <i class="fa-solid fa-arrows-rotate me-2"></i>Update Order/Sequence
                             </button>
                         </form>
