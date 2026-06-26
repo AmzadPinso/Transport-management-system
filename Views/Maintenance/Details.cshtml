@@ -1,0 +1,92 @@
+@model Transport_Management_System.Models.MaintenanceRecord
+@using Transport_Management_System.Models
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 font-weight-bold"><i class="fas fa-info-circle mr-2"></i>Maintenance Record Details</h5>
+                    <div>
+                        @switch (Model.Status)
+                        {
+                            case MaintenanceStatus.Completed:
+                                <span class="badge bg-success">Completed</span>
+                                break;
+                            case MaintenanceStatus.Scheduled:
+                                <span class="badge bg-primary">Scheduled</span>
+                                break;
+                            case MaintenanceStatus.InProgress:
+                                <span class="badge bg-info text-dark">In Progress</span>
+                                break;
+                            case MaintenanceStatus.Overdue:
+                                <span class="badge bg-danger">Overdue</span>
+                                break;
+                            case MaintenanceStatus.Cancelled:
+                                <span class="badge bg-secondary">Cancelled</span>
+                                break;
+                        }
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Vehicle Details</span>
+                            <span class="h5 text-dark font-weight-bold">@Model.Vehicle?.VehicleName</span>
+                            <span class="text-muted d-block">Number: @Model.Vehicle?.VehicleNumber</span>
+                            <span class="text-muted d-block">Type: @Model.Vehicle?.VehicleType</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Maintenance Type</span>
+                            <span class="h5 text-dark font-weight-bold">@Model.MaintenanceType.ToString()</span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Service Date</span>
+                            <span class="text-dark font-weight-bold">@Model.ServiceDate.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Next Service Due</span>
+                            <span class="text-dark font-weight-bold">@Model.NextServiceDate.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Maintenance Cost</span>
+                            <span class="text-dark font-weight-bold h5 text-primary">৳@Model.Cost.ToString("N2")</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Service Provider</span>
+                            <span class="text-dark">@(string.IsNullOrEmpty(Model.ServiceProvider) ? "N/A" : Model.ServiceProvider)</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Record Created</span>
+                            <span class="text-dark text-sm">@Model.CreatedAt.ToString("g")</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="text-muted d-block text-xs text-uppercase font-weight-bold mb-2">Service Notes</span>
+                        <div class="p-3 bg-light rounded text-dark" style="white-space: pre-line;">
+                            @(string.IsNullOrEmpty(Model.Notes) ? "No notes recorded for this service." : Model.Notes)
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to List
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@Model.MaintenanceRecordId" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-edit mr-2"></i>Edit Record
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

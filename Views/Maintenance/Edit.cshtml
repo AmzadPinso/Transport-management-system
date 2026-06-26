@@ -1,0 +1,89 @@
+@model Transport_Management_System.Models.ViewModels.MaintenanceFormViewModel
+@using Transport_Management_System.Models
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="m-0 font-weight-bold"><i class="fas fa-edit mr-2"></i>Edit Maintenance Record</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="MaintenanceRecordId" />
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="VehicleId" class="form-label font-weight-bold"></label>
+                                <select asp-for="VehicleId" asp-items="Model.VehicleList" class="form-select"></select>
+                                <span asp-validation-for="VehicleId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="MaintenanceType" class="form-label font-weight-bold"></label>
+                                <select asp-for="MaintenanceType" asp-items="Html.GetEnumSelectList<MaintenanceType>()" class="form-select"></select>
+                                <span asp-validation-for="MaintenanceType" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="ServiceDate" class="form-label font-weight-bold"></label>
+                                <input asp-for="ServiceDate" class="form-control" type="date" />
+                                <span asp-validation-for="ServiceDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="NextServiceDate" class="form-label font-weight-bold"></label>
+                                <input asp-for="NextServiceDate" class="form-control" type="date" />
+                                <span asp-validation-for="NextServiceDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="ServiceProvider" class="form-label font-weight-bold"></label>
+                                <input asp-for="ServiceProvider" class="form-control" />
+                                <span asp-validation-for="ServiceProvider" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Cost" class="form-label font-weight-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">৳</span>
+                                    <input asp-for="Cost" class="form-control" type="number" step="0.01" />
+                                </div>
+                                <span asp-validation-for="Cost" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Status" class="form-label font-weight-bold"></label>
+                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<MaintenanceStatus>()" class="form-select"></select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Notes" class="form-label font-weight-bold"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left mr-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-save mr-2"></i>Update Record
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

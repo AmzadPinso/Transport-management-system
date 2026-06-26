@@ -13,19 +13,28 @@ namespace Transport_Management_System.Controllers
         private readonly IStationRepository _stationRepo;
         private readonly ITripRepository _tripRepo;
         private readonly IBookingRepository _bookingRepo;
+        private readonly IMaintenanceRepository _maintenanceRepo;
+        private readonly IDriverIssueRepository _driverIssueRepo;
+        private readonly IExpenseRepository _expenseRepo;
 
         public DashboardController(
             IDriverRepository driverRepo,
             IRouteRepository routeRepo,
             IStationRepository stationRepo,
             ITripRepository tripRepo,
-            IBookingRepository bookingRepo)
+            IBookingRepository bookingRepo,
+            IMaintenanceRepository maintenanceRepo,
+            IDriverIssueRepository driverIssueRepo,
+            IExpenseRepository expenseRepo)
         {
             _driverRepo = driverRepo;
             _routeRepo = routeRepo;
             _stationRepo = stationRepo;
             _tripRepo = tripRepo;
             _bookingRepo = bookingRepo;
+            _maintenanceRepo = maintenanceRepo;
+            _driverIssueRepo = driverIssueRepo;
+            _expenseRepo = expenseRepo;
         }
 
         public async Task<IActionResult> Index()
@@ -65,7 +74,19 @@ namespace Transport_Management_System.Controllers
             ViewBag.CancelledBookings = await _bookingRepo.GetBookingsCountByStatusAsync(BookingStatus.Cancelled);
             ViewBag.TotalRevenue = await _bookingRepo.GetTotalRevenueAsync();
 
+            // Week 6 Sprint — Smart Features & Maintenance stats
+            ViewBag.OverdueMaintenanceCount = await _maintenanceRepo.GetOverdueCountAsync();
+            ViewBag.UpcomingMaintenanceCount = await _maintenanceRepo.GetUpcomingCountAsync(7);
+            ViewBag.InProgressMaintenanceCount = await _maintenanceRepo.GetInProgressCountAsync();
+            ViewBag.OpenDriverIssuesCount = await _driverIssueRepo.GetOpenIssuesCountAsync();
+            
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            ViewBag.TotalExpenses = await _expenseRepo.GetTotalExpensesAsync();
+            ViewBag.ThisMonthExpenses = await _expenseRepo.GetTotalExpensesAsync(startOfMonth, today);
+
             return View();
         }
     }
 }
+

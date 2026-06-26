@@ -1,0 +1,276 @@
+@model IEnumerable<Transport_Management_System.Models.MaintenanceRecord>
+@using Transport_Management_System.Models
+@using Transport_Management_System.Services
+
+@{
+    var alerts = ViewBag.Alerts as MaintenanceAlertViewModel;
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-dark font-weight-bold">Maintenance Monitoring & Alerts</h1>
+            <p class="text-muted">Track vehicle services, scheduled upkeep, and active alerts.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-plus mr-2"></i> Add Maintenance Record
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Cards Section -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Overdue Vehicles</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(alerts?.OverdueCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Upcoming Services (7 Days)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(alerts?.UpcomingCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Progress</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(alerts?.InProgressCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tools fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (alerts != null && alerts.Alerts.Any())
+    {
+        <div class="card border-0 shadow mb-4">
+            <div class="card-header bg-danger-soft py-3">
+                <h6 class="m-0 font-weight-bold text-danger"><i class="fas fa-bell mr-2"></i>Active Maintenance Alerts</h6>
+            </div>
+            <div class="card-body py-2">
+                <div class="list-group list-group-flush">
+                    @foreach (var alert in alerts.Alerts)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom">
+                            <div>
+                                <span class="badge @(alert.AlertType == "Overdue" ? "bg-danger" : "bg-warning") text-white mr-2">@alert.AlertType</span>
+                                <strong>@alert.VehicleName (@alert.VehicleNumber)</strong>
+                                <span class="text-muted d-block d-md-inline ml-md-2">@alert.Description</span>
+                            </div>
+                            <div>
+                                <a asp-action="Create" asp-route-vehicleId="@alert.VehicleId" class="btn btn-outline-primary btn-sm">
+                                    Schedule Service
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Filters and Table Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label font-weight-bold">Search</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search vehicle or provider..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label font-weight-bold">Vehicle</label>
+                    <select name="vehicleId" asp-items="ViewBag.VehicleList" class="form-select">
+                        <option value="">-- All Vehicles --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label font-weight-bold">Status</label>
+                    <select name="status" asp-items="Html.GetEnumSelectList<MaintenanceStatus>()" class="form-select">
+                        <option value="">-- All Statuses --</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100"><i class="fas fa-filter mr-2"></i>Filter</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light text-uppercase font-weight-bold text-xs text-muted">
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Type</th>
+                            <th>Service Date</th>
+                            <th>Next Service</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="font-weight-bold text-dark">@item.Vehicle?.VehicleName</div>
+                                        <div class="text-muted text-xs">@item.Vehicle?.VehicleNumber</div>
+                                    </td>
+                                    <td>@item.MaintenanceType.ToString()</td>
+                                    <td>@item.ServiceDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@item.NextServiceDate.ToString("yyyy-MM-dd")</td>
+                                    <td class="font-weight-bold">৳@item.Cost.ToString("N2")</td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case MaintenanceStatus.Completed:
+                                                <span class="badge bg-success">Completed</span>
+                                                break;
+                                            case MaintenanceStatus.Scheduled:
+                                                <span class="badge bg-primary">Scheduled</span>
+                                                break;
+                                            case MaintenanceStatus.InProgress:
+                                                <span class="badge bg-info text-dark">In Progress</span>
+                                                break;
+                                            case MaintenanceStatus.Overdue:
+                                                <span class="badge bg-danger">Overdue</span>
+                                                break;
+                                            case MaintenanceStatus.Cancelled:
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.MaintenanceRecordId" class="btn btn-outline-secondary btn-sm" title="View details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.MaintenanceRecordId" class="btn btn-outline-primary btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" title="Delete" 
+                                                    onclick="confirmDelete(@item.MaintenanceRecordId, '@item.Vehicle?.VehicleName')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-tools fa-3x mb-3 text-gray-300"></i>
+                                    <p class="mb-0">No maintenance records found matching your filters.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted text-sm">
+                        Showing page @ViewBag.PageNumber of @ViewBag.TotalPages (@ViewBag.TotalRecords total records)
+                    </div>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, status = ViewBag.SelectedStatus, pageNumber = ViewBag.PageNumber - 1 })">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, status = ViewBag.SelectedStatus, pageNumber = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(ViewBag.PageNumber == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, status = ViewBag.SelectedStatus, pageNumber = ViewBag.PageNumber + 1 })">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-trash-alt mr-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p>Are you sure you want to delete the maintenance record for <strong id="deleteTargetName"></strong>?</p>
+                <p class="text-danger mb-0"><small>This action cannot be undone and will remove the historical service cost record.</small></p>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" asp-action="Delete">
+                    <button type="submit" class="btn btn-danger">Delete Record</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id, name) {
+            document.getElementById('deleteTargetName').innerText = name;
+            document.getElementById('deleteForm').action = '/Maintenance/Delete/' + id;
+            var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+    </script>
+}
+
+<style>
+    .border-left-danger {
+        border-left: 0.25rem solid #e74a3b !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .bg-danger-soft {
+        background-color: #fdf2f2 !important;
+    }
+</style>

@@ -64,7 +64,7 @@ namespace Transport_Management_System.Controllers
 
         // ─── Seat Selection ───────────────────────────────────────
         // GET /Bookings/SelectSeat/5
-        public async Task<IActionResult> SelectSeat(int? id)
+        public async Task<IActionResult> SelectSeat(int? id, int passengerCount = 1)
         {
             if (id == null) return NotFound();
 
@@ -80,6 +80,7 @@ namespace Transport_Management_System.Controllers
             var bookedSeats = await _bookingRepo.GetBookedSeatsForTripAsync(trip.TripId);
             var seatList    = bookedSeats.ToList();
             var layout      = _seatService.GenerateSeatLayout(trip.Vehicle?.Capacity ?? 40, seatList);
+            var recommendation = _seatService.RecommendSeats(layout, passengerCount);
 
             var vm = new BookingSeatViewModel
             {
@@ -89,6 +90,8 @@ namespace Transport_Management_System.Controllers
                 TotalAvailable = (trip.Vehicle?.Capacity ?? 40) - seatList.Count
             };
 
+            ViewBag.Recommendation = recommendation;
+            ViewBag.PassengerCount = passengerCount;
             ViewData["Title"] = "Select Seat";
             return View(vm);
         }

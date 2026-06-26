@@ -1,0 +1,213 @@
+@model IEnumerable<Transport_Management_System.Models.DriverIssue>
+@using Transport_Management_System.Models
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-dark font-weight-bold">Driver Issue Logbook</h1>
+            <p class="text-muted">Report and track vehicle defects, mechanical issues, and road incidents.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-bullhorn mr-2"></i> Report New Issue
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters and Table Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label font-weight-bold">Search</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search description, driver..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Vehicle</label>
+                    <select name="vehicleId" asp-items="ViewBag.VehicleList" class="form-select">
+                        <option value="">-- All --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Driver</label>
+                    <select name="driverId" asp-items="ViewBag.DriverList" class="form-select">
+                        <option value="">-- All --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Status</label>
+                    <select name="status" asp-items="Html.GetEnumSelectList<IssueStatus>()" class="form-select">
+                        <option value="">-- All --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Priority</label>
+                    <select name="priority" asp-items="Html.GetEnumSelectList<IssuePriority>()" class="form-select">
+                        <option value="">-- All --</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100"><i class="fas fa-filter"></i></button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light text-uppercase font-weight-bold text-xs text-muted">
+                        <tr>
+                            <th>Report Date</th>
+                            <th>Vehicle</th>
+                            <th>Driver</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="font-weight-bold">@item.ReportDate.ToString("yyyy-MM-dd")</div>
+                                        <div class="text-muted text-xs">@item.ReportDate.ToString("t")</div>
+                                    </td>
+                                    <td>
+                                        <div class="font-weight-bold text-dark">@item.Vehicle?.VehicleName</div>
+                                        <div class="text-muted text-xs">@item.Vehicle?.VehicleNumber</div>
+                                    </td>
+                                    <td>@item.Driver?.FullName</td>
+                                    <td>@item.IssueCategory.ToString()</td>
+                                    <td>
+                                        @switch (item.Priority)
+                                        {
+                                            case IssuePriority.Critical:
+                                                <span class="badge bg-danger text-uppercase">Critical</span>
+                                                break;
+                                            case IssuePriority.High:
+                                                <span class="badge bg-warning text-dark text-uppercase">High</span>
+                                                break;
+                                            case IssuePriority.Medium:
+                                                <span class="badge bg-primary text-uppercase">Medium</span>
+                                                break;
+                                            case IssuePriority.Low:
+                                                <span class="badge bg-secondary text-uppercase">Low</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case IssueStatus.Open:
+                                                <span class="badge bg-danger">Open</span>
+                                                break;
+                                            case IssueStatus.UnderReview:
+                                                <span class="badge bg-warning text-dark">Under Review</span>
+                                                break;
+                                            case IssueStatus.InProgress:
+                                                <span class="badge bg-info text-dark">In Progress</span>
+                                                break;
+                                            case IssueStatus.Resolved:
+                                                <span class="badge bg-success">Resolved</span>
+                                                break;
+                                            case IssueStatus.Closed:
+                                                <span class="badge bg-dark">Closed</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.DriverIssueId" class="btn btn-outline-secondary btn-sm" title="View details">
+                                                <i class="fas fa-info-circle"></i> View
+                                            </a>
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <a asp-action="UpdateStatus" asp-route-id="@item.DriverIssueId" class="btn btn-outline-primary btn-sm" title="Update status">
+                                                    <i class="fas fa-check-circle"></i> Action
+                                                </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" title="Delete" 
+                                                        onclick="confirmDeleteIssue(@item.DriverIssueId)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-clipboard-list fa-3x mb-3 text-gray-300"></i>
+                                    <p class="mb-0">No logged issues found matching your filters.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted text-sm">
+                        Showing page @ViewBag.PageNumber of @ViewBag.TotalPages (@ViewBag.TotalRecords total records)
+                    </div>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, driverId = ViewBag.SelectedDriverId, status = ViewBag.SelectedStatus, priority = ViewBag.SelectedPriority, pageNumber = ViewBag.PageNumber - 1 })">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, driverId = ViewBag.SelectedDriverId, status = ViewBag.SelectedStatus, priority = ViewBag.SelectedPriority, pageNumber = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(ViewBag.PageNumber == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, driverId = ViewBag.SelectedDriverId, status = ViewBag.SelectedStatus, priority = ViewBag.SelectedPriority, pageNumber = ViewBag.PageNumber + 1 })">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+@if (User.IsInRole("Admin"))
+{
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteIssueModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-trash-alt mr-2"></i>Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p>Are you sure you want to delete this issue log entry?</p>
+                    <p class="text-danger mb-0"><small>This will permanently delete this driver issue record from history.</small></p>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteIssueForm" method="post" asp-action="Delete">
+                        <button type="submit" class="btn btn-danger">Delete Log</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function confirmDeleteIssue(id) {
+            document.getElementById('deleteIssueForm').action = '/DriverIssues/Delete/' + id;
+            var modal = new bootstrap.Modal(document.getElementById('deleteIssueModal'));
+            modal.show();
+        }
+    </script>
+}

@@ -1,0 +1,123 @@
+@model Transport_Management_System.Models.DriverIssue
+@using Transport_Management_System.Models
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 font-weight-bold"><i class="fas fa-info-circle mr-2"></i>Issue Details</h5>
+                    <div>
+                        @switch (Model.Status)
+                        {
+                            case IssueStatus.Open:
+                                <span class="badge bg-danger">Open</span>
+                                break;
+                            case IssueStatus.UnderReview:
+                                <span class="badge bg-warning text-dark">Under Review</span>
+                                break;
+                            case IssueStatus.InProgress:
+                                <span class="badge bg-info text-dark">In Progress</span>
+                                break;
+                            case IssueStatus.Resolved:
+                                <span class="badge bg-success">Resolved</span>
+                                break;
+                            case IssueStatus.Closed:
+                                <span class="badge bg-dark">Closed</span>
+                                break;
+                        }
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Vehicle Reported</span>
+                            <span class="h5 text-dark font-weight-bold">@Model.Vehicle?.VehicleName</span>
+                            <span class="text-muted d-block">Number: @Model.Vehicle?.VehicleNumber</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Reporting Driver</span>
+                            <span class="h5 text-dark font-weight-bold">@Model.Driver?.FullName</span>
+                            <span class="text-muted d-block">Phone: @Model.Driver?.PhoneNumber</span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Issue Category</span>
+                            <span class="text-dark font-weight-bold">@Model.IssueCategory.ToString()</span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Priority Level</span>
+                            <span>
+                                @switch (Model.Priority)
+                                {
+                                    case IssuePriority.Critical:
+                                        <span class="badge bg-danger">Critical</span>
+                                        break;
+                                    case IssuePriority.High:
+                                        <span class="badge bg-warning text-dark">High</span>
+                                        break;
+                                    case IssuePriority.Medium:
+                                        <span class="badge bg-primary">Medium</span>
+                                        break;
+                                    case IssuePriority.Low:
+                                        <span class="badge bg-secondary">Low</span>
+                                        break;
+                                }
+                            </span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted d-block text-xs text-uppercase font-weight-bold">Report Date</span>
+                            <span class="text-dark">@Model.ReportDate.ToString("yyyy-MM-dd HH:mm")</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="text-muted d-block text-xs text-uppercase font-weight-bold mb-2">Issue Description</span>
+                        <div class="p-3 bg-light rounded text-dark" style="white-space: pre-line;">
+                            @Model.IssueDescription
+                        </div>
+                    </div>
+
+                    @if (Model.Status == IssueStatus.Resolved || Model.Status == IssueStatus.Closed || !string.IsNullOrEmpty(Model.ResolutionNotes))
+                    {
+                        <div class="card border-0 bg-success-soft mb-4">
+                            <div class="card-body p-3">
+                                <span class="text-success d-block text-xs text-uppercase font-weight-bold mb-2"><i class="fas fa-check mr-1"></i>Resolution Details</span>
+                                <div class="text-dark mb-2" style="white-space: pre-line;">
+                                    @(string.IsNullOrEmpty(Model.ResolutionNotes) ? "No resolution notes registered." : Model.ResolutionNotes)
+                                </div>
+                                @if (Model.ResolvedAt.HasValue)
+                                {
+                                    <span class="text-muted text-xs d-block">Resolved on: @Model.ResolvedAt.Value.ToString("g")</span>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to List
+                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="UpdateStatus" asp-route-id="@Model.DriverIssueId" class="btn btn-primary shadow-sm">
+                                <i class="fas fa-check-circle mr-2"></i>Update Status & Resolve
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-success-soft {
+        background-color: #f3faf4 !important;
+        border-left: 4px solid #2e7d32 !important;
+    }
+</style>

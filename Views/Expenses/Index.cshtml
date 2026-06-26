@@ -1,0 +1,218 @@
+@model IEnumerable<Transport_Management_System.Models.Expense>
+@using Transport_Management_System.Models
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-dark font-weight-bold">Operational Expense Tracking</h1>
+            <p class="text-muted">Monitor and record vehicle fuel, repair, maintenance, and miscellaneous costs.</p>
+        </div>
+        <div class="btn-group">
+            <a asp-action="Summary" class="btn btn-outline-dark btn-lg shadow-sm mr-2">
+                <i class="fas fa-chart-bar mr-2"></i> View Report Summary
+            </a>
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-plus mr-2"></i> Log Expense
+            </a>
+        </div>
+    </div>
+
+    <!-- Expenses Summary Card -->
+    <div class="card border-0 bg-dark text-white shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <span class="text-xs text-uppercase tracking-wider text-muted-light font-weight-bold d-block">Total Filtered Expense</span>
+                    <span class="h1 font-weight-bold text-white mb-0">৳@(((decimal)ViewBag.TotalExpensesAmount).ToString("N2"))</span>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-wallet fa-3x text-muted-light"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Table Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label font-weight-bold">Search</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search description..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Vehicle</label>
+                    <select name="vehicleId" asp-items="ViewBag.VehicleList" class="form-select">
+                        <option value="">-- All Vehicles --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Category</label>
+                    <select name="category" asp-items="Html.GetEnumSelectList<ExpenseCategory>()" class="form-select">
+                        <option value="">-- All Categories --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">Start Date</label>
+                    <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label font-weight-bold">End Date</label>
+                    <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control" />
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100"><i class="fas fa-filter"></i></button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light text-uppercase font-weight-bold text-xs text-muted">
+                        <tr>
+                            <th>Expense Date</th>
+                            <th>Vehicle</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.ExpenseDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @if (item.Vehicle != null)
+                                        {
+                                            <div class="font-weight-bold text-dark">@item.Vehicle.VehicleName</div>
+                                            <div class="text-muted text-xs">@item.Vehicle.VehicleNumber</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted text-xs font-italic">General (No Vehicle)</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @switch (item.ExpenseCategory)
+                                        {
+                                            case ExpenseCategory.Fuel:
+                                                <span class="badge bg-warning text-dark"><i class="fas fa-gas-pump mr-1"></i>Fuel</span>
+                                                break;
+                                            case ExpenseCategory.Maintenance:
+                                                <span class="badge bg-info text-dark"><i class="fas fa-wrench mr-1"></i>Maintenance</span>
+                                                break;
+                                            case ExpenseCategory.Repair:
+                                                <span class="badge bg-danger"><i class="fas fa-tools mr-1"></i>Repair</span>
+                                                break;
+                                            case ExpenseCategory.TollCharges:
+                                                <span class="badge bg-primary"><i class="fas fa-road mr-1"></i>Toll Charges</span>
+                                                break;
+                                            case ExpenseCategory.Insurance:
+                                                <span class="badge bg-dark"><i class="fas fa-shield-alt mr-1"></i>Insurance</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">@item.ExpenseCategory.ToString()</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="text-wrap" style="max-width: 300px;">
+                                            @(string.IsNullOrEmpty(item.Description) ? "—" : item.Description)
+                                        </div>
+                                    </td>
+                                    <td class="font-weight-bold text-dark h6 mb-0">৳@item.Amount.ToString("N2")</td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a asp-action="Edit" asp-route-id="@item.ExpenseId" class="btn btn-outline-primary btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" title="Delete" 
+                                                    onclick="confirmDeleteExpense(@item.ExpenseId, '@item.ExpenseCategory')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fas fa-receipt fa-3x mb-3 text-gray-300"></i>
+                                    <p class="mb-0">No expense records found matching your filters.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted text-sm">
+                        Showing page @ViewBag.PageNumber of @ViewBag.TotalPages (@ViewBag.TotalRecords total records)
+                    </div>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, category = ViewBag.SelectedCategory, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, pageNumber = ViewBag.PageNumber - 1 })">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, category = ViewBag.SelectedCategory, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, pageNumber = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(ViewBag.PageNumber == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, vehicleId = ViewBag.SelectedVehicleId, category = ViewBag.SelectedCategory, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, pageNumber = ViewBag.PageNumber + 1 })">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteExpenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-trash-alt mr-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p>Are you sure you want to delete this expense record (<span id="deleteExpenseCat"></span>)?</p>
+                <p class="text-danger mb-0"><small>This will permanently remove the logged financial record.</small></p>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteExpenseForm" method="post" asp-action="Delete">
+                    <button type="submit" class="btn btn-danger">Delete Record</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDeleteExpense(id, cat) {
+            document.getElementById('deleteExpenseCat').innerText = cat;
+            document.getElementById('deleteExpenseForm').action = '/Expenses/Delete/' + id;
+            var modal = new bootstrap.Modal(document.getElementById('deleteExpenseModal'));
+            modal.show();
+        }
+    </script>
+}
+
+<style>
+    .text-muted-light {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+</style>

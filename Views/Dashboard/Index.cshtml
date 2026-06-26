@@ -213,6 +213,67 @@
     </div>
 </div>
 
+<!-- Smart Features & Maintenance Summary -->
+<h4 class="mt-4 mb-3 animate-fade-in delay-1 fw-bold"><i class="fa-solid fa-wrench text-primary me-2"></i>Smart Features & Maintenance</h4>
+<div class="stats-grid animate-fade-in delay-1 mb-4">
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Overdue Maintenance</p>
+            <h3 class="stat-value text-danger">@ViewBag.OverdueMaintenanceCount</h3>
+            <div class="stat-trend text-danger small">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Vehicles requiring immediate service</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-danger-subtle text-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Upcoming / In Progress</p>
+            <h3 class="stat-value">@(ViewBag.UpcomingMaintenanceCount + ViewBag.InProgressMaintenanceCount)</h3>
+            <div class="stat-trend text-info small">
+                <i class="fa-solid fa-clock"></i>
+                <span>@ViewBag.UpcomingMaintenanceCount Upcoming, @ViewBag.InProgressMaintenanceCount Active</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-info-subtle text-info">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">Open Driver Issues</p>
+            <h3 class="stat-value @(ViewBag.OpenDriverIssuesCount > 0 ? "text-warning" : "")">@ViewBag.OpenDriverIssuesCount</h3>
+            <div class="stat-trend text-muted small">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Mechanical faults reported</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-warning-subtle text-warning">
+            <i class="fa-solid fa-bullhorn"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-content">
+            <p class="stat-label">This Month Expenses</p>
+            <h3 class="stat-value">৳@(((decimal)ViewBag.ThisMonthExpenses).ToString("N0"))</h3>
+            <div class="stat-trend text-muted small">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Total: ৳@(((decimal)ViewBag.TotalExpenses).ToString("N0"))</span>
+            </div>
+        </div>
+        <div class="stat-icon bg-success-subtle text-success">
+            <i class="fa-solid fa-wallet"></i>
+        </div>
+    </div>
+</div>
+
+
 <!-- Charts Row -->
 <div class="row animate-fade-in delay-2 mb-4">
     <div class="col-lg-8 mb-4 mb-lg-0">

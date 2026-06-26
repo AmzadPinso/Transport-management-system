@@ -10,6 +10,7 @@ namespace Transport_Management_System.Data
         {
         }
 
+        // Existing tables
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
@@ -22,11 +23,16 @@ namespace Transport_Management_System.Data
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
+        // Week 6 — Smart Features & Maintenance Module
+        public DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
+        public DbSet<DriverIssue> DriverIssues { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure Trip relationships to avoid multiple cascade path issues
+            // ── Trip relationships ──────────────────────────────────
             modelBuilder.Entity<Trip>()
                 .HasOne(t => t.Route)
                 .WithMany()
@@ -45,7 +51,12 @@ namespace Transport_Management_System.Data
                 .HasForeignKey(t => t.DriverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Booking relationships
+            // Fix decimal precision warning for Trip.TicketPrice
+            modelBuilder.Entity<Trip>()
+                .Property(t => t.TicketPrice)
+                .HasColumnType("decimal(18,2)");
+
+            // ── Booking relationships ───────────────────────────────
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.User)
                 .WithMany()
@@ -62,14 +73,19 @@ namespace Transport_Management_System.Data
                 .HasIndex(b => b.BookingReference)
                 .IsUnique();
 
-            // Configure One-to-Many relationship
+            // Fix decimal precision warning for Booking.TotalAmount
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.TotalAmount)
+                .HasColumnType("decimal(18,2)");
+
+            // ── User → Role relationship ────────────────────────────
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes by default
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Route and Station relationships to prevent multiple cascade paths
+            // ── Route & Station relationships ───────────────────────
             modelBuilder.Entity<Route>()
                 .HasOne(r => r.OriginStation)
                 .WithMany(s => s.OriginRoutes)
@@ -118,7 +134,54 @@ namespace Transport_Management_System.Data
                 .HasForeignKey(dp => dp.StationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Seed some default roles
+            // ── MaintenanceRecord relationships ─────────────────────
+            modelBuilder.Entity<MaintenanceRecord>()
+                .HasOne(m => m.Vehicle)
+                .WithMany()
+                .HasForeignKey(m => m.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MaintenanceRecord>()
+                .Property(m => m.Cost)
+                .HasColumnType("decimal(18,2)");
+
+            // ── DriverIssue relationships ───────────────────────────
+            modelBuilder.Entity<DriverIssue>()
+                .HasOne(d => d.Driver)
+                .WithMany()
+                .HasForeignKey(d => d.DriverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DriverIssue>()
+                .HasOne(d => d.Vehicle)
+                .WithMany()
+                .HasForeignKey(d => d.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DriverIssue>()
+                .HasOne(d => d.ReportedByUser)
+                .WithMany()
+                .HasForeignKey(d => d.ReportedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // ── Expense relationships ───────────────────────────────
+            modelBuilder.Entity<Expense>()
+                .HasOne(e => e.Vehicle)
+                .WithMany()
+                .HasForeignKey(e => e.VehicleId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Expense>()
+                .HasOne(e => e.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Expense>()
+                .Property(e => e.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            // ── Seed default roles ──────────────────────────────────
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, RoleName = "Admin", RoleDescription = "Administrator with full access" },
                 new Role { Id = 2, RoleName = "User", RoleDescription = "Standard User" }
@@ -126,3 +189,4 @@ namespace Transport_Management_System.Data
         }
     }
 }
+

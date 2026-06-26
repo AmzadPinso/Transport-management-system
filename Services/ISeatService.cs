@@ -8,6 +8,13 @@ namespace Transport_Management_System.Services
         public int Col { get; set; }
     }
 
+    public class SeatRecommendation
+    {
+        public List<string> SuggestedSeats { get; set; } = new List<string>();
+        public bool IsWindow { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+
     public interface ISeatService
     {
         /// <summary>
@@ -18,5 +25,11 @@ namespace Transport_Management_System.Services
 
         /// <summary>Generates a unique booking reference number.</summary>
         string GenerateBookingReference();
+
+        /// <summary>
+        /// Analyzes the seat layout and recommends the best seats for a passenger/group.
+        /// </summary>
+        SeatRecommendation RecommendSeats(List<List<SeatInfo>> layout, int passengerCount);
     }
 }
+

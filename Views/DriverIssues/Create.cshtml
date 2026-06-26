@@ -1,0 +1,78 @@
+@model Transport_Management_System.Models.ViewModels.DriverIssueFormViewModel
+@using Transport_Management_System.Models
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="m-0 font-weight-bold"><i class="fas fa-bullhorn mr-2"></i>Report New Issue</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="DriverId" class="form-label font-weight-bold"></label>
+                                <select asp-for="DriverId" asp-items="Model.DriverList" class="form-select">
+                                    <option value="">-- Select Driver --</option>
+                                </select>
+                                <span asp-validation-for="DriverId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="VehicleId" class="form-label font-weight-bold"></label>
+                                <select asp-for="VehicleId" asp-items="Model.VehicleList" class="form-select">
+                                    <option value="">-- Select Vehicle --</option>
+                                </select>
+                                <span asp-validation-for="VehicleId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="IssueCategory" class="form-label font-weight-bold"></label>
+                                <select asp-for="IssueCategory" asp-items="Html.GetEnumSelectList<IssueCategory>()" class="form-select">
+                                    <option value="">-- Select Category --</option>
+                                </select>
+                                <span asp-validation-for="IssueCategory" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Priority" class="form-label font-weight-bold"></label>
+                                <select asp-for="Priority" asp-items="Html.GetEnumSelectList<IssuePriority>()" class="form-select"></select>
+                                <span asp-validation-for="Priority" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="ReportDate" class="form-label font-weight-bold"></label>
+                                <input asp-for="ReportDate" class="form-control" type="date" />
+                                <span asp-validation-for="ReportDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="IssueDescription" class="form-label font-weight-bold"></label>
+                            <textarea asp-for="IssueDescription" class="form-control" rows="5" placeholder="Please describe the mechanical defect or incident in detail. Include when the issue started and any symptoms..."></textarea>
+                            <span asp-validation-for="IssueDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-paper-plane mr-2"></i>Submit Issue Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

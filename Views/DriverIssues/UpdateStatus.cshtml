@@ -1,0 +1,58 @@
+@model Transport_Management_System.Models.ViewModels.UpdateIssueStatusViewModel
+@using Transport_Management_System.Models
+
+@{
+    var issue = ViewBag.Issue as DriverIssue;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="m-0 font-weight-bold"><i class="fas fa-tasks mr-2"></i>Update Issue Status & Action</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (issue != null)
+                    {
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <h6 class="font-weight-bold text-dark mb-1">Issue Preview</h6>
+                            <p class="mb-2 text-muted"><strong>Category:</strong> @issue.IssueCategory | <strong>Vehicle:</strong> @issue.Vehicle?.VehicleName (@issue.Vehicle?.VehicleNumber)</p>
+                            <p class="mb-0 text-dark italic" style="white-space: pre-line;">"@issue.IssueDescription"</p>
+                        </div>
+                    }
+
+                    <form asp-action="UpdateStatus" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="DriverIssueId" />
+
+                        <div class="mb-3 col-md-6">
+                            <label asp-for="Status" class="form-label font-weight-bold"></label>
+                            <select asp-for="Status" asp-items="Html.GetEnumSelectList<IssueStatus>()" class="form-select"></select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ResolutionNotes" class="form-label font-weight-bold"></label>
+                            <textarea asp-for="ResolutionNotes" class="form-control" rows="5" placeholder="Detail the diagnosis, components repaired or replaced, or general feedback on status change..."></textarea>
+                            <span asp-validation-for="ResolutionNotes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Details" asp-route-id="@Model.DriverIssueId" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left mr-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-save mr-2"></i>Save Resolution
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

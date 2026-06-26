@@ -1,0 +1,161 @@
+@using Transport_Management_System.Models
+
+@{
+    var categorySummary = ViewBag.CategorySummary as Dictionary<ExpenseCategory, decimal> ?? new Dictionary<ExpenseCategory, decimal>();
+    var monthlySummary = ViewBag.MonthlySummary as Dictionary<string, decimal> ?? new Dictionary<string, decimal>();
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-dark font-weight-bold">Expense Analytics & Summary</h1>
+            <p class="text-muted">Analyze operational cost distributions by month and category.</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg mr-2">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Expenses
+            </a>
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-plus mr-2"></i> Log Expense
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-0 bg-dark text-white shadow h-100 py-3">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-muted-light text-uppercase mb-1">This Month's Spending</div>
+                            <div class="h3 mb-0 font-weight-bold text-white">৳@(((decimal)ViewBag.ThisMonthTotal).ToString("N2"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-day fa-3x text-muted-light"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-0 bg-primary text-white shadow h-100 py-3">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-muted-light text-uppercase mb-1">Overall Spending</div>
+                            <div class="h3 mb-0 font-weight-bold text-white">৳@(((decimal)ViewBag.OverallTotal).ToString("N2"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-globe-asia fa-3x text-muted-light"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Category Summary Chart/List Card -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-chart-pie mr-2"></i>Cost Distribution by Category</h6>
+                </div>
+                <div class="card-body">
+                    @if (categorySummary.Any())
+                    {
+                        var maxVal = categorySummary.Values.Max();
+                        foreach (var kvp in categorySummary)
+                        {
+                            var percentage = maxVal > 0 ? (int)(kvp.Value / maxVal * 100) : 0;
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="font-weight-bold text-dark">@kvp.Key.ToString()</span>
+                                    <span class="text-muted font-weight-bold text-sm">৳@kvp.Value.ToString("N2")</span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    @switch (kvp.Key)
+                                    {
+                                        case ExpenseCategory.Fuel:
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: @percentage%"></div>
+                                            break;
+                                        case ExpenseCategory.Maintenance:
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: @percentage%"></div>
+                                            break;
+                                        case ExpenseCategory.Repair:
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: @percentage%"></div>
+                                            break;
+                                        case ExpenseCategory.TollCharges:
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: @percentage%"></div>
+                                            break;
+                                        default:
+                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: @percentage%"></div>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-chart-pie fa-3x mb-3 text-gray-300"></i>
+                            <p>No category expense logs exist.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Summary Card -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-chart-line mr-2"></i>Monthly Spend History</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light text-uppercase font-weight-bold text-xs text-muted">
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-end">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var kvp in monthlySummary.OrderByDescending(k => k.Key))
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                @{
+                                                    if (DateTime.TryParseExact(kvp.Key + "-01", "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dateParsed))
+                                                    {
+                                                        @dateParsed.ToString("MMMM yyyy")
+                                                    }
+                                                    else
+                                                    {
+                                                        @kvp.Key
+                                                    }
+                                                }
+                                            </strong>
+                                        </td>
+                                        <td class="text-end font-weight-bold text-dark">৳@kvp.Value.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-muted-light {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+</style>

@@ -48,13 +48,20 @@
         </a>
 
         <div class="nav-group-label">Management</div>
-        <a href="#" class="sidebar-link">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
-            <span>Maintenance</span>
-        </a>
-        <a href="#" class="sidebar-link">
-            <i class="fa-solid fa-gas-pump"></i>
-            <span>Fuel Tracking</span>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Maintenance" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                <span>Maintenance</span>
+            </a>
+            <a asp-controller="Expenses" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Expenses" ? "active" : "")">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Expenses</span>
+            </a>
+        }
+        <a asp-controller="DriverIssues" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "DriverIssues" ? "active" : "")">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>Driver Issues</span>
         </a>
         <a asp-controller="Users" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")">
             <i class="fa-solid fa-users"></i>
