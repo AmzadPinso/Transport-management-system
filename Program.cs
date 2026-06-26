@@ -27,6 +27,8 @@ builder.Services.AddScoped<IDriverIssueRepository, DriverIssueRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IEmailService, EmailService>();
 

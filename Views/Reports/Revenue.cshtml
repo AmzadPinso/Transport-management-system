@@ -1,0 +1,360 @@
+@model Transport_Management_System.Controllers.RevenueReportViewModel
+@{
+    ViewData["Title"] = "Revenue & Financial Reports";
+}
+
+<div class="page-header animate-fade-in d-print-none">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="page-title">Revenue & Financial Analytics</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-0">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-primary">TMS PRO</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Reports" asp-action="Index" class="text-decoration-none text-primary">Reports Center</a></li>
+                    <li class="breadcrumb-item active">Revenue</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <button onclick="window.print()" class="btn btn-outline-secondary btn-modern shadow-sm me-2">
+                <i class="fa-solid fa-print me-2"></i>Print Report
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Print-Only Header -->
+<div class="d-none d-print-block mb-4 text-center">
+    <h2 class="fw-bold">Smart Transport Management System (STMS)</h2>
+    <h4>Financial & Revenue Analysis Report</h4>
+    <p class="text-muted">Generated on @DateTime.Now.ToString("F") | Period: @(Model.StartDate?.ToString("yyyy-MM-dd") ?? "Inception") to @(Model.EndDate?.ToString("yyyy-MM-dd") ?? "Present")</p>
+    <hr />
+</div>
+
+<!-- Filter Section -->
+<div class="card-modern mb-4 animate-fade-in delay-1 d-print-none">
+    <div class="card-body-modern p-4">
+        <form method="get" asp-controller="Reports" asp-action="Revenue" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-muted small">Start Date</label>
+                <input type="date" name="startDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" class="form-control form-control-modern" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-muted small">End Date</label>
+                <input type="date" name="endDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" class="form-control form-control-modern" />
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-modern w-100">
+                    <i class="fa-solid fa-filter me-2"></i>Filter
+                </button>
+                <a asp-controller="Reports" asp-action="Revenue" class="btn btn-light btn-modern border w-100">
+                    <i class="fa-solid fa-rotate-left me-2"></i>Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Financial Summary KPI Deck -->
+<div class="row animate-fade-in delay-1 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card border-start border-primary border-5 bg-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Total Booking Income</p>
+                <h3 class="stat-value text-primary">৳@Model.Summary.TotalIncome.ToString("N2")</h3>
+                <span class="text-muted small">Paid passenger tickets</span>
+            </div>
+            <div class="stat-icon bg-primary-subtle text-primary">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card border-start border-danger border-5 bg-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Total Fleet Expenses</p>
+                <h3 class="stat-value text-danger">৳@Model.Summary.TotalExpenses.ToString("N2")</h3>
+                <span class="text-muted small">Operations & maintenance costs</span>
+            </div>
+            <div class="stat-icon bg-danger-subtle text-danger">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card border-start border-success border-5 bg-card">
+            <div class="stat-card-content">
+                <p class="stat-label">Net Operational Revenue</p>
+                <h3 class="stat-value @(Model.Summary.NetRevenue >= 0 ? "text-success" : "text-danger")">৳@Model.Summary.NetRevenue.ToString("N2")</h3>
+                <span class="text-muted small">Bookings income minus expenses</span>
+            </div>
+            <div class="stat-icon bg-success-subtle text-success">
+                <i class="fa-solid fa-calculator"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Temporal Performance Indicators -->
+<h5 class="mt-4 mb-3 animate-fade-in delay-1 fw-bold text-main d-print-none"><i class="fa-solid fa-clock text-primary me-2"></i>Revenue Collection Timeline (KPIs)</h5>
+<div class="row animate-fade-in delay-1 mb-4 d-print-none">
+    <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card-modern border-0 shadow-sm">
+            <div class="card-body-modern p-3 d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Daily Revenue (Today)</p>
+                    <h5 class="fw-bold mb-0">৳@Model.Summary.DailyRevenue.ToString("N0")</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card-modern border-0 shadow-sm">
+            <div class="card-body-modern p-3 d-flex align-items-center gap-3">
+                <div class="bg-info bg-opacity-10 text-info p-3 rounded-3">
+                    <i class="fa-solid fa-calendar-week"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Weekly Revenue</p>
+                    <h5 class="fw-bold mb-0">৳@Model.Summary.WeeklyRevenue.ToString("N0")</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card-modern border-0 shadow-sm">
+            <div class="card-body-modern p-3 d-flex align-items-center gap-3">
+                <div class="bg-success bg-opacity-10 text-success p-3 rounded-3">
+                    <i class="fa-solid fa-calendar-month"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Monthly Revenue</p>
+                    <h5 class="fw-bold mb-0">৳@Model.Summary.MonthlyRevenue.ToString("N0")</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card-modern border-0 shadow-sm">
+            <div class="card-body-modern p-3 d-flex align-items-center gap-3">
+                <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+                    <i class="fa-solid fa-calendar"></i>
+                </div>
+                <div>
+                    <p class="text-muted small mb-0">Yearly Revenue</p>
+                    <h5 class="fw-bold mb-0">৳@Model.Summary.YearlyRevenue.ToString("N0")</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row animate-fade-in delay-2 mb-4">
+    <!-- Trend Analysis -->
+    <div class="col-lg-8 mb-4">
+        <div class="card-modern h-100 shadow-sm">
+            <div class="card-header-modern">
+                <h5 class="card-title-modern fw-bold"><i class="fa-solid fa-chart-line text-primary me-2"></i>Monthly Revenue & Expense Trend</h5>
+            </div>
+            <div class="card-body-modern">
+                <div id="revenue-trend-chart" style="min-height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribution by Vehicle Type -->
+    <div class="col-lg-4 mb-4">
+        <div class="card-modern h-100 shadow-sm">
+            <div class="card-header-modern">
+                <h5 class="card-title-modern fw-bold"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Revenue by Vehicle Type</h5>
+            </div>
+            <div class="card-body-modern">
+                <div id="revenue-distribution-chart" style="min-height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Route Performance -->
+<div class="row animate-fade-in delay-3 mb-4">
+    <div class="col-12">
+        <div class="card-modern shadow-sm">
+            <div class="card-header-modern">
+                <h5 class="card-title-modern fw-bold"><i class="fa-solid fa-route text-primary me-2"></i>Top Performing Routes (Revenue Breakdown)</h5>
+            </div>
+            <div class="card-body-modern">
+                <div class="row">
+                    <div class="col-md-7 mb-4 mb-md-0">
+                        <div id="route-revenue-chart" style="min-height: 350px;"></div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="table-responsive">
+                            <table class="table table-modern align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Route Name</th>
+                                        <th class="text-end">Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RouteRevenue.Any())
+                                    {
+                                        foreach (var route in Model.RouteRevenue)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold">@route.RouteName</td>
+                                                <td class="text-end fw-semibold text-primary">৳@route.Revenue.ToString("N2")</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-center py-4 text-muted">No route revenue recorded for this period.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Trend Analysis Chart
+            var trendLabels = @Html.Raw(Json.Serialize(Model.Trend.Select(t => t.Period)));
+            var trendIncome = @Html.Raw(Json.Serialize(Model.Trend.Select(t => t.Income)));
+            var trendExpenses = @Html.Raw(Json.Serialize(Model.Trend.Select(t => t.Expenses)));
+
+            var trendOptions = {
+                series: [{
+                    name: 'Income',
+                    data: trendIncome
+                }, {
+                    name: 'Expenses',
+                    data: trendExpenses
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    toolbar: { show: false },
+                    fontFamily: 'Inter, sans-serif'
+                },
+                colors: ['#10b981', '#ef4444'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.3,
+                        opacityTo: 0.05,
+                        stops: [0, 90, 100]
+                    }
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 3 },
+                xaxis: {
+                    categories: trendLabels,
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) {
+                            return "৳" + val.toLocaleString();
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: 'rgba(0,0,0,0.05)',
+                    strokeDashArray: 4
+                },
+                legend: { position: 'top', horizontalAlign: 'right' }
+            };
+
+            var trendChart = new ApexCharts(document.querySelector("#revenue-trend-chart"), trendOptions);
+            trendChart.render();
+
+            // 2. Distribution Chart
+            var distLabels = @Html.Raw(Json.Serialize(Model.Distribution.Select(d => d.Category)));
+            var distValues = @Html.Raw(Json.Serialize(Model.Distribution.Select(d => d.Value)));
+
+            var distOptions = {
+                series: distValues,
+                chart: {
+                    height: 350,
+                    type: 'donut',
+                    fontFamily: 'Inter, sans-serif'
+                },
+                labels: distLabels,
+                colors: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'],
+                legend: { position: 'bottom' },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '70%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total Revenue',
+                                    formatter: () => '৳' + @Model.Summary.TotalIncome.ToString("N0")
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var distChart = new ApexCharts(document.querySelector("#revenue-distribution-chart"), distOptions);
+            distChart.render();
+
+            // 3. Route Revenue Bar Chart
+            var routeLabels = @Html.Raw(Json.Serialize(Model.RouteRevenue.Select(r => r.RouteName)));
+            var routeValues = @Html.Raw(Json.Serialize(Model.RouteRevenue.Select(r => r.Revenue)));
+
+            var routeOptions = {
+                series: [{
+                    name: 'Revenue',
+                    data: routeValues
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    toolbar: { show: false },
+                    fontFamily: 'Inter, sans-serif'
+                },
+                colors: ['#6366f1'],
+                plotOptions: {
+                    bar: {
+                        borderRadius: 6,
+                        horizontal: true,
+                        barHeight: '60%'
+                    }
+                },
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: routeLabels,
+                    labels: {
+                        formatter: function (val) {
+                            return "৳" + val.toLocaleString();
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: 'rgba(0,0,0,0.05)',
+                    strokeDashArray: 4
+                }
+            };
+
+            var routeChart = new ApexCharts(document.querySelector("#route-revenue-chart"), routeOptions);
+            routeChart.render();
+        });
+    </script>
+}

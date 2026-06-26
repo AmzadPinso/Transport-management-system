@@ -1,7 +1,13 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Transport_Management_System.Data;
 using Transport_Management_System.Models;
 using Transport_Management_System.Repository.Interface;
+using Transport_Management_System.Services;
 
 namespace Transport_Management_System.Controllers
 {
@@ -16,6 +22,8 @@ namespace Transport_Management_System.Controllers
         private readonly IMaintenanceRepository _maintenanceRepo;
         private readonly IDriverIssueRepository _driverIssueRepo;
         private readonly IExpenseRepository _expenseRepo;
+        private readonly IReportsService _reportsService;
+        private readonly AppDbContext _context;
 
         public DashboardController(
             IDriverRepository driverRepo,
@@ -25,7 +33,9 @@ namespace Transport_Management_System.Controllers
             IBookingRepository bookingRepo,
             IMaintenanceRepository maintenanceRepo,
             IDriverIssueRepository driverIssueRepo,
-            IExpenseRepository expenseRepo)
+            IExpenseRepository expenseRepo,
+            IReportsService reportsService,
+            AppDbContext context)
         {
             _driverRepo = driverRepo;
             _routeRepo = routeRepo;
@@ -35,6 +45,8 @@ namespace Transport_Management_System.Controllers
             _maintenanceRepo = maintenanceRepo;
             _driverIssueRepo = driverIssueRepo;
             _expenseRepo = expenseRepo;
+            _reportsService = reportsService;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -45,6 +57,7 @@ namespace Transport_Management_System.Controllers
             var routes = await _routeRepo.GetAllAsync();
             var stations = await _stationRepo.GetAllAsync();
             var trips = await _tripRepo.GetAllAsync();
+            var vehicles = await _context.Vehicles.ToListAsync();
             var now = DateTime.Now;
 
             ViewBag.TotalDrivers = drivers.Count();
@@ -57,6 +70,12 @@ namespace Transport_Management_System.Controllers
             ViewBag.ActiveRoutes = routes.Count(r => r.Status == RouteStatus.Active);
             ViewBag.TotalStations = stations.Count();
             ViewBag.ActiveStations = stations.Count(s => s.IsActive);
+
+            // Vehicle Status Counts
+            ViewBag.ActiveVehiclesCount = vehicles.Count(v => v.Status == VehicleStatus.Active);
+            ViewBag.MaintenanceVehiclesCount = vehicles.Count(v => v.Status == VehicleStatus.InMaintenance);
+            ViewBag.OutOfServiceVehiclesCount = vehicles.Count(v => v.Status == VehicleStatus.OutOfService);
+            ViewBag.TotalVehiclesCount = vehicles.Count;
 
             // Trip Statistics
             ViewBag.TotalTrips = trips.Count();
@@ -85,8 +104,35 @@ namespace Transport_Management_System.Controllers
             ViewBag.TotalExpenses = await _expenseRepo.GetTotalExpensesAsync();
             ViewBag.ThisMonthExpenses = await _expenseRepo.GetTotalExpensesAsync(startOfMonth, today);
 
-            return View();
+            // Fetch the advanced executive model containing recent bookings, trips, maintenance, and reports
+            var execModel = await _reportsService.GetExecutiveDashboardAsync();
+
+            // Fetch last 7 days booking counts for the chart
+            var last7Days = Enumerable.Range(0, 7)
+                .Select(i => today.AddDays(-i))
+                .Reverse()
+                .ToList();
+
+            var chartLabels = last7Days.Select(d => d.ToString("ddd")).ToArray();
+            var chartBookings = new int[7];
+            var chartRevenues = new decimal[7];
+
+            for (int i = 0; i < 7; i++)
+            {
+                var date = last7Days[i];
+                var dateBookings = await _context.Bookings
+                    .Where(b => b.BookingDate.Date == date.Date)
+                    .ToListAsync();
+
+                chartBookings[i] = dateBookings.Count;
+                chartRevenues[i] = dateBookings.Where(b => b.PaymentStatus == PaymentStatus.Paid).Sum(b => b.TotalAmount);
+            }
+
+            ViewBag.ChartLabels = chartLabels;
+            ViewBag.ChartBookings = chartBookings;
+            ViewBag.ChartRevenues = chartRevenues;
+
+            return View(execModel);
         }
     }
 }
-

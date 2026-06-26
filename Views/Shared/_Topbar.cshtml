@@ -3,10 +3,74 @@
         <button id="sidebar-toggle" class="sidebar-toggle">
             <i class="fa-solid fa-bars-staggered"></i>
         </button>
-        <div class="search-wrapper d-none d-md-block">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search for shipments, drivers, routes...">
-        </div>
+        <form asp-controller="Search" asp-action="Index" method="get" class="search-form position-relative d-none d-md-block" style="min-width: 320px;">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="query" class="search-input" placeholder="Search for vehicles, drivers, routes..." autocomplete="off">
+                <div class="search-suggestions-dropdown position-absolute bg-white shadow rounded-3 mt-1 py-2 d-none" style="width: 100%; max-height: 300px; overflow-y: auto; z-index: 1050; left: 0;">
+                </div>
+            </div>
+        </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var searchInput = document.querySelector('.search-input');
+                var suggestionsDropdown = document.querySelector('.search-suggestions-dropdown');
+                var debounceTimer;
+
+                if (searchInput && suggestionsDropdown) {
+                    searchInput.addEventListener('input', function () {
+                        clearTimeout(debounceTimer);
+                        var query = this.value.trim();
+
+                        if (query.length < 2) {
+                            suggestionsDropdown.classList.add('d-none');
+                            suggestionsDropdown.innerHTML = '';
+                            return;
+                        }
+
+                        debounceTimer = setTimeout(function () {
+                            fetch('/Search/Suggestions?query=' + encodeURIComponent(query))
+                                .then(response => response.json())
+                                .then(data => {
+                                    suggestionsDropdown.innerHTML = '';
+                                    if (data && data.length > 0) {
+                                        data.forEach(function (item) {
+                                            var itemEl = document.createElement('a');
+                                            itemEl.href = item.url;
+                                            itemEl.className = 'dropdown-item py-2 px-3 text-decoration-none d-flex justify-content-between align-items-center text-dark hover-bg-light';
+                                            itemEl.style.fontSize = '13px';
+                                            
+                                            var titleSpan = document.createElement('span');
+                                            titleSpan.textContent = item.title;
+                                            titleSpan.className = 'text-truncate pe-2';
+                                            
+                                            var catBadge = document.createElement('span');
+                                            catBadge.textContent = item.category;
+                                            catBadge.className = 'badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1 small flex-shrink-0';
+                                            catBadge.style.fontSize = '10px';
+
+                                            itemEl.appendChild(titleSpan);
+                                            itemEl.appendChild(catBadge);
+                                            suggestionsDropdown.appendChild(itemEl);
+                                        });
+                                        suggestionsDropdown.classList.remove('d-none');
+                                    } else {
+                                        suggestionsDropdown.classList.add('d-none');
+                                    }
+                                })
+                                .catch(err => console.error('Error fetching suggestions:', err));
+                        }, 250);
+                    });
+
+                    document.addEventListener('click', function (e) {
+                        if (!searchInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
+                            suggestionsDropdown.classList.add('d-none');
+                        }
+                    });
+                }
+            });
+        </script>
     </div>
 
     <div class="topbar-right">

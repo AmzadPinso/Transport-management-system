@@ -1,0 +1,99 @@
+@{
+    ViewData["Title"] = "Reports & Analytics Center";
+}
+
+<div class="page-header animate-fade-in">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="page-title">Reports & Analytics Center</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-0">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-primary">TMS PRO</a></li>
+                    <li class="breadcrumb-item active">Reports Center</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row animate-fade-in delay-1 mt-4">
+    <!-- Revenue Report Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-modern h-100 hover-shadow border-0 transition-all">
+            <div class="card-body-modern p-4 d-flex flex-column h-100">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex p-3 mb-3" style="width: fit-content;">
+                    <i class="fa-solid fa-money-bill-trend-up fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Revenue & Finance Reports</h5>
+                <p class="text-muted small flex-grow-1">Analyze income trends, daily, weekly, monthly, and yearly revenues, operating expenses, net revenues, and route financial performances.</p>
+                <a asp-controller="Reports" asp-action="Revenue" class="btn btn-primary btn-modern w-100 mt-3">
+                    <i class="fa-solid fa-chart-line me-2"></i>View Financials
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle Utilization Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-modern h-100 hover-shadow border-0 transition-all">
+            <div class="card-body-modern p-4 d-flex flex-column h-100">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success d-inline-flex p-3 mb-3" style="width: fit-content;">
+                    <i class="fa-solid fa-truck-fast fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Vehicle Utilization & Fleet Analytics</h5>
+                <p class="text-muted small flex-grow-1">Measure fleet efficiency. Track total trips per vehicle, most and least used vehicles, fleet availability rates, and vehicle maintenance frequency.</p>
+                <a asp-controller="Reports" asp-action="VehicleUtilization" class="btn btn-success btn-modern w-100 mt-3 text-white">
+                    <i class="fa-solid fa-truck-line me-2"></i>View Utilization
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Report Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-modern h-100 hover-shadow border-0 transition-all">
+            <div class="card-body-modern p-4 d-flex flex-column h-100">
+                <div class="rounded-circle bg-info bg-opacity-10 text-info d-inline-flex p-3 mb-3" style="width: fit-content;">
+                    <i class="fa-solid fa-ticket fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Passenger Booking Audits</h5>
+                <p class="text-muted small flex-grow-1">Detailed breakdowns of passenger reservations, ticket sales, dates of bookings, confirmation status, and payment tracking with printable sheets.</p>
+                <a asp-controller="Reports" asp-action="Bookings" class="btn btn-info btn-modern w-100 mt-3 text-white">
+                    <i class="fa-solid fa-receipt me-2"></i>View Bookings
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operating Expenses Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-modern h-100 hover-shadow border-0 transition-all">
+            <div class="card-body-modern p-4 d-flex flex-column h-100">
+                <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-inline-flex p-3 mb-3" style="width: fit-content;">
+                    <i class="fa-solid fa-wallet fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Operating Expenses Reports</h5>
+                <p class="text-muted small flex-grow-1">Track operational costs. Filter expenses by categories (Fuel, Tolls, Salaries, Meals) and vehicles. Render distribution trend and pie charts.</p>
+                <a asp-controller="Reports" asp-action="Expenses" class="btn btn-warning btn-modern w-100 mt-3 text-white">
+                    <i class="fa-solid fa-file-invoice-dollar me-2"></i>View Expenses
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Audits Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-modern h-100 hover-shadow border-0 transition-all">
+            <div class="card-body-modern p-4 d-flex flex-column h-100">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex p-3 mb-3" style="width: fit-content;">
+                    <i class="fa-solid fa-screwdriver-wrench fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Maintenance & Health Audits</h5>
+                <p class="text-muted small flex-grow-1">Review scheduled services, maintenance cost breakdowns, fleet health alerts, service providers, and upcoming checkups.</p>
+                <a asp-controller="Reports" asp-action="Maintenance" class="btn btn-danger btn-modern w-100 mt-3">
+                    <i class="fa-solid fa-notes-medical me-2"></i>View Maintenance
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

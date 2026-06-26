@@ -1,0 +1,429 @@
+@model Transport_Management_System.Services.GlobalSearchResultsViewModel
+@{
+    ViewData["Title"] = $"Search Results for: \"{Model.Query}\"";
+}
+
+<div class="page-header animate-fade-in">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="page-title">Global Search Results</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-0">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-primary">TMS PRO</a></li>
+                    <li class="breadcrumb-item active">Search</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="card-modern mb-4 animate-fade-in delay-1">
+    <div class="card-body-modern p-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h4 class="mb-1 fw-bold text-main">Search Term: "@Model.Query"</h4>
+                <p class="text-muted small mb-0">Found a total of <span class="text-primary fw-bold">@Model.TotalResults</span> matches across the platform.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                @if (Model.Users.Any()) { <a href="#users-section" class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 text-decoration-none small">Employees (@Model.Users.Count)</a> }
+                @if (Model.Drivers.Any()) { <a href="#drivers-section" class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 text-decoration-none small">Drivers (@Model.Drivers.Count)</a> }
+                @if (Model.Vehicles.Any()) { <a href="#vehicles-section" class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2 text-decoration-none small">Vehicles (@Model.Vehicles.Count)</a> }
+                @if (Model.Stations.Any()) { <a href="#stations-section" class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 text-decoration-none small">Stations (@Model.Stations.Count)</a> }
+                @if (Model.Routes.Any()) { <a href="#routes-section" class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 text-decoration-none small">Routes (@Model.Routes.Count)</a> }
+                @if (Model.Trips.Any()) { <a href="#trips-section" class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 text-decoration-none small">Trips (@Model.Trips.Count)</a> }
+                @if (Model.Bookings.Any()) { <a href="#bookings-section" class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 text-decoration-none small">Bookings (@Model.Bookings.Count)</a> }
+                @if (Model.MaintenanceRecords.Any()) { <a href="#maintenance-section" class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 text-decoration-none small">Maintenance (@Model.MaintenanceRecords.Count)</a> }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.TotalResults == 0)
+{
+    <div class="card-modern text-center py-5 animate-fade-in delay-2">
+        <div class="card-body-modern p-5">
+            <i class="fa-solid fa-magnifying-glass-minus fa-4x text-muted mb-3 d-block"></i>
+            <h4 class="fw-bold">No results found</h4>
+            <p class="text-muted col-md-6 mx-auto">We couldn't find any records matching "@Model.Query". Double-check spelling, try other keywords, or verify the search parameters.</p>
+            <a href="/" class="btn btn-primary btn-modern mt-3">
+                <i class="fa-solid fa-house me-2"></i>Go back to Dashboard
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Matched Stations -->
+    @if (Model.Stations.Any())
+    {
+        <div id="stations-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-location-dot text-primary me-2"></i>Matched Stations (@Model.Stations.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Station Name</th>
+                                <th>City</th>
+                                <th>District</th>
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var station in Model.Stations)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@station.StationName</td>
+                                    <td>@station.City</td>
+                                    <td>@station.District</td>
+                                    <td>@station.Address</td>
+                                    <td>
+                                        <span class="badge @(station.IsActive ? "bg-success" : "bg-danger") bg-opacity-10 text-@(station.IsActive ? "success" : "danger") border border-@(station.IsActive ? "success" : "danger") border-opacity-25 px-2 py-1">
+                                            @(station.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Stations" asp-action="Edit" asp-route-id="@station.StationId" class="btn btn-sm btn-light border me-1"><i class="fa-solid fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Routes -->
+    @if (Model.Routes.Any())
+    {
+        <div id="routes-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-route text-primary me-2"></i>Matched Routes (@Model.Routes.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Route Name</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Distance</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var route in Model.Routes)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@route.RouteName</td>
+                                    <td>@route.OriginStation?.StationName (@route.OriginStation?.City)</td>
+                                    <td>@route.DestinationStation?.StationName (@route.DestinationStation?.City)</td>
+                                    <td>@route.DistanceKm km</td>
+                                    <td>@route.EstimatedDurationMinutes mins</td>
+                                    <td>
+                                        <span class="badge @(route.Status == RouteStatus.Active ? "bg-success" : "bg-danger") bg-opacity-10 text-@(route.Status == RouteStatus.Active ? "success" : "danger") border border-@(route.Status == RouteStatus.Active ? "success" : "danger") border-opacity-25 px-2 py-1">
+                                            @route.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Routes" asp-action="Details" asp-route-id="@route.RouteId" class="btn btn-sm btn-light border me-1"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Trips -->
+    @if (Model.Trips.Any())
+    {
+        <div id="trips-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Matched Trips (@Model.Trips.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Trip Name</th>
+                                <th>Route</th>
+                                <th>Vehicle</th>
+                                <th>Driver</th>
+                                <th>Departure</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var trip in Model.Trips)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@trip.TripName</td>
+                                    <td>@trip.Route?.RouteName</td>
+                                    <td>@trip.Vehicle?.VehicleName</td>
+                                    <td>@trip.Driver?.FullName</td>
+                                    <td>@trip.DepartureDate.ToString("yyyy-MM-dd") @trip.DepartureTime.ToString(@"hh\:mm")</td>
+                                    <td>৳@trip.TicketPrice.ToString("N2")</td>
+                                    <td>
+                                        <span class="badge @(trip.Status == TripStatus.Completed ? "bg-success" : trip.Status == TripStatus.Scheduled ? "bg-info" : trip.Status == TripStatus.Ongoing ? "bg-primary" : "bg-warning") bg-opacity-10 text-@(trip.Status == TripStatus.Completed ? "success" : trip.Status == TripStatus.Scheduled ? "info" : trip.Status == TripStatus.Ongoing ? "primary" : "warning") border border-@(trip.Status == TripStatus.Completed ? "success" : trip.Status == TripStatus.Scheduled ? "info" : trip.Status == TripStatus.Ongoing ? "primary" : "warning") border-opacity-25 px-2 py-1">
+                                            @trip.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Trips" asp-action="Details" asp-route-id="@trip.TripId" class="btn btn-sm btn-light border me-1"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Bookings -->
+    @if (Model.Bookings.Any())
+    {
+        <div id="bookings-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-ticket text-primary me-2"></i>Matched Passenger Bookings (@Model.Bookings.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Passenger</th>
+                                <th>Trip Name</th>
+                                <th>Seat</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model.Bookings)
+                            {
+                                <tr>
+                                    <td class="fw-bold">#@booking.BookingReference</td>
+                                    <td>@booking.User?.UserName</td>
+                                    <td>@booking.Trip?.TripName</td>
+                                    <td>@booking.SeatNumber</td>
+                                    <td>@booking.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>৳@booking.TotalAmount.ToString("N2")</td>
+                                    <td>
+                                        <span class="badge @(booking.Status == BookingStatus.Confirmed ? "bg-success" : booking.Status == BookingStatus.Pending ? "bg-warning" : "bg-danger") bg-opacity-10 text-@(booking.Status == BookingStatus.Confirmed ? "success" : booking.Status == BookingStatus.Pending ? "warning" : "danger") border border-@(booking.Status == BookingStatus.Confirmed ? "success" : booking.Status == BookingStatus.Pending ? "warning" : "danger") border-opacity-25 px-2 py-1">
+                                            @booking.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="AdminBookings" asp-action="Details" asp-route-id="@booking.BookingId" class="btn btn-sm btn-light border"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Vehicles -->
+    @if (Model.Vehicles.Any())
+    {
+        <div id="vehicles-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-car-side text-primary me-2"></i>Matched Fleet Vehicles (@Model.Vehicles.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Name</th>
+                                <th>Number Plate</th>
+                                <th>Type</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var vehicle in Model.Vehicles)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@vehicle.VehicleName</td>
+                                    <td>@vehicle.VehicleNumber</td>
+                                    <td>@vehicle.VehicleType</td>
+                                    <td>@vehicle.Capacity seats</td>
+                                    <td>
+                                        <span class="badge @(vehicle.Status == VehicleStatus.Active ? "bg-success" : vehicle.Status == VehicleStatus.InMaintenance ? "bg-warning" : "bg-danger") bg-opacity-10 text-@(vehicle.Status == VehicleStatus.Active ? "success" : vehicle.Status == VehicleStatus.InMaintenance ? "warning" : "danger") border border-@(vehicle.Status == VehicleStatus.Active ? "success" : vehicle.Status == VehicleStatus.InMaintenance ? "warning" : "danger") border-opacity-25 px-2 py-1">
+                                            @vehicle.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Vehicles" asp-action="Edit" asp-route-id="@vehicle.VehicleId" class="btn btn-sm btn-light border me-1"><i class="fa-solid fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Drivers -->
+    @if (Model.Drivers.Any())
+    {
+        <div id="drivers-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-id-card text-primary me-2"></i>Matched Drivers (@Model.Drivers.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Driver Name</th>
+                                <th>Phone Number</th>
+                                <th>Email</th>
+                                <th>License Number</th>
+                                <th>Availability</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var driver in Model.Drivers)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@driver.FullName</td>
+                                    <td>@driver.PhoneNumber</td>
+                                    <td>@driver.Email</td>
+                                    <td>@driver.LicenseNumber</td>
+                                    <td>
+                                        <span class="badge @(driver.AvailabilityStatus == DriverAvailabilityStatus.Available ? "bg-success" : driver.AvailabilityStatus == DriverAvailabilityStatus.OnTrip ? "bg-primary" : "bg-danger") bg-opacity-10 text-@(driver.AvailabilityStatus == DriverAvailabilityStatus.Available ? "success" : driver.AvailabilityStatus == DriverAvailabilityStatus.OnTrip ? "primary" : "danger") border border-@(driver.AvailabilityStatus == DriverAvailabilityStatus.Available ? "success" : driver.AvailabilityStatus == DriverAvailabilityStatus.OnTrip ? "primary" : "danger") border-opacity-25 px-2 py-1">
+                                            @driver.AvailabilityStatus
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Drivers" asp-action="Edit" asp-route-id="@driver.DriverId" class="btn btn-sm btn-light border me-1"><i class="fa-solid fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Users -->
+    @if (Model.Users.Any())
+    {
+        <div id="users-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-users text-primary me-2"></i>Matched Employees / Users (@Model.Users.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>User Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Address</th>
+                                <th>Verified</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@user.UserName</td>
+                                    <td>@user.Email</td>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1">@user.Role?.RoleName</span>
+                                    </td>
+                                    <td>@user.Address</td>
+                                    <td>
+                                        <span class="badge @(user.IsEmailVerified ? "bg-success" : "bg-warning") bg-opacity-10 text-@(user.IsEmailVerified ? "success" : "warning") border border-@(user.IsEmailVerified ? "success" : "warning") border-opacity-25 px-2 py-1">
+                                            @(user.IsEmailVerified ? "Verified" : "Pending")
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Users" asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-sm btn-light border me-1"><i class="fa-solid fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Matched Maintenance Records -->
+    @if (Model.MaintenanceRecords.Any())
+    {
+        <div id="maintenance-section" class="card-modern mb-4 animate-fade-in delay-2">
+            <div class="card-header-modern bg-light py-3 border-bottom">
+                <h5 class="card-title-modern fw-bold mb-0 text-main"><i class="fa-solid fa-screwdriver-wrench text-primary me-2"></i>Matched Maintenance Records (@Model.MaintenanceRecords.Count)</h5>
+            </div>
+            <div class="card-body-modern p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Service Type</th>
+                                <th>Provider</th>
+                                <th>Service Date</th>
+                                <th>Cost</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var maint in Model.MaintenanceRecords)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@maint.Vehicle?.VehicleName (@maint.Vehicle?.VehicleNumber)</td>
+                                    <td><span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">@maint.MaintenanceType</span></td>
+                                    <td>@maint.ServiceProvider</td>
+                                    <td>@maint.ServiceDate.ToString("yyyy-MM-dd")</td>
+                                    <td class="fw-semibold text-danger">৳@maint.Cost.ToString("N2")</td>
+                                    <td>
+                                        <span class="badge @(maint.Status == MaintenanceStatus.Completed ? "bg-success" : maint.Status == MaintenanceStatus.InProgress ? "bg-warning" : "bg-info") bg-opacity-10 text-@(maint.Status == MaintenanceStatus.Completed ? "success" : maint.Status == MaintenanceStatus.InProgress ? "warning" : "info") border border-@(maint.Status == MaintenanceStatus.Completed ? "success" : maint.Status == MaintenanceStatus.InProgress ? "warning" : "info") border-opacity-25 px-2 py-1">
+                                            @maint.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Maintenance" asp-action="Edit" asp-route-id="@maint.MaintenanceRecordId" class="btn btn-sm btn-light border"><i class="fa-solid fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}

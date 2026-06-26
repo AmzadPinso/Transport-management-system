@@ -83,15 +83,14 @@
             </a>
         }
 
-        <div class="nav-group-label">Insights</div>
-        <a href="#" class="sidebar-link">
-            <i class="fa-solid fa-file-contract"></i>
-            <span>Reports</span>
-        </a>
-        <a href="#" class="sidebar-link">
-            <i class="fa-solid fa-chart-pie"></i>
-            <span>Analytics</span>
-        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="nav-group-label">Insights</div>
+            <a asp-controller="Reports" asp-action="Index" class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Reports & Analytics</span>
+            </a>
+        }
 
         <div class="nav-group-label">System</div>
         <a href="#" class="sidebar-link">

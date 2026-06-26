@@ -1,3 +1,4 @@
+@model Transport_Management_System.Services.ExecutiveDashboardViewModel
 @{
     ViewData["Title"] = "Executive Dashboard";
 }
@@ -14,9 +15,18 @@
             </nav>
         </div>
         <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <button class="btn btn-primary btn-modern shadow-sm">
-                <i class="fa-solid fa-plus me-2"></i> New Shipment
-            </button>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Trips" asp-action="Create" class="btn btn-primary btn-modern shadow-sm">
+                    <i class="fa-solid fa-plus me-2"></i> New Trip Dispatch
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Bookings" asp-action="Index" class="btn btn-primary btn-modern shadow-sm">
+                    <i class="fa-solid fa-plus me-2"></i> Book a Ticket
+                </a>
+            }
         </div>
     </div>
 </div>
@@ -25,11 +35,11 @@
 <div class="stats-grid animate-fade-in delay-1">
     <div class="stat-card">
         <div class="stat-card-content">
-            <p class="stat-label">Total Vehicles</p>
-            <h3 class="stat-value">124</h3>
+            <p class="stat-label">Total Fleet Vehicles</p>
+            <h3 class="stat-value">@Model.TotalVehicles</h3>
             <div class="stat-trend trend-up">
-                <i class="fa-solid fa-arrow-up"></i>
-                <span>4.5% from last month</span>
+                <i class="fa-solid fa-truck"></i>
+                <span>Active fleet vehicles</span>
             </div>
         </div>
         <div class="stat-icon bg-primary-subtle text-primary">
@@ -40,19 +50,19 @@
     <div class="stat-card">
         <div class="stat-card-content">
             <p class="stat-label">Drivers Overview</p>
-            <h3 class="stat-value">@ViewBag.TotalDrivers</h3>
+            <h3 class="stat-value">@Model.TotalDrivers</h3>
             <div class="stat-trend trend-up">
                 <i class="fa-solid fa-user-check"></i>
                 <span>@ViewBag.AvailableDrivers Available, @ViewBag.DriversOnTrip On Trip</span>
             </div>
-            @if(ViewBag.ExpiredLicenses > 0 || ViewBag.ExpiringLicenses > 0)
+            @if (ViewBag.ExpiredLicenses > 0 || ViewBag.ExpiringLicenses > 0)
             {
                 <div class="mt-3 pt-2 border-top border-light d-flex flex-wrap gap-2 small fw-bold">
-                    @if(ViewBag.ExpiredLicenses > 0)
+                    @if (ViewBag.ExpiredLicenses > 0)
                     {
                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> @ViewBag.ExpiredLicenses Expired</span>
                     }
-                    @if(ViewBag.ExpiringLicenses > 0)
+                    @if (ViewBag.ExpiringLicenses > 0)
                     {
                         <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2 py-1"><i class="fa-solid fa-clock me-1"></i> @ViewBag.ExpiringLicenses Expiring Soon</span>
                     }
@@ -67,7 +77,7 @@
     <div class="stat-card">
         <div class="stat-card-content">
             <p class="stat-label">Total Routes</p>
-            <h3 class="stat-value">@ViewBag.TotalRoutes</h3>
+            <h3 class="stat-value">@Model.TotalRoutes</h3>
             <div class="stat-trend trend-up">
                 <i class="fa-solid fa-route"></i>
                 <span>@ViewBag.ActiveRoutes Active Routes</span>
@@ -99,10 +109,10 @@
     <div class="stat-card">
         <div class="stat-card-content">
             <p class="stat-label">Total Trips</p>
-            <h3 class="stat-value">@ViewBag.TotalTrips</h3>
+            <h3 class="stat-value">@Model.TotalTrips</h3>
             <div class="stat-trend text-muted small">
                 <i class="fa-solid fa-route"></i>
-                <span>Active operational trips</span>
+                <span>Overall dispatches</span>
             </div>
         </div>
         <div class="stat-icon bg-primary-subtle text-primary">
@@ -126,8 +136,8 @@
 
     <div class="stat-card">
         <div class="stat-card-content">
-            <p class="stat-label">Ongoing / Delayed</p>
-            <h3 class="stat-value">@ViewBag.OngoingTrips</h3>
+            <p class="stat-label">Ongoing Trips</p>
+            <h3 class="stat-value text-primary">@ViewBag.OngoingTrips</h3>
             <div class="stat-trend text-warning small">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>@ViewBag.DelayedTrips Delayed Trips</span>
@@ -140,8 +150,8 @@
 
     <div class="stat-card">
         <div class="stat-card-content">
-            <p class="stat-label">Completed & Cancelled</p>
-            <h3 class="stat-value">@ViewBag.CompletedTrips</h3>
+            <p class="stat-label">Completed Trips</p>
+            <h3 class="stat-value text-success">@ViewBag.CompletedTrips</h3>
             <div class="stat-trend text-danger small">
                 <i class="fa-solid fa-circle-xmark"></i>
                 <span>@ViewBag.CancelledTrips Cancelled Trips</span>
@@ -159,10 +169,10 @@
     <div class="stat-card">
         <div class="stat-card-content">
             <p class="stat-label">Total Bookings</p>
-            <h3 class="stat-value">@ViewBag.TotalBookings</h3>
+            <h3 class="stat-value">@Model.TotalBookings</h3>
             <div class="stat-trend text-muted small">
                 <i class="fa-solid fa-receipt"></i>
-                <span>Overall passenger reservations</span>
+                <span>Passenger reservations</span>
             </div>
         </div>
         <div class="stat-icon bg-primary-subtle text-primary">
@@ -176,7 +186,7 @@
             <h3 class="stat-value">@ViewBag.ConfirmedBookings</h3>
             <div class="stat-trend text-success small">
                 <i class="fa-solid fa-circle-check"></i>
-                <span>Ready for departure</span>
+                <span>Paid / Ready departures</span>
             </div>
         </div>
         <div class="stat-icon bg-success-subtle text-success">
@@ -201,10 +211,10 @@
     <div class="stat-card">
         <div class="stat-card-content">
             <p class="stat-label">Total Revenue</p>
-            <h3 class="stat-value">৳@(((decimal)ViewBag.TotalRevenue).ToString("N0"))</h3>
+            <h3 class="stat-value">৳@Model.TotalRevenue.ToString("N0")</h3>
             <div class="stat-trend text-success small">
                 <i class="fa-solid fa-circle-dollar-to-slot"></i>
-                <span>Collected from paid bookings</span>
+                <span>Total booking collections</span>
             </div>
         </div>
         <div class="stat-icon bg-info-subtle text-info">
@@ -247,7 +257,7 @@
     <div class="stat-card">
         <div class="stat-card-content">
             <p class="stat-label">Open Driver Issues</p>
-            <h3 class="stat-value @(ViewBag.OpenDriverIssuesCount > 0 ? "text-warning" : "")">@ViewBag.OpenDriverIssuesCount</h3>
+            <h3 class="stat-value @(Model.OpenDriverIssuesCount > 0 ? "text-warning" : "")">@Model.OpenDriverIssuesCount</h3>
             <div class="stat-trend text-muted small">
                 <i class="fa-solid fa-clipboard-list"></i>
                 <span>Mechanical faults reported</span>
@@ -264,7 +274,7 @@
             <h3 class="stat-value">৳@(((decimal)ViewBag.ThisMonthExpenses).ToString("N0"))</h3>
             <div class="stat-trend text-muted small">
                 <i class="fa-solid fa-wallet"></i>
-                <span>Total: ৳@(((decimal)ViewBag.TotalExpenses).ToString("N0"))</span>
+                <span>Total: ৳@Model.TotalExpenses.ToString("N0")</span>
             </div>
         </div>
         <div class="stat-icon bg-success-subtle text-success">
@@ -273,18 +283,13 @@
     </div>
 </div>
 
-
 <!-- Charts Row -->
 <div class="row animate-fade-in delay-2 mb-4">
     <div class="col-lg-8 mb-4 mb-lg-0">
         <div class="card-modern h-100">
             <div class="card-header-modern">
-                <h5 class="card-title-modern">Shipment Performance</h5>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-light border" data-bs-toggle="dropdown">
-                        Last 7 Days <i class="fa-solid fa-chevron-down ms-1 x-small"></i>
-                    </button>
-                </div>
+                <h5 class="card-title-modern">Weekly Bookings & Income Trend</h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">Last 7 Days</span>
             </div>
             <div class="card-body-modern">
                 <div id="shipment-chart" style="min-height: 350px;"></div>
@@ -294,7 +299,7 @@
     <div class="col-lg-4">
         <div class="card-modern h-100">
             <div class="card-header-modern">
-                <h5 class="card-title-modern">Fleet Utilization</h5>
+                <h5 class="card-title-modern">Fleet Status Distribution</h5>
             </div>
             <div class="card-body-modern">
                 <div id="utilization-chart" style="min-height: 350px;"></div>
@@ -303,62 +308,229 @@
     </div>
 </div>
 
-<!-- Recent Transactions & Vehicle Status -->
-<div class="row animate-fade-in delay-3">
+<!-- Recent Transactions & Operational Insights -->
+<div class="row animate-fade-in delay-3 mb-4">
     <div class="col-lg-12">
         <div class="card-modern">
-            <div class="card-header-modern">
-                <h5 class="card-title-modern">Recent Shipment Status</h5>
-                <a href="#" class="small text-primary text-decoration-none fw-bold">View All</a>
+            <div class="card-header-modern border-bottom-0 pb-0">
+                <h5 class="card-title-modern fw-bold"><i class="fa-solid fa-receipt text-primary me-2"></i>Real-time Operations & Insights</h5>
             </div>
-            <div class="card-body-modern p-0">
-                <div class="table-responsive">
-                    <table class="table table-modern mb-0">
-                        <thead>
-                            <tr>
-                                <th>Shipment ID</th>
-                                <th>Vehicle</th>
-                                <th>Driver</th>
-                                <th>Destination</th>
-                                <th>Status</th>
-                                <th>ETA</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="fw-bold text-primary">#SHP-9021</td>
-                                <td>TRK-201 (Volvo FH)</td>
-                                <td>James Wilson</td>
-                                <td>Chicago, IL</td>
-                                <td><span class="badge-status badge-success">On Route</span></td>
-                                <td>Today, 4:30 PM</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-bold text-primary">#SHP-9022</td>
-                                <td>TRK-105 (Kenworth)</td>
-                                <td>Sarah Miller</td>
-                                <td>Austin, TX</td>
-                                <td><span class="badge-status badge-info">Dispatched</span></td>
-                                <td>Tomorrow, 9:00 AM</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-bold text-primary">#SHP-9023</td>
-                                <td>VAN-402 (Ford Transit)</td>
-                                <td>Michael Chen</td>
-                                <td>Seattle, WA</td>
-                                <td><span class="badge-status badge-warning">Delayed</span></td>
-                                <td>Today, 6:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-bold text-primary">#SHP-9024</td>
-                                <td>TRK-310 (Freightliner)</td>
-                                <td>Robert Taylor</td>
-                                <td>Miami, FL</td>
-                                <td><span class="badge-status badge-success">Completed</span></td>
-                                <td>2 hours ago</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="card-body-modern pt-2">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs nav-tabs-modern mb-3" id="recentActivityTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings-panel" type="button" role="tab" aria-controls="bookings-panel" aria-selected="true">
+                            <i class="fa-solid fa-ticket me-2"></i>Recent Bookings
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="trips-tab" data-bs-toggle="tab" data-bs-target="#trips-panel" type="button" role="tab" aria-controls="trips-panel" aria-selected="false">
+                            <i class="fa-solid fa-calendar-day me-2"></i>Trips & Dispatches
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="maintenance-tab" data-bs-toggle="tab" data-bs-target="#maintenance-panel" type="button" role="tab" aria-controls="maintenance-panel" aria-selected="false">
+                            <i class="fa-solid fa-screwdriver-wrench me-2"></i>Maintenance Activities
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="driverReports-tab" data-bs-toggle="tab" data-bs-target="#driverReports-panel" type="button" role="tab" aria-controls="driverReports-panel" aria-selected="false">
+                            <i class="fa-solid fa-clipboard-list me-2"></i>Driver Issue Logs
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Panels -->
+                <div class="tab-content" id="recentActivityTabsContent">
+                    <!-- Bookings Panel -->
+                    <div class="tab-pane fade show active" id="bookings-panel" role="tabpanel" aria-labelledby="bookings-tab">
+                        <div class="table-responsive">
+                            <table class="table table-modern align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <th>Passenger</th>
+                                        <th>Trip Name</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentBookings.Any())
+                                    {
+                                        foreach (var booking in Model.RecentBookings)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold text-primary">#@booking.BookingReference</td>
+                                                <td>@booking.User?.UserName</td>
+                                                <td>@booking.Trip?.TripName</td>
+                                                <td>@booking.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                                <td class="fw-semibold">৳@booking.TotalAmount.ToString("N2")</td>
+                                                <td>
+                                                    <span class="badge @(booking.PaymentStatus == PaymentStatus.Paid ? "bg-success" : booking.PaymentStatus == PaymentStatus.Pending ? "bg-warning" : "bg-danger") bg-opacity-10 text-@(booking.PaymentStatus == PaymentStatus.Paid ? "success" : booking.PaymentStatus == PaymentStatus.Pending ? "warning" : "danger") border border-@(booking.PaymentStatus == PaymentStatus.Paid ? "success" : booking.PaymentStatus == PaymentStatus.Pending ? "warning" : "danger") border-opacity-25 px-2 py-1">
+                                                        @booking.PaymentStatus
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge @(booking.Status == BookingStatus.Confirmed ? "bg-success" : booking.Status == BookingStatus.Pending ? "bg-warning" : "bg-danger") bg-opacity-10 text-@(booking.Status == BookingStatus.Confirmed ? "success" : booking.Status == BookingStatus.Pending ? "warning" : "danger") border border-@(booking.Status == BookingStatus.Confirmed ? "success" : booking.Status == BookingStatus.Pending ? "warning" : "danger") border-opacity-25 px-2 py-1">
+                                                        @booking.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">No recent bookings recorded.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Trips & Dispatches Panel -->
+                    <div class="tab-pane fade" id="trips-panel" role="tabpanel" aria-labelledby="trips-tab">
+                        <div class="table-responsive">
+                            <table class="table table-modern align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Trip Name</th>
+                                        <th>Route</th>
+                                        <th>Vehicle</th>
+                                        <th>Driver</th>
+                                        <th>Departure</th>
+                                        <th>Tickets Price</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentTrips.Any())
+                                    {
+                                        foreach (var trip in Model.RecentTrips)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold text-primary">@trip.TripName</td>
+                                                <td>@trip.Route?.RouteName</td>
+                                                <td>@trip.Vehicle?.VehicleName (@trip.Vehicle?.VehicleNumber)</td>
+                                                <td>@trip.Driver?.FullName</td>
+                                                <td>@trip.DepartureDate.ToString("yyyy-MM-dd") @trip.DepartureTime.ToString(@"hh\:mm")</td>
+                                                <td class="fw-semibold">৳@trip.TicketPrice.ToString("N2")</td>
+                                                <td>
+                                                    <span class="badge @(trip.Status == TripStatus.Completed ? "bg-success" : trip.Status == TripStatus.Scheduled ? "bg-info" : trip.Status == TripStatus.Ongoing ? "bg-primary" : "bg-warning") bg-opacity-10 text-@(trip.Status == TripStatus.Completed ? "success" : trip.Status == TripStatus.Scheduled ? "info" : trip.Status == TripStatus.Ongoing ? "primary" : "warning") border border-@(trip.Status == TripStatus.Completed ? "success" : trip.Status == TripStatus.Scheduled ? "info" : trip.Status == TripStatus.Ongoing ? "primary" : "warning") border-opacity-25 px-2 py-1">
+                                                        @trip.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">No recent trips found.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Activities Panel -->
+                    <div class="tab-pane fade" id="maintenance-panel" role="tabpanel" aria-labelledby="maintenance-tab">
+                        <div class="table-responsive">
+                            <table class="table table-modern align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle</th>
+                                        <th>Type</th>
+                                        <th>Provider</th>
+                                        <th>Service Date</th>
+                                        <th>Cost</th>
+                                        <th>Next Service</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentMaintenanceActivities.Any())
+                                    {
+                                        foreach (var maint in Model.RecentMaintenanceActivities)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold text-primary">@maint.Vehicle?.VehicleName</td>
+                                                <td>@maint.MaintenanceType</td>
+                                                <td>@maint.ServiceProvider</td>
+                                                <td>@maint.ServiceDate.ToString("yyyy-MM-dd")</td>
+                                                <td class="fw-semibold">৳@maint.Cost.ToString("N2")</td>
+                                                <td>@maint.NextServiceDate.ToString("yyyy-MM-dd")</td>
+                                                <td>
+                                                    <span class="badge @(maint.Status == MaintenanceStatus.Completed ? "bg-success" : maint.Status == MaintenanceStatus.InProgress ? "bg-warning" : "bg-info") bg-opacity-10 text-@(maint.Status == MaintenanceStatus.Completed ? "success" : maint.Status == MaintenanceStatus.InProgress ? "warning" : "info") border border-@(maint.Status == MaintenanceStatus.Completed ? "success" : maint.Status == MaintenanceStatus.InProgress ? "warning" : "info") border-opacity-25 px-2 py-1">
+                                                        @maint.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">No recent maintenance records found.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Driver Issue Logs Panel -->
+                    <div class="tab-pane fade" id="driverReports-panel" role="tabpanel" aria-labelledby="driverReports-tab">
+                        <div class="table-responsive">
+                            <table class="table table-modern align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Driver</th>
+                                        <th>Vehicle</th>
+                                        <th>Issue Category</th>
+                                        <th>Severity</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentDriverReports.Any())
+                                    {
+                                        foreach (var issue in Model.RecentDriverReports)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold text-primary">@issue.Driver?.FullName</td>
+                                                <td>@issue.Vehicle?.VehicleName</td>
+                                                <td>@issue.IssueCategory</td>
+                                                <td>
+                                                    <span class="badge @(issue.Priority == IssuePriority.High || issue.Priority == IssuePriority.Critical ? "bg-danger" : "bg-warning") bg-opacity-10 text-@(issue.Priority == IssuePriority.High || issue.Priority == IssuePriority.Critical ? "danger" : "warning") border border-@(issue.Priority == IssuePriority.High || issue.Priority == IssuePriority.Critical ? "danger" : "warning") border-opacity-25 px-2 py-1">
+                                                        @issue.Priority
+                                                    </span>
+                                                </td>
+                                                <td>@issue.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                                <td>
+                                                    <span class="badge @(issue.Status == IssueStatus.Resolved ? "bg-success" : issue.Status == IssueStatus.Open ? "bg-danger" : "bg-warning") bg-opacity-10 text-@(issue.Status == IssueStatus.Resolved ? "success" : issue.Status == IssueStatus.Open ? "danger" : "warning") border border-@(issue.Status == IssueStatus.Resolved ? "success" : issue.Status == IssueStatus.Open ? "danger" : "warning") border-opacity-25 px-2 py-1">
+                                                        @issue.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4 text-muted">No recent driver issues reported.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -368,29 +540,60 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Shipment Chart
+            // Weekly Bookings & Income Trend Area/Line Chart
+            var labels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+            var bookingsData = @Html.Raw(Json.Serialize(ViewBag.ChartBookings));
+            var revenuesData = @Html.Raw(Json.Serialize(ViewBag.ChartRevenues));
+
             var shipmentOptions = {
                 series: [{
-                    name: 'Delivered',
-                    data: [31, 40, 28, 51, 42, 109, 100]
+                    name: 'Bookings (Count)',
+                    type: 'column',
+                    data: bookingsData
                 }, {
-                    name: 'Pending',
-                    data: [11, 32, 45, 32, 34, 52, 41]
+                    name: 'Income (BDT)',
+                    type: 'area',
+                    data: revenuesData
                 }],
                 chart: {
                     height: 350,
-                    type: 'area',
+                    type: 'line',
+                    stacked: false,
                     toolbar: { show: false },
                     fontFamily: 'Inter, sans-serif'
                 },
-                colors: ['#6366f1', '#06b6d4'],
+                colors: ['#06b6d4', '#6366f1'],
+                stroke: { width: [0, 3], curve: 'smooth' },
+                fill: {
+                    opacity: [0.85, 0.25],
+                    gradient: {
+                        inverseColors: false,
+                        shade: 'light',
+                        type: "vertical",
+                        opacityFrom: 0.85,
+                        opacityTo: 0.55
+                    }
+                },
                 dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 3 },
                 xaxis: {
-                    categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                    categories: labels,
                     axisBorder: { show: false },
                     axisTicks: { show: false }
                 },
+                yaxis: [
+                    {
+                        title: { text: "Bookings Count", style: { color: '#06b6d4' } },
+                        labels: { style: { colors: '#06b6d4' } }
+                    },
+                    {
+                        opposite: true,
+                        title: { text: "Revenue (BDT)", style: { color: '#6366f1' } },
+                        labels: {
+                            style: { colors: '#6366f1' },
+                            formatter: function (value) { return "৳" + value.toLocaleString(); }
+                        }
+                    }
+                ],
                 grid: {
                     borderColor: 'rgba(0,0,0,0.05)',
                     strokeDashArray: 4
@@ -401,15 +604,19 @@
             var shipmentChart = new ApexCharts(document.querySelector("#shipment-chart"), shipmentOptions);
             shipmentChart.render();
 
-            // Utilization Chart
+            // Utilization / Fleet Status Donut Chart
+            var activeCount = @ViewBag.ActiveVehiclesCount;
+            var maintCount = @ViewBag.MaintenanceVehiclesCount;
+            var outCount = @ViewBag.OutOfServiceVehiclesCount;
+
             var utilOptions = {
-                series: [76, 18, 6],
+                series: [activeCount, maintCount, outCount],
                 chart: {
                     height: 350,
                     type: 'donut',
                     fontFamily: 'Inter, sans-serif'
                 },
-                labels: ['Active', 'In Maintenance', 'Idle'],
+                labels: ['Active', 'In Maintenance', 'Out Of Service'],
                 colors: ['#10b981', '#f59e0b', '#ef4444'],
                 legend: { position: 'bottom' },
                 plotOptions: {
@@ -421,7 +628,7 @@
                                 total: {
                                     show: true,
                                     label: 'Total Fleet',
-                                    formatter: () => '124'
+                                    formatter: () => '@ViewBag.TotalVehiclesCount'
                                 }
                             }
                         }

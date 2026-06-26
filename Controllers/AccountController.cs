@@ -161,7 +161,7 @@ namespace Transport_Management_System.Controllers
                         // Redirect based on role
                         if (user.Role?.RoleName == "Admin")
                         {
-                            return RedirectToAction("Index", "Users");
+                            return RedirectToAction("Index", "Dashboard");
                         }
                         
                         return RedirectToAction("Index", "Home");
