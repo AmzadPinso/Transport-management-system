@@ -164,6 +164,25 @@ namespace Transport_Management_System.Repository.Application
                                b.Status != BookingStatus.Cancelled);
         }
 
+        public async Task<IEnumerable<Booking>> GetGroupBookingsAsync(string groupBookingRef)
+        {
+            return await _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Trip)
+                    .ThenInclude(t => t!.Route)
+                        .ThenInclude(r => r!.OriginStation)
+                .Include(b => b.Trip)
+                    .ThenInclude(t => t!.Route)
+                        .ThenInclude(r => r!.DestinationStation)
+                .Include(b => b.Trip)
+                    .ThenInclude(t => t!.Vehicle)
+                .Include(b => b.Trip)
+                    .ThenInclude(t => t!.Driver)
+                .Where(b => b.GroupBookingRef == groupBookingRef)
+                .OrderBy(b => b.SeatNumber)
+                .ToListAsync();
+        }
+
         public async Task<int> GetTotalBookingsCountAsync()
             => await _context.Bookings.CountAsync();
 

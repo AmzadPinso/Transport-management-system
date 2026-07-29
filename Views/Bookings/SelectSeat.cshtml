@@ -1,12 +1,19 @@
 @model Transport_Management_System.Models.ViewModels.BookingSeatViewModel
+@using Transport_Management_System.Services
 
 @{
     ViewData["Title"] = "Select Your Seat";
+    var rec = ViewBag.Recommendation as SeatRecommendation;
+    var recommendedSet = rec?.SuggestedSeats != null
+        ? new HashSet<string>(rec.SuggestedSeats, StringComparer.OrdinalIgnoreCase)
+        : new HashSet<string>();
 }
 
 <div class="container py-4">
     <div class="d-flex align-items-center gap-3 mb-4">
-        <a asp-controller="Bookings" asp-action="Index" class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+        <a asp-controller="Bookings" asp-action="Index"
+           class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center"
+           style="width:40px;height:40px;">
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
@@ -14,59 +21,6 @@
             <p class="text-muted small mb-0">@Model.Trip.TripName — @Model.Trip.Route?.RouteName</p>
         </div>
     </div>
-
-    <!-- Passenger Count Selection for Group Recommendations -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <span class="small fw-semibold text-muted"><i class="fa-solid fa-users me-2"></i>Traveling with a group? Adjust passenger count to find adjacent seats:</span>
-            <form method="get" class="d-flex align-items-center gap-2 mb-0">
-                <select name="passengerCount" class="form-select form-select-sm rounded-3" style="width: 100px;" onchange="this.form.submit()">
-                    @for (int count = 1; count <= 4; count++)
-                    {
-                        if (ViewBag.PassengerCount == count)
-                        {
-                            <option value="@count" selected>@count pax</option>
-                        }
-                        else
-                        {
-                            <option value="@count">@count pax</option>
-                        }
-                    }
-                </select>
-            </form>
-        </div>
-    </div>
-
-    <!-- Smart Seat Recommendation Banner -->
-    @if (ViewBag.Recommendation != null)
-    {
-        var rec = (Transport_Management_System.Services.SeatRecommendation)ViewBag.Recommendation;
-        if (rec.SuggestedSeats.Any())
-        {
-            <div class="card border-0 bg-primary bg-opacity-10 text-primary-emphasis mb-4 shadow-sm rounded-4 animate-fade-in">
-                <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="bg-primary text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                            <i class="fa-solid fa-wand-magic-sparkles fs-5"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1 text-dark">AI Seat Recommendation (@(rec.IsWindow ? "Window Priority" : "Adjacent Group"))</h6>
-                            <p class="mb-0 text-muted small">@rec.Message</p>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        @foreach (var seatNum in rec.SuggestedSeats)
-                        {
-                            <button type="button" class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-3" 
-                                    onclick="applyRecommendedSeat('@seatNum')">
-                                Select Seat @seatNum
-                            </button>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
-    }
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -76,30 +30,125 @@
         </div>
     }
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Passenger Count Selector -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span class="small fw-semibold text-muted">
+                <i class="fa-solid fa-users me-2"></i>Traveling with a group? Adjust passenger count for adjacent seat recommendations:
+            </span>
+            <form method="get" class="d-flex align-items-center gap-2 mb-0">
+                <input type="hidden" name="id" value="@Model.Trip.TripId" />
+                <select name="passengerCount" class="form-select form-select-sm rounded-3"
+                        style="width:110px;" onchange="this.form.submit()">
+                    @for (int count = 1; count <= 6; count++)
+                    {
+                        if (ViewBag.PassengerCount == count)
+                        {
+                            <option value="@count" selected>@count @(count == 1 ? "passenger" : "passengers")</option>
+                        }
+                        else
+                        {
+                            <option value="@count">@count @(count == 1 ? "passenger" : "passengers")</option>
+                        }
+                    }
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Smart Recommendation Banner -->
+    @if (rec != null && rec.SuggestedSeats.Any())
+    {
+        <div class="card border-0 mb-4 shadow-sm rounded-4 animate-fade-in-up"
+             style="background: linear-gradient(135deg, rgba(79,70,229,.08), rgba(16,185,129,.08)); border-left: 4px solid var(--primary) !important;">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:48px;height:48px;">
+                        <i class="fa-solid fa-wand-magic-sparkles fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">
+                            Smart Recommendation
+                            @if (rec.IsWindow)
+                            {
+                                <span class="badge bg-info text-white ms-2 small">Window Seat</span>
+                            }
+                            else if (rec.IsGroup)
+                            {
+                                <span class="badge bg-success text-white ms-2 small">Adjacent Group</span>
+                            }
+                        </h6>
+                        <p class="mb-0 text-muted small">@rec.Message</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    @foreach (var seatNum in rec.SuggestedSeats)
+                    {
+                        <button type="button" class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-3"
+                                onclick="applyRecommendedSeat('@seatNum')">
+                            <i class="fa-solid fa-couch me-1"></i>@seatNum
+                        </button>
+                    }
+                    @if (rec.SuggestedSeats.Count > 1)
+                    {
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-bold px-3 py-2 rounded-3"
+                                onclick="applyFirstRecommended()">
+                            <i class="fa-solid fa-check-double me-1"></i>Select First
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else if (rec != null && !rec.SuggestedSeats.Any())
+    {
+        <div class="alert alert-warning rounded-4 mb-4">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>@rec.Message
+        </div>
+    }
+
     <div class="row g-4">
         <!-- Seat Map -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
+
                     <!-- Legend -->
-                    <div class="d-flex gap-4 mb-4 flex-wrap">
+                    <div class="d-flex gap-3 mb-4 flex-wrap align-items-center">
                         <div class="d-flex align-items-center gap-2">
-                            <div class="seat-demo available"></div>
+                            <div class="seat-legend available"></div>
                             <span class="small text-muted fw-semibold">Available</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <div class="seat-demo booked"></div>
+                            <div class="seat-legend recommended"></div>
+                            <span class="small text-muted fw-semibold">Recommended</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="seat-legend window-seat"></div>
+                            <span class="small text-muted fw-semibold">Window</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="seat-legend booked"></div>
                             <span class="small text-muted fw-semibold">Booked</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <div class="seat-demo selected"></div>
+                            <div class="seat-legend selected"></div>
                             <span class="small text-muted fw-semibold">Your Selection</span>
                         </div>
                     </div>
 
-                    <!-- Bus Front Indicator -->
+                    <!-- Driver -->
                     <div class="text-center mb-4">
-                        <div class="bus-front d-inline-block px-5 py-2 rounded-pill bg-dark text-white small fw-bold">
+                        <div class="d-inline-block px-5 py-2 rounded-pill bg-dark text-white small fw-bold">
                             <i class="fa-solid fa-steering-wheel me-2"></i>DRIVER
                         </div>
                     </div>
@@ -107,32 +156,61 @@
                     <!-- Seat Grid -->
                     <form id="seatForm" asp-controller="Bookings" asp-action="Confirm" method="get">
                         <input type="hidden" name="tripId" value="@Model.Trip.TripId" />
-                        <input type="hidden" name="seatNumber" id="selectedSeatInput" value="" />
+                        <input type="hidden" name="seatNumbers" id="selectedSeatsInput" value="" />
 
-                        <div class="seat-bus-container mx-auto" style="max-width: 420px;">
+                        <div class="seat-bus-container mx-auto" style="max-width:440px;">
                             @foreach (var row in Model.SeatLayout)
                             {
                                 <div class="seat-row d-flex justify-content-center gap-2 mb-3">
                                     @for (int i = 0; i < row.Count; i++)
                                     {
                                         var seat = row[i];
-                                        // Insert aisle gap after seat 2
+
+                                        // Aisle gap after col 2
                                         if (i == 2)
                                         {
-                                            <div style="width:24px;"></div>
+                                            <div class="aisle-gap d-flex align-items-center justify-content-center text-muted"
+                                                 style="width:28px;">
+                                                <small style="font-size:.55rem;writing-mode:vertical-rl;opacity:.4;">AISLE</small>
+                                            </div>
                                         }
 
                                         if (seat.IsBooked)
                                         {
-                                            <div class="seat booked" title="Booked - @seat.SeatNumber">
+                                            <div class="seat booked" title="Occupied — @seat.SeatNumber">
                                                 <i class="fa-solid fa-user"></i>
+                                                <span>@seat.SeatNumber</span>
+                                            </div>
+                                        }
+                                        else if (seat.IsRecommended)
+                                        {
+                                            <div class="seat recommended @(seat.IsWindow ? "window-seat" : "")"
+                                                 data-seat="@seat.SeatNumber"
+                                                 title="@(seat.IsWindow ? "Recommended Window" : "Recommended") — @seat.SeatNumber"
+                                                 onclick="selectSeat(this)">
+                                                <i class="fa-solid fa-star"></i>
+                                                <span>@seat.SeatNumber</span>
+                                                @if (seat.IsWindow)
+                                                {
+                                                    <span class="window-badge">W</span>
+                                                }
+                                            </div>
+                                        }
+                                        else if (seat.IsWindow)
+                                        {
+                                            <div class="seat available window-seat"
+                                                 data-seat="@seat.SeatNumber"
+                                                 title="Window Seat — @seat.SeatNumber"
+                                                 onclick="selectSeat(this)">
+                                                <i class="fa-regular fa-window-maximize"></i>
                                                 <span>@seat.SeatNumber</span>
                                             </div>
                                         }
                                         else
                                         {
-                                            <div class="seat available" data-seat="@seat.SeatNumber"
-                                                 title="Available - @seat.SeatNumber"
+                                            <div class="seat available"
+                                                 data-seat="@seat.SeatNumber"
+                                                 title="Available — @seat.SeatNumber"
                                                  onclick="selectSeat(this)">
                                                 <i class="fa-regular fa-square"></i>
                                                 <span>@seat.SeatNumber</span>
@@ -143,13 +221,21 @@
                             }
                         </div>
 
-                        <div id="seatSelectedMsg" class="alert alert-success rounded-3 mt-4 d-none text-center fw-bold">
-                            <i class="fa-solid fa-couch me-2"></i>Seat <span id="chosenSeatDisplay"></span> selected!
+                        <div id="seatSelectedMsg" class="alert alert-success rounded-3 mt-4 d-none">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div>
+                                    <i class="fa-solid fa-couch me-2"></i>
+                                    <strong>Selected:</strong> <span id="chosenSeatDisplay" class="fw-bold text-primary"></span>
+                                </div>
+                                <span class="badge bg-primary rounded-pill px-3 py-2" id="seatCountBadge">0 seat(s)</span>
+                            </div>
                         </div>
 
                         <div class="d-flex gap-3 justify-content-end mt-4">
-                            <a asp-controller="Bookings" asp-action="Index" class="btn btn-light border rounded-3 px-4">Cancel</a>
-                            <button type="submit" id="proceedBtn" class="btn-modern btn-modern-primary px-5 rounded-3" disabled>
+                            <a asp-controller="Bookings" asp-action="Index"
+                               class="btn btn-light border rounded-3 px-4">Cancel</a>
+                            <button type="submit" id="proceedBtn"
+                                    class="btn-modern btn-modern-primary px-5 rounded-3" disabled>
                                 <i class="fa-solid fa-arrow-right me-2"></i>Proceed to Confirm
                             </button>
                         </div>
@@ -158,8 +244,9 @@
             </div>
         </div>
 
-        <!-- Trip Summary Sidebar -->
+        <!-- Sidebar -->
         <div class="col-lg-4">
+            <!-- Trip Summary -->
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3 text-secondary small text-uppercase">Trip Summary</h5>
@@ -196,7 +283,7 @@
                 </div>
             </div>
 
-            <!-- Availability Counter -->
+            <!-- Availability -->
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3 text-secondary small text-uppercase">Availability</h5>
@@ -208,10 +295,11 @@
                         <span class="text-muted small">Booked Seats</span>
                         <span class="fw-bold text-danger">@Model.TotalBooked</span>
                     </div>
-                    <div class="progress rounded-pill" style="height: 8px;">
-                        @{ var pct = Model.TotalBooked + Model.TotalAvailable > 0
-                               ? (int)((double)Model.TotalBooked / (Model.TotalBooked + Model.TotalAvailable) * 100)
-                               : 0; }
+                    @{
+                        var total = Model.TotalBooked + Model.TotalAvailable;
+                        var pct   = total > 0 ? (int)((double)Model.TotalBooked / total * 100) : 0;
+                    }
+                    <div class="progress rounded-pill mb-1" style="height:8px;">
                         <div class="progress-bar bg-danger" role="progressbar" style="width:@pct%"></div>
                     </div>
                     <small class="text-muted">@pct% occupied</small>
@@ -221,22 +309,26 @@
     </div>
 </div>
 
+<!-- ── Styles ───────────────────────────────────────────────────────── -->
 <style>
     .seat {
-        width: 56px; height: 56px;
+        width: 58px; height: 58px;
         border-radius: 10px;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
-        font-size: .65rem; font-weight: 700;
+        font-size: .62rem; font-weight: 700;
         cursor: pointer; transition: all .18s ease;
         user-select: none;
         border: 2px solid transparent;
+        position: relative;
     }
     .seat i { font-size: 1rem; margin-bottom: 2px; }
+
+    /* Available */
     .seat.available {
         background: rgba(16,185,129,.1);
         color: #059669;
-        border-color: rgba(16,185,129,.3);
+        border-color: rgba(16,185,129,.35);
     }
     .seat.available:hover {
         background: #10b981;
@@ -244,60 +336,180 @@
         transform: scale(1.1);
         box-shadow: 0 4px 15px rgba(16,185,129,.4);
     }
+
+    /* Window seat (available but not recommended) */
+    .seat.available.window-seat {
+        background: rgba(14,165,233,.1);
+        color: #0369a1;
+        border-color: rgba(14,165,233,.4);
+    }
+    .seat.available.window-seat:hover {
+        background: #0ea5e9;
+        color: white;
+        box-shadow: 0 4px 15px rgba(14,165,233,.4);
+        transform: scale(1.1);
+    }
+
+    /* Recommended */
+    .seat.recommended {
+        background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(249,115,22,.12));
+        color: #d97706;
+        border-color: rgba(245,158,11,.5);
+        animation: pulse-recommend 2s infinite;
+    }
+    .seat.recommended:hover {
+        background: #f59e0b;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(245,158,11,.45);
+        animation: none;
+    }
+
+    /* Recommended window */
+    .seat.recommended.window-seat {
+        background: linear-gradient(135deg, rgba(79,70,229,.15), rgba(16,185,129,.12));
+        color: var(--primary, #4f46e5);
+        border-color: rgba(79,70,229,.5);
+    }
+    .seat.recommended.window-seat:hover {
+        background: var(--primary, #4f46e5);
+        color: white;
+        box-shadow: 0 4px 15px rgba(79,70,229,.45);
+    }
+
+    /* Window badge */
+    .window-badge {
+        position: absolute;
+        top: 2px; right: 3px;
+        font-size: .5rem;
+        background: currentColor;
+        color: white;
+        border-radius: 3px;
+        padding: 0 2px;
+        line-height: 1.4;
+        opacity: .75;
+    }
+
+    /* Booked */
     .seat.booked {
         background: rgba(239,68,68,.08);
         color: #dc2626;
         border-color: rgba(239,68,68,.2);
         cursor: not-allowed;
-        opacity: .75;
+        opacity: .65;
     }
+
+    /* Selected */
     .seat.selected {
-        background: var(--primary);
+        background: var(--primary, #4f46e5);
         color: white;
-        border-color: var(--primary-hover);
-        box-shadow: 0 4px 15px rgba(79,70,229,.4);
-        transform: scale(1.08);
+        border-color: var(--primary-hover, #4338ca);
+        box-shadow: 0 4px 18px rgba(79,70,229,.45);
+        transform: scale(1.1);
+        animation: none !important;
     }
-    .seat-demo {
-        width: 24px; height: 24px; border-radius: 6px; border: 2px solid transparent;
+
+    /* Legend dots */
+    .seat-legend {
+        width: 22px; height: 22px; border-radius: 6px; border: 2px solid transparent;
     }
-    .seat-demo.available { background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.4); }
-    .seat-demo.booked    { background: rgba(239,68,68,.1);   border-color: rgba(239,68,68,.3); }
-    .seat-demo.selected  { background: var(--primary);        border-color: var(--primary-hover); }
+    .seat-legend.available    { background: rgba(16,185,129,.15);  border-color: rgba(16,185,129,.4); }
+    .seat-legend.recommended  { background: rgba(245,158,11,.2);   border-color: rgba(245,158,11,.5); }
+    .seat-legend.window-seat  { background: rgba(14,165,233,.15);  border-color: rgba(14,165,233,.4); }
+    .seat-legend.booked       { background: rgba(239,68,68,.1);    border-color: rgba(239,68,68,.3); }
+    .seat-legend.selected     { background: var(--primary,#4f46e5); border-color: var(--primary-hover,#4338ca); }
+
+    @@keyframes pulse-recommend {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); }
+        50%       { box-shadow: 0 0 0 6px rgba(245,158,11,.0); }
+    }
 </style>
 
 @section Scripts {
     <script>
-        let currentSeat = null;
+        // Multi-seat selection
+        const selectedSeats    = new Set();          // currently selected seat numbers
+        const recommendedSeats = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(recommendedSet.ToList()));
+
+        function updateUI() {
+            const arr = Array.from(selectedSeats);
+            document.getElementById('selectedSeatsInput').value = arr.join(',');
+            document.getElementById('chosenSeatDisplay').textContent =
+                arr.length ? arr.join(', ') : '';
+            document.getElementById('seatCountBadge').textContent =
+                arr.length + (arr.length === 1 ? ' seat' : ' seats') + ' selected';
+
+            const msgEl = document.getElementById('seatSelectedMsg');
+            if (arr.length > 0) {
+                msgEl.classList.remove('d-none');
+            } else {
+                msgEl.classList.add('d-none');
+            }
+            document.getElementById('proceedBtn').disabled = (arr.length === 0);
+        }
+
+        function restoreVisual(el) {
+            const seatNum   = el.dataset.seat;
+            const isRec     = recommendedSeats.includes(seatNum);
+            const isWindow  = el.classList.contains('window-seat');
+            el.classList.remove('selected');
+            if (isRec) {
+                el.classList.add('recommended');
+                el.querySelector('i').className = 'fa-solid fa-star';
+            } else if (isWindow) {
+                el.classList.add('available', 'window-seat');
+                el.querySelector('i').className = 'fa-regular fa-window-maximize';
+            } else {
+                el.classList.add('available');
+                el.querySelector('i').className = 'fa-regular fa-square';
+            }
+        }
 
         function selectSeat(el) {
             if (el.classList.contains('booked')) return;
 
-            // Deselect previous
-            if (currentSeat) {
-                currentSeat.classList.remove('selected');
-                currentSeat.classList.add('available');
-                currentSeat.querySelector('i').className = 'fa-regular fa-square';
-            }
-
-            // Select new
-            el.classList.remove('available');
-            el.classList.add('selected');
-            el.querySelector('i').className = 'fa-solid fa-couch';
-            currentSeat = el;
-
             const seatNum = el.dataset.seat;
-            document.getElementById('selectedSeatInput').value = seatNum;
-            document.getElementById('chosenSeatDisplay').textContent = seatNum;
-            document.getElementById('seatSelectedMsg').classList.remove('d-none');
-            document.getElementById('proceedBtn').disabled = false;
+
+            if (selectedSeats.has(seatNum)) {
+                // Deselect (toggle off)
+                selectedSeats.delete(seatNum);
+                restoreVisual(el);
+            } else {
+                // Select
+                selectedSeats.add(seatNum);
+                el.classList.remove('available', 'recommended');
+                el.classList.add('selected');
+                el.querySelector('i').className = 'fa-solid fa-couch';
+            }
+            updateUI();
         }
 
         function applyRecommendedSeat(seatNum) {
             const el = document.querySelector(`[data-seat="${seatNum}"]`);
-            if (el) {
-                selectSeat(el);
-            }
+            if (el && !el.classList.contains('booked')) selectSeat(el);
         }
+
+        function applyFirstRecommended() {
+            // For group recommendations select ALL recommended seats at once
+            recommendedSeats.forEach(sn => {
+                const el = document.querySelector(`[data-seat="${sn}"]`);
+                if (el && !el.classList.contains('booked') && !selectedSeats.has(sn)) {
+                    selectedSeats.add(sn);
+                    el.classList.remove('available', 'recommended');
+                    el.classList.add('selected');
+                    el.querySelector('i').className = 'fa-solid fa-couch';
+                }
+            });
+            updateUI();
+        }
+
+        // Double-click / double-submit prevention
+        document.getElementById('proceedBtn').addEventListener('click', function (e) {
+            if (selectedSeats.size === 0) { e.preventDefault(); return; }
+            this.disabled = true;
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Loading...';
+            document.getElementById('seatForm').submit();
+        });
     </script>
 }

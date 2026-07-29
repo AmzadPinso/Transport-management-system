@@ -1,0 +1,217 @@
+@model IEnumerable<Transport_Management_System.Models.Shipment>
+@using Transport_Management_System.Models
+
+@{
+    ViewData["Title"] = "Shipment Management";
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = ViewBag.TotalPages;
+    int totalRecords = ViewBag.TotalRecords;
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Shipment Management</h1>
+            <p class="text-muted small mb-0">Track and manage all cargo shipments. Total: <strong>@totalRecords</strong> records.</p>
+        </div>
+        <a asp-action="Create" class="btn-modern btn-modern-primary shadow-sm">
+            <i class="fa-solid fa-plus"></i> <span>New Shipment</span>
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4 shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                <div class="col-lg-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="search" value="@ViewBag.Search"
+                               class="form-control bg-light border-0 ps-0"
+                               placeholder="Ref, sender, receiver, origin..." />
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <select name="type" class="form-select bg-light border-0"
+                            asp-items="Html.GetEnumSelectList<ShipmentType>()">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <select name="status" class="form-select bg-light border-0"
+                            asp-items="Html.GetEnumSelectList<ShipmentStatus>()">
+                        <option value="">All Statuses</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 rounded-3">
+                        <i class="fa-solid fa-filter me-1"></i>Filter
+                    </button>
+                    @if (!string.IsNullOrEmpty(ViewBag.Search as string) || ViewBag.SelectedType != null || ViewBag.SelectedStatus != null)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary px-3 rounded-3" title="Clear Filters">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Shipments Table -->
+    <div class="table-container animate-fade-in-up">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>Shipment Ref</th>
+                    <th>Sender → Receiver</th>
+                    <th>Route</th>
+                    <th>Type</th>
+                    <th>Weight</th>
+                    <th>Status</th>
+                    <th>Dispatch</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-primary">@item.ShipmentRef</div>
+                                <div class="small text-muted">@item.CreatedAt.ToString("MMM dd, yyyy")</div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold">@item.SenderName</div>
+                                <div class="small text-muted"><i class="fa-solid fa-arrow-right me-1"></i>@item.ReceiverName</div>
+                            </td>
+                            <td>
+                                <div class="small"><i class="fa-solid fa-location-dot text-danger me-1"></i>@item.Origin</div>
+                                <div class="small text-muted"><i class="fa-solid fa-flag-checkered text-success me-1"></i>@item.Destination</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1">
+                                    @item.ShipmentType
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold">@item.WeightKg.ToString("F1")</span> <small class="text-muted">kg</small>
+                            </td>
+                            <td>
+                                @{
+                                    var (badgeClass, icon) = item.Status switch
+                                    {
+                                        ShipmentStatus.Delivered      => ("bg-success-subtle text-success", "fa-circle-check"),
+                                        ShipmentStatus.InTransit      => ("bg-info-subtle text-info", "fa-truck-moving"),
+                                        ShipmentStatus.Dispatched     => ("bg-primary bg-opacity-10 text-primary", "fa-paper-plane"),
+                                        ShipmentStatus.OutForDelivery => ("bg-warning-subtle text-warning", "fa-person-biking"),
+                                        ShipmentStatus.Pending        => ("bg-secondary bg-opacity-10 text-secondary", "fa-clock"),
+                                        ShipmentStatus.Processing     => ("bg-primary bg-opacity-10 text-primary", "fa-gears"),
+                                        ShipmentStatus.Failed         => ("bg-danger-subtle text-danger", "fa-triangle-exclamation"),
+                                        ShipmentStatus.Cancelled      => ("bg-danger-subtle text-danger", "fa-ban"),
+                                        ShipmentStatus.Returned       => ("bg-warning-subtle text-warning", "fa-rotate-left"),
+                                        _                             => ("bg-secondary bg-opacity-10 text-secondary", "fa-circle")
+                                    };
+                                }
+                                <span class="badge rounded-pill @badgeClass border-0 px-3 py-2">
+                                    <i class="fa-solid @icon me-1"></i>@item.Status
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                @(item.DispatchDate.HasValue ? item.DispatchDate.Value.ToString("MMM dd, yyyy") : "—")
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.ShipmentId"
+                                       class="btn btn-sm btn-outline-info border-0 rounded-circle p-2" title="View Details">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.ShipmentId"
+                                       class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Edit">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.ShipmentId"
+                                       class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" title="Delete">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-box-open d-block fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0">No shipments found matching your criteria.</p>
+                            <a asp-action="Create" class="btn btn-primary btn-sm mt-3 rounded-3">
+                                <i class="fa-solid fa-plus me-1"></i>Create First Shipment
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination pagination-modern gap-2">
+                    <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index"
+                           asp-route-pageNumber="@(pageNumber - 1)"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-type="@ViewBag.SelectedType"
+                           asp-route-status="@ViewBag.SelectedStatus">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle @(i == pageNumber ? "bg-primary text-white" : "bg-white text-dark")"
+                               asp-action="Index"
+                               asp-route-pageNumber="@i"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-type="@ViewBag.SelectedType"
+                               asp-route-status="@ViewBag.SelectedStatus">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(pageNumber == totalPages ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-circle shadow-sm" asp-action="Index"
+                           asp-route-pageNumber="@(pageNumber + 1)"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-type="@ViewBag.SelectedType"
+                           asp-route-status="@ViewBag.SelectedStatus">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

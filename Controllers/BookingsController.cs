@@ -97,10 +97,10 @@ namespace Transport_Management_System.Controllers
         }
 
         // ─── Booking Confirmation ─────────────────────────────────
-        // GET /Bookings/Confirm?tripId=5&seatNumber=B2
-        public async Task<IActionResult> Confirm(int tripId, string seatNumber)
+        // GET /Bookings/Confirm?tripId=5&seatNumbers=A1,A2,A3
+        public async Task<IActionResult> Confirm(int tripId, string seatNumbers)
         {
-            if (string.IsNullOrWhiteSpace(seatNumber))
+            if (string.IsNullOrWhiteSpace(seatNumbers))
                 return RedirectToAction(nameof(SelectSeat), new { id = tripId });
 
             var userId = GetCurrentUserId();
@@ -109,26 +109,39 @@ namespace Transport_Management_System.Controllers
             var trip = await _tripRepo.GetByIdAsync(tripId);
             if (trip == null) return NotFound();
 
-            // Check seat is still free
-            if (await _bookingRepo.HasSeatAlreadyBookedAsync(tripId, seatNumber))
+            // Parse and deduplicate seats
+            var seats = seatNumbers
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (seats.Count == 0)
+                return RedirectToAction(nameof(SelectSeat), new { id = tripId });
+
+            // Check each seat is still free
+            var takenSeats = new List<string>();
+            foreach (var seat in seats)
             {
-                TempData["ErrorMessage"] = $"Seat {seatNumber} was just taken. Please choose another.";
+                if (await _bookingRepo.HasSeatAlreadyBookedAsync(tripId, seat))
+                    takenSeats.Add(seat);
+            }
+
+            if (takenSeats.Count == seats.Count)
+            {
+                TempData["ErrorMessage"] = $"All selected seats ({string.Join(", ", takenSeats)}) are already taken. Please choose again.";
                 return RedirectToAction(nameof(SelectSeat), new { id = tripId });
             }
 
-            // Check user hasn't already booked this trip
-            if (await _bookingRepo.HasUserAlreadyBookedTripAsync(userId, tripId))
-            {
-                TempData["ErrorMessage"] = "You already have an active booking on this trip.";
-                return RedirectToAction(nameof(History));
-            }
+            if (takenSeats.Any())
+                TempData["WarningMessage"] = $"Seat(s) {string.Join(", ", takenSeats)} were already taken and removed from your selection.";
 
+            var availableSeats = seats.Except(takenSeats, StringComparer.OrdinalIgnoreCase).ToList();
             var user = await _userRepo.GetByIdAsync(userId);
 
             var vm = new BookingConfirmViewModel
             {
                 TripId         = tripId,
-                SeatNumber     = seatNumber,
+                SeatNumbers    = string.Join(",", availableSeats),
                 Trip           = trip,
                 PassengerName  = user?.UserName ?? string.Empty,
                 PassengerEmail = user?.Email    ?? string.Empty
@@ -146,53 +159,83 @@ namespace Transport_Management_System.Controllers
             var userId = GetCurrentUserId();
             if (userId == 0) return RedirectToAction("Login", "Account");
 
-            // Final seat conflict check
-            if (await _bookingRepo.HasSeatAlreadyBookedAsync(model.TripId, model.SeatNumber))
-            {
-                TempData["ErrorMessage"] = $"Seat {model.SeatNumber} was just taken. Please choose another.";
+            var seats = model.SeatList;
+            if (seats.Count == 0)
                 return RedirectToAction(nameof(SelectSeat), new { id = model.TripId });
-            }
-
-            if (await _bookingRepo.HasUserAlreadyBookedTripAsync(userId, model.TripId))
-            {
-                TempData["ErrorMessage"] = "You already have an active booking on this trip.";
-                return RedirectToAction(nameof(History));
-            }
 
             var trip = await _tripRepo.GetByIdAsync(model.TripId);
             if (trip == null) return NotFound();
 
-            // Generate unique reference (retry on collision)
-            string reference;
-            do { reference = _seatService.GenerateBookingReference(); }
-            while (await _bookingRepo.GetBookingByReferenceAsync(reference) != null);
-
-            var booking = new Booking
+            // Final per-seat conflict check
+            var takenSeats = new List<string>();
+            foreach (var seat in seats)
             {
-                BookingReference = reference,
-                UserId           = userId,
-                TripId           = model.TripId,
-                SeatNumber       = model.SeatNumber,
-                BookingDate      = DateTime.Now,
-                Status           = BookingStatus.Confirmed,
-                PaymentStatus    = PaymentStatus.Pending,
-                TotalAmount      = trip.TicketPrice,
-                Remarks          = model.Remarks,
-                CreatedAt        = DateTime.Now,
-                UpdatedAt        = DateTime.Now
-            };
+                if (await _bookingRepo.HasSeatAlreadyBookedAsync(model.TripId, seat))
+                    takenSeats.Add(seat);
+            }
 
-            await _bookingRepo.AddAsync(booking);
+            var availableSeats = seats.Except(takenSeats, StringComparer.OrdinalIgnoreCase).ToList();
 
-            // Reduce available capacity on the trip
-            trip.AvailableCapacity = Math.Max(0, trip.AvailableCapacity - 1);
+            if (availableSeats.Count == 0)
+            {
+                TempData["ErrorMessage"] = $"All selected seats ({string.Join(", ", takenSeats)}) were taken between confirmation and submit. Please choose again.";
+                return RedirectToAction(nameof(SelectSeat), new { id = model.TripId });
+            }
+
+            if (takenSeats.Any())
+                TempData["WarningMessage"] = $"Seat(s) {string.Join(", ", takenSeats)} were taken by another user and skipped.";
+
+            // Generate a shared group reference for multi-seat bookings
+            bool isGroup = availableSeats.Count > 1;
+            string? groupRef = isGroup ? $"GRP-{DateTime.Now:yyMMddHHmm}-{new Random().Next(100,999)}" : null;
+
+            int firstBookingId = 0;
+
+            foreach (var seat in availableSeats)
+            {
+                // Generate unique reference per seat (retry on collision)
+                string reference;
+                do { reference = _seatService.GenerateBookingReference(); }
+                while (await _bookingRepo.GetBookingByReferenceAsync(reference) != null);
+
+                var booking = new Booking
+                {
+                    BookingReference = reference,
+                    GroupBookingRef  = groupRef,
+                    UserId           = userId,
+                    TripId           = model.TripId,
+                    SeatNumber       = seat,
+                    BookingDate      = DateTime.Now,
+                    Status           = BookingStatus.Confirmed,
+                    PaymentStatus    = PaymentStatus.Pending,
+                    TotalAmount      = trip.TicketPrice,
+                    Remarks          = model.Remarks,
+                    CreatedAt        = DateTime.Now,
+                    UpdatedAt        = DateTime.Now
+                };
+
+                await _bookingRepo.AddAsync(booking);
+
+                if (firstBookingId == 0)
+                {
+                    // Flush to get the BookingId of the first record
+                    await _bookingRepo.SaveAsync();
+                    firstBookingId = booking.BookingId;
+                }
+
+                // Reduce capacity for each seat
+                trip.AvailableCapacity = Math.Max(0, trip.AvailableCapacity - 1);
+            }
+
             trip.UpdatedAt = DateTime.Now;
             _tripRepo.Update(trip);
-
             await _bookingRepo.SaveAsync();
 
-            TempData["SuccessMessage"] = $"Booking confirmed! Reference: {reference}";
-            return RedirectToAction(nameof(Ticket), new { id = booking.BookingId });
+            TempData["SuccessMessage"] = availableSeats.Count == 1
+                ? $"Booking confirmed! Seat {availableSeats[0]} booked successfully."
+                : $"{availableSeats.Count} seats booked! Group ref: {groupRef}";
+
+            return RedirectToAction(nameof(Ticket), new { id = firstBookingId });
         }
 
         // ─── Ticket ───────────────────────────────────────────────
@@ -208,6 +251,13 @@ namespace Transport_Management_System.Controllers
             // Users can only view their own tickets; admins can view all
             if (!User.IsInRole("Admin") && booking.UserId != userId)
                 return Forbid();
+
+            // Load all seats for group bookings
+            if (!string.IsNullOrEmpty(booking.GroupBookingRef))
+            {
+                var groupBookings = await _bookingRepo.GetGroupBookingsAsync(booking.GroupBookingRef);
+                ViewBag.GroupBookings = groupBookings;
+            }
 
             ViewData["Title"] = $"Ticket - {booking.BookingReference}";
             return View(booking);

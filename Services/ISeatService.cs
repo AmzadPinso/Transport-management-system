@@ -2,17 +2,20 @@ namespace Transport_Management_System.Services
 {
     public class SeatInfo
     {
-        public string SeatNumber { get; set; } = string.Empty;
-        public bool IsBooked { get; set; }
-        public int Row { get; set; }
-        public int Col { get; set; }
+        public string SeatNumber    { get; set; } = string.Empty;
+        public bool   IsBooked      { get; set; }
+        public bool   IsRecommended { get; set; }   // highlighted in the UI
+        public bool   IsWindow      { get; set; }   // Col 1 or Col 4
+        public int    Row           { get; set; }
+        public int    Col           { get; set; }
     }
 
     public class SeatRecommendation
     {
         public List<string> SuggestedSeats { get; set; } = new List<string>();
-        public bool IsWindow { get; set; }
-        public string Message { get; set; } = string.Empty;
+        public bool   IsWindow  { get; set; }
+        public bool   IsGroup   { get; set; }
+        public string Message   { get; set; } = string.Empty;
     }
 
     public interface ISeatService

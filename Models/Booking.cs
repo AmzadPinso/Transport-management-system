@@ -59,6 +59,11 @@ namespace Transport_Management_System.Models
         [StringLength(500)]
         public string? Remarks { get; set; }
 
+        /// <summary>Shared reference for seats booked together in one transaction. Null for single-seat bookings.</summary>
+        [StringLength(25)]
+        [Display(Name = "Group Ref")]
+        public string? GroupBookingRef { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }

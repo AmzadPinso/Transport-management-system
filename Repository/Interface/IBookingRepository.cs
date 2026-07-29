@@ -25,6 +25,7 @@ namespace Transport_Management_System.Repository.Interface
         Task<IEnumerable<string>> GetBookedSeatsForTripAsync(int tripId);
         Task<bool> HasSeatAlreadyBookedAsync(int tripId, string seatNumber);
         Task<bool> HasUserAlreadyBookedTripAsync(int userId, int tripId);
+        Task<IEnumerable<Booking>> GetGroupBookingsAsync(string groupBookingRef);
         Task<int> GetTotalBookingsCountAsync();
         Task<int> GetBookingsCountByStatusAsync(BookingStatus status);
         Task<decimal> GetTotalRevenueAsync();

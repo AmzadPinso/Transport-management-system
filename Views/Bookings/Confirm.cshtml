@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Confirm Your Booking";
+    var seats     = Model.SeatList;
+    var seatCount = seats.Count;
+    var unitPrice = Model.Trip?.TicketPrice ?? 0;
+    var total     = unitPrice * seatCount;
 }
 
 <div class="container py-4">
@@ -9,7 +13,8 @@
         <div class="col-lg-7 col-md-10">
             <div class="d-flex align-items-center gap-3 mb-4">
                 <a asp-controller="Bookings" asp-action="SelectSeat" asp-route-id="@Model.TripId"
-                   class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                   class="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                   style="width:40px;height:40px;">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div>
@@ -18,22 +23,44 @@
                 </div>
             </div>
 
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div class="alert alert-warning rounded-4 mb-4 alert-dismissible fade show">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["WarningMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
             <!-- Booking Summary Card -->
             <div class="card border-0 shadow rounded-4 mb-4 overflow-hidden">
-                <div class="bg-primary text-white p-4">
+                <!-- Header -->
+                <div class="text-white p-4" style="background: linear-gradient(135deg, #4f46e5, #0ea5e9);">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fa-solid fa-ticket-simple fs-3 mb-2 d-block opacity-75"></i>
                             <h4 class="fw-bold mb-0">Booking Summary</h4>
                         </div>
                         <div class="text-end">
-                            <div class="fs-1 fw-bold">@Model.SeatNumber</div>
-                            <small class="opacity-75">Your Seat</small>
+                            @if (seatCount == 1)
+                            {
+                                <div class="fs-1 fw-bold font-monospace">@seats[0]</div>
+                                <small class="opacity-75">Your Seat</small>
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-wrap gap-2 justify-content-end mb-1">
+                                    @foreach (var s in seats)
+                                    {
+                                        <span class="badge bg-white text-primary fw-bold fs-6 px-3 py-2 rounded-3">@s</span>
+                                    }
+                                </div>
+                                <small class="opacity-75">@seatCount Seats Selected</small>
+                            }
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-4">
 
+                <div class="card-body p-4">
                     <!-- Route Visualization -->
                     <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-4">
                         <div class="text-center">
@@ -86,19 +113,49 @@
                         </div>
                     </div>
 
-                    <!-- Price -->
-                    <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 mb-4">
-                        <span class="fw-bold text-dark">Total Amount</span>
-                        <span class="fs-4 fw-bold text-success">
-                            @(Model.Trip?.TicketPrice > 0 ? $"৳{Model.Trip.TicketPrice:N0}" : "FREE")
-                        </span>
+                    <!-- Seats Summary (multi-seat) -->
+                    @if (seatCount > 1)
+                    {
+                        <div class="p-3 border border-primary border-opacity-25 rounded-3 mb-4 bg-primary bg-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-primary small"><i class="fa-solid fa-couch me-2"></i>Selected Seats</span>
+                                <span class="badge bg-primary rounded-pill">@seatCount seats</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var s in seats)
+                                {
+                                    <span class="badge bg-white border border-primary text-primary fw-bold px-3 py-2 rounded-3 fs-6">@s</span>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Price Breakdown -->
+                    <div class="border rounded-3 mb-4 overflow-hidden">
+                        @if (seatCount > 1)
+                        {
+                            <div class="d-flex justify-content-between px-3 py-2 bg-light border-bottom">
+                                <span class="text-muted small">Price per seat</span>
+                                <span class="fw-semibold small">@(unitPrice > 0 ? $"৳{unitPrice:N0}" : "FREE")</span>
+                            </div>
+                            <div class="d-flex justify-content-between px-3 py-2 bg-light border-bottom">
+                                <span class="text-muted small">Number of seats</span>
+                                <span class="fw-semibold small">× @seatCount</span>
+                            </div>
+                        }
+                        <div class="d-flex justify-content-between align-items-center p-3">
+                            <span class="fw-bold text-dark">Total Amount</span>
+                            <span class="fs-4 fw-bold text-success">
+                                @(total > 0 ? $"৳{total:N0}" : "FREE")
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Confirm Form -->
                     <form asp-action="Confirm" method="post">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="TripId" value="@Model.TripId" />
-                        <input type="hidden" name="SeatNumber" value="@Model.SeatNumber" />
+                        <input type="hidden" name="TripId"      value="@Model.TripId" />
+                        <input type="hidden" name="SeatNumbers" value="@Model.SeatNumbers" />
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Remarks / Special Requests (Optional)</label>
@@ -111,8 +168,10 @@
                                class="btn btn-light border flex-grow-1 py-3 rounded-3 fw-bold">
                                 Back
                             </a>
-                            <button type="submit" class="btn btn-success flex-grow-1 py-3 rounded-3 fw-bold shadow-sm">
-                                <i class="fa-solid fa-circle-check me-2"></i>Confirm Booking
+                            <button type="submit" id="confirmBtn"
+                                    class="btn btn-success flex-grow-1 py-3 rounded-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-circle-check me-2"></i>
+                                Confirm @(seatCount > 1 ? $"{seatCount} Seats" : "Booking")
                             </button>
                         </div>
                     </form>
@@ -126,3 +185,14 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Prevent double submit
+        document.getElementById('confirmBtn').addEventListener('click', function () {
+            this.disabled = true;
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Processing...';
+            this.closest('form').submit();
+        });
+    </script>
+}

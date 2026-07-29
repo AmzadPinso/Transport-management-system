@@ -28,6 +28,9 @@ namespace Transport_Management_System.Data
         public DbSet<DriverIssue> DriverIssues { get; set; }
         public DbSet<Expense> Expenses { get; set; }
 
+        // Week 7 — Shipment Management Module
+        public DbSet<Shipment> Shipments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

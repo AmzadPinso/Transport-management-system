@@ -16,7 +16,9 @@
         </a>
 
         <div class="nav-group-label">Operations</div>
-        <a href="#" title="Fleet" class="sidebar-link">
+        <a asp-controller="Vehicles" asp-action="Index"
+           title="Fleet"
+           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vehicles" ? "active" : "")">
             <i class="fa-solid fa-truck-moving"></i>
             <span>Fleet</span>
         </a>
@@ -32,13 +34,9 @@
             <i class="fa-solid fa-id-card"></i>
             <span>Drivers</span>
         </a>
-        <a asp-controller="Vehicles" asp-action="Index"
-           title="Vehicles"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vehicles" ? "active" : "")">
-            <i class="fa-solid fa-car-side"></i>
-            <span>Vehicles</span>
-        </a>
-        <a href="#" title="Shipments" class="sidebar-link">
+        <a asp-controller="Shipments" asp-action="Index"
+           title="Shipments"
+           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Shipments" ? "active" : "")">
             <i class="fa-solid fa-box-archive"></i>
             <span>Shipments</span>
         </a>
@@ -123,7 +121,9 @@
         }
 
         <div class="nav-group-label">System</div>
-        <a href="#" title="Settings" class="sidebar-link">
+        <a asp-controller="Profile" asp-action="Index"
+           title="Settings"
+           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Profile" ? "active" : "")">
             <i class="fa-solid fa-gears"></i>
             <span>Settings</span>
         </a>

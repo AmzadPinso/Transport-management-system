@@ -94,8 +94,27 @@
                         </div>
                         <div class="col-6">
                             <div class="p-3 border rounded-3 h-100 text-center">
-                                <div class="text-muted small text-uppercase mb-1">Seat</div>
-                                <div class="fw-bold display-6 text-primary">@Model.SeatNumber</div>
+                                <div class="text-muted small text-uppercase mb-2">Seat(s)</div>
+                                @{
+                                    var groupBookings = ViewBag.GroupBookings as IEnumerable<Transport_Management_System.Models.Booking>;
+                                    var allSeats = groupBookings != null && groupBookings.Any()
+                                        ? groupBookings.Select(b => b.SeatNumber).ToList()
+                                        : new List<string> { Model.SeatNumber };
+                                }
+                                @if (allSeats.Count == 1)
+                                {
+                                    <div class="fw-bold display-6 text-primary">@allSeats[0]</div>
+                                }
+                                else
+                                {
+                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                        @foreach (var s in allSeats)
+                                        {
+                                            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-3 fs-6">@s</span>
+                                        }
+                                    </div>
+                                    <div class="text-muted small mt-1">@allSeats.Count seats</div>
+                                }
                             </div>
                         </div>
                         <div class="col-4">
@@ -133,11 +152,23 @@
                     </div>
 
                     <!-- Payment Status Footer -->
+                    @{
+                        var grpBookings2 = ViewBag.GroupBookings as IEnumerable<Transport_Management_System.Models.Booking>;
+                        var displayTotal = (grpBookings2 != null && grpBookings2.Any())
+                            ? grpBookings2.Sum(b => b.TotalAmount)
+                            : Model.TotalAmount;
+                    }
                     <div class="d-flex justify-content-between align-items-center p-3 rounded-3
                         @(Model.PaymentStatus == PaymentStatus.Paid ? "bg-success-subtle" : "bg-warning-subtle")">
                         <div>
                             <div class="fw-bold small">Payment Status</div>
                             <div class="text-muted small">Booked on @Model.BookingDate.ToString("MMM dd, yyyy hh:mm tt")</div>
+                            @if (!string.IsNullOrEmpty(Model.GroupBookingRef))
+                            {
+                                <div class="text-muted small mt-1">
+                                    <i class="fa-solid fa-layer-group me-1"></i>Group Ref: <strong>@Model.GroupBookingRef</strong>
+                                </div>
+                            }
                         </div>
                         <div class="text-end">
                             <span class="badge rounded-pill px-3 py-2 fw-bold
@@ -147,9 +178,9 @@
                                   "bg-warning text-dark")">
                                 @Model.PaymentStatus
                             </span>
-                            @if (Model.TotalAmount > 0)
+                            @if (displayTotal > 0)
                             {
-                                <div class="fw-bold fs-5 mt-1">৳@Model.TotalAmount.ToString("N0")</div>
+                                <div class="fw-bold fs-5 mt-1">৳@displayTotal.ToString("N0")</div>
                             }
                         </div>
                     </div>
