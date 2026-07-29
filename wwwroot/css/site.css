@@ -223,6 +223,64 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    overflow: hidden;   /* prevents content bleeding during width transition */
+}
+
+/* ── Collapsed sidebar ─────────────────────────────────────────
+   The JS toggles .collapsed on both .sidebar and .main-content.
+   These rules make the toggle visually work.
+   ─────────────────────────────────────────────────────────────── */
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);  /* 80px — already defined in :root */
+}
+
+/* Main content shifts left when sidebar collapses */
+.main-content.collapsed {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Hide text labels when collapsed */
+.sidebar.collapsed .sidebar-link span,
+.sidebar.collapsed .sidebar-brand span,
+.sidebar.collapsed .nav-group-label {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Center icons when collapsed */
+.sidebar.collapsed .sidebar-link {
+    justify-content: center;
+    padding: 0.75rem 0;
+    margin: 0.2rem 0.5rem;
+}
+
+.sidebar.collapsed .sidebar-brand {
+    justify-content: center;
+    padding: 0 0.5rem;
+}
+
+/* Keep icon size consistent */
+.sidebar.collapsed .sidebar-link i {
+    font-size: 1.25rem;
+    width: auto;
+}
+
+/* Tooltip on hover in collapsed mode — shows the label as native title */
+.sidebar.collapsed .sidebar-link {
+    position: relative;
+}
+
+/* Smooth transition for text appearance */
+.sidebar-link span,
+.sidebar-brand span {
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.nav-group-label {
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .sidebar-header {
@@ -251,6 +309,11 @@ body {
     flex: 1;
     padding: 1.5rem 0.75rem;
     overflow-y: auto;
+    overflow-x: hidden;
+    /* Must be a definite height for scrollTop persistence to work correctly */
+    min-height: 0;
+    /* Prevent browser smooth-scroll from interfering with JS-restored position */
+    scroll-behavior: auto;
 }
 
 .nav-group-label {
@@ -693,11 +756,23 @@ body {
 
 /* --- Responsive Helpers --- */
 @media (max-width: 991px) {
+    /* On mobile, sidebar uses overlay (show/hide), NOT collapsed width */
     .sidebar {
         left: -100%;
+        width: var(--sidebar-width) !important;  /* always full width on mobile */
     }
 
     .sidebar.show {
+        left: 0;
+    }
+
+    /* Disable desktop collapsed-width behavior on mobile */
+    .sidebar.collapsed {
+        width: var(--sidebar-width) !important;
+        left: -100%;
+    }
+
+    .sidebar.collapsed.show {
         left: 0;
     }
 
