@@ -53,38 +53,33 @@ namespace Transport_Management_System.Controllers
         {
             ViewData["Title"] = "Dashboard Overview";
 
-            var drivers = await _driverRepo.GetAllAsync();
-            var routes = await _routeRepo.GetAllAsync();
-            var stations = await _stationRepo.GetAllAsync();
-            var trips = await _tripRepo.GetAllAsync();
-            var vehicles = await _context.Vehicles.ToListAsync();
             var now = DateTime.Now;
 
-            ViewBag.TotalDrivers = drivers.Count();
-            ViewBag.AvailableDrivers = drivers.Count(d => d.AvailabilityStatus == DriverAvailabilityStatus.Available);
-            ViewBag.DriversOnTrip = drivers.Count(d => d.AvailabilityStatus == DriverAvailabilityStatus.OnTrip);
-            ViewBag.ExpiredLicenses = drivers.Count(d => d.LicenseExpiryDate <= now);
-            ViewBag.ExpiringLicenses = drivers.Count(d => d.LicenseExpiryDate > now && d.LicenseExpiryDate <= now.AddDays(30));
+            ViewBag.TotalDrivers = await _context.Drivers.CountAsync();
+            ViewBag.AvailableDrivers = await _context.Drivers.CountAsync(d => d.AvailabilityStatus == DriverAvailabilityStatus.Available);
+            ViewBag.DriversOnTrip = await _context.Drivers.CountAsync(d => d.AvailabilityStatus == DriverAvailabilityStatus.OnTrip);
+            ViewBag.ExpiredLicenses = await _context.Drivers.CountAsync(d => d.LicenseExpiryDate <= now);
+            ViewBag.ExpiringLicenses = await _context.Drivers.CountAsync(d => d.LicenseExpiryDate > now && d.LicenseExpiryDate <= now.AddDays(30));
 
-            ViewBag.TotalRoutes = routes.Count();
-            ViewBag.ActiveRoutes = routes.Count(r => r.Status == RouteStatus.Active);
-            ViewBag.TotalStations = stations.Count();
-            ViewBag.ActiveStations = stations.Count(s => s.IsActive);
+            ViewBag.TotalRoutes = await _context.Routes.CountAsync();
+            ViewBag.ActiveRoutes = await _context.Routes.CountAsync(r => r.Status == RouteStatus.Active);
+            ViewBag.TotalStations = await _context.Stations.CountAsync();
+            ViewBag.ActiveStations = await _context.Stations.CountAsync(s => s.IsActive);
 
             // Vehicle Status Counts
-            ViewBag.ActiveVehiclesCount = vehicles.Count(v => v.Status == VehicleStatus.Active);
-            ViewBag.MaintenanceVehiclesCount = vehicles.Count(v => v.Status == VehicleStatus.InMaintenance);
-            ViewBag.OutOfServiceVehiclesCount = vehicles.Count(v => v.Status == VehicleStatus.OutOfService);
-            ViewBag.TotalVehiclesCount = vehicles.Count;
+            ViewBag.ActiveVehiclesCount = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Active);
+            ViewBag.MaintenanceVehiclesCount = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.InMaintenance);
+            ViewBag.OutOfServiceVehiclesCount = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.OutOfService);
+            ViewBag.TotalVehiclesCount = await _context.Vehicles.CountAsync();
 
             // Trip Statistics
-            ViewBag.TotalTrips = trips.Count();
-            ViewBag.ScheduledTrips = trips.Count(t => t.Status == TripStatus.Scheduled);
-            ViewBag.OngoingTrips = trips.Count(t => t.Status == TripStatus.Ongoing);
-            ViewBag.CompletedTrips = trips.Count(t => t.Status == TripStatus.Completed);
-            ViewBag.DelayedTrips = trips.Count(t => t.Status == TripStatus.Delayed);
-            ViewBag.CancelledTrips = trips.Count(t => t.Status == TripStatus.Cancelled);
-            ViewBag.ReadyForDispatchTrips = trips.Count(t => t.Status == TripStatus.ReadyForDispatch);
+            ViewBag.TotalTrips = await _context.Trips.CountAsync();
+            ViewBag.ScheduledTrips = await _context.Trips.CountAsync(t => t.Status == TripStatus.Scheduled);
+            ViewBag.OngoingTrips = await _context.Trips.CountAsync(t => t.Status == TripStatus.Ongoing);
+            ViewBag.CompletedTrips = await _context.Trips.CountAsync(t => t.Status == TripStatus.Completed);
+            ViewBag.DelayedTrips = await _context.Trips.CountAsync(t => t.Status == TripStatus.Delayed);
+            ViewBag.CancelledTrips = await _context.Trips.CountAsync(t => t.Status == TripStatus.Cancelled);
+            ViewBag.ReadyForDispatchTrips = await _context.Trips.CountAsync(t => t.Status == TripStatus.ReadyForDispatch);
 
             // Booking & Revenue Statistics
             ViewBag.TotalBookings = await _bookingRepo.GetTotalBookingsCountAsync();

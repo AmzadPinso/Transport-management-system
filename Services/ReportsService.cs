@@ -24,8 +24,8 @@ namespace Transport_Management_System.Services
             var summary = new RevenueSummaryViewModel();
             var today = DateTime.Today;
 
-            // 1. Booking Income (Only paid bookings)
-            var bookingsQuery = _context.Bookings.Where(b => b.PaymentStatus == PaymentStatus.Paid);
+            // 1. Booking Income (Only valid bookings)
+            var bookingsQuery = _context.Bookings.Where(b => b.Status != BookingStatus.Cancelled);
             if (startDate.HasValue)
                 bookingsQuery = bookingsQuery.Where(b => b.BookingDate >= startDate.Value);
             if (endDate.HasValue)
@@ -42,30 +42,22 @@ namespace Transport_Management_System.Services
 
             var opExpenses = await expensesQuery.SumAsync(e => e.Amount);
 
-            var maintenanceQuery = _context.MaintenanceRecords.Where(m => m.Status == MaintenanceStatus.Completed);
-            if (startDate.HasValue)
-                maintenanceQuery = maintenanceQuery.Where(m => m.ServiceDate >= startDate.Value);
-            if (endDate.HasValue)
-                maintenanceQuery = maintenanceQuery.Where(m => m.ServiceDate <= endDate.Value);
-
-            var maintExpenses = await maintenanceQuery.SumAsync(m => m.Cost);
-
-            summary.TotalExpenses = opExpenses + maintExpenses;
+            summary.TotalExpenses = opExpenses;
 
             // 3. Time-based Income Cards (ignore the custom range filters to keep KPIs stable, or apply where relevant)
-            var dailyQuery = _context.Bookings.Where(b => b.PaymentStatus == PaymentStatus.Paid && b.BookingDate.Date == today);
+            var dailyQuery = _context.Bookings.Where(b => b.Status != BookingStatus.Cancelled && b.BookingDate.Date == today);
             summary.DailyRevenue = await dailyQuery.SumAsync(b => b.TotalAmount);
 
             var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
-            var weeklyQuery = _context.Bookings.Where(b => b.PaymentStatus == PaymentStatus.Paid && b.BookingDate.Date >= startOfWeek);
+            var weeklyQuery = _context.Bookings.Where(b => b.Status != BookingStatus.Cancelled && b.BookingDate.Date >= startOfWeek);
             summary.WeeklyRevenue = await weeklyQuery.SumAsync(b => b.TotalAmount);
 
             var startOfMonth = new DateTime(today.Year, today.Month, 1);
-            var monthlyQuery = _context.Bookings.Where(b => b.PaymentStatus == PaymentStatus.Paid && b.BookingDate.Date >= startOfMonth);
+            var monthlyQuery = _context.Bookings.Where(b => b.Status != BookingStatus.Cancelled && b.BookingDate.Date >= startOfMonth);
             summary.MonthlyRevenue = await monthlyQuery.SumAsync(b => b.TotalAmount);
 
             var startOfYear = new DateTime(today.Year, 1, 1);
-            var yearlyQuery = _context.Bookings.Where(b => b.PaymentStatus == PaymentStatus.Paid && b.BookingDate.Date >= startOfYear);
+            var yearlyQuery = _context.Bookings.Where(b => b.Status != BookingStatus.Cancelled && b.BookingDate.Date >= startOfYear);
             summary.YearlyRevenue = await yearlyQuery.SumAsync(b => b.TotalAmount);
 
             return summary;
@@ -91,7 +83,7 @@ namespace Transport_Management_System.Services
 
                 // Booking revenue in this month
                 var monthlyIncome = await _context.Bookings
-                    .Where(b => b.PaymentStatus == PaymentStatus.Paid && b.BookingDate >= currentMonth && b.BookingDate < nextMonth)
+                    .Where(b => b.Status != BookingStatus.Cancelled && b.BookingDate >= currentMonth && b.BookingDate < nextMonth)
                     .SumAsync(b => b.TotalAmount);
 
                 // Expenses in this month
@@ -99,15 +91,11 @@ namespace Transport_Management_System.Services
                     .Where(e => e.ExpenseDate >= currentMonth && e.ExpenseDate < nextMonth)
                     .SumAsync(e => e.Amount);
 
-                var monthlyMaintExpenses = await _context.MaintenanceRecords
-                    .Where(m => m.Status == MaintenanceStatus.Completed && m.ServiceDate >= currentMonth && m.ServiceDate < nextMonth)
-                    .SumAsync(m => m.Cost);
-
                 points.Add(new RevenueTrendPoint
                 {
                     Period = label,
                     Income = monthlyIncome,
-                    Expenses = monthlyOpExpenses + monthlyMaintExpenses
+                    Expenses = monthlyOpExpenses
                 });
 
                 currentMonth = nextMonth;
@@ -121,7 +109,7 @@ namespace Transport_Management_System.Services
             var bookingsQuery = _context.Bookings
                 .Include(b => b.Trip)
                     .ThenInclude(t => t!.Route)
-                .Where(b => b.PaymentStatus == PaymentStatus.Paid && b.Trip != null && b.Trip.Route != null);
+                .Where(b => b.Status != BookingStatus.Cancelled && b.Trip != null && b.Trip.Route != null);
 
             if (startDate.HasValue)
                 bookingsQuery = bookingsQuery.Where(b => b.BookingDate >= startDate.Value);
@@ -148,7 +136,7 @@ namespace Transport_Management_System.Services
             var bookingsQuery = _context.Bookings
                 .Include(b => b.Trip)
                     .ThenInclude(t => t!.Vehicle)
-                .Where(b => b.PaymentStatus == PaymentStatus.Paid && b.Trip != null && b.Trip.Vehicle != null);
+                .Where(b => b.Status != BookingStatus.Cancelled && b.Trip != null && b.Trip.Vehicle != null);
 
             if (startDate.HasValue)
                 bookingsQuery = bookingsQuery.Where(b => b.BookingDate >= startDate.Value);
@@ -244,14 +232,11 @@ namespace Transport_Management_System.Services
             vm.TotalBookings = await _context.Bookings.CountAsync();
 
             vm.TotalRevenue = await _context.Bookings
-                .Where(b => b.PaymentStatus == PaymentStatus.Paid)
+                .Where(b => b.Status != BookingStatus.Cancelled)
                 .SumAsync(b => b.TotalAmount);
 
             var opExpenses = await _context.Expenses.SumAsync(e => e.Amount);
-            var maintExpenses = await _context.MaintenanceRecords
-                .Where(m => m.Status == MaintenanceStatus.Completed)
-                .SumAsync(m => m.Cost);
-            vm.TotalExpenses = opExpenses + maintExpenses;
+            vm.TotalExpenses = opExpenses;
 
             var alerts = await _maintenanceService.GetMaintenanceAlertsAsync();
             vm.MaintenanceAlertsCount = alerts.OverdueCount + alerts.UpcomingCount;

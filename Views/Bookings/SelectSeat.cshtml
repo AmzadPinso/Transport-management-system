@@ -429,8 +429,7 @@
     <script>
         // Multi-seat selection
         const selectedSeats    = new Set();          // currently selected seat numbers
-        const recommendedSeats = @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(recommendedSet.ToList()));
+        const recommendedSeats = @Json.Serialize(recommendedSet.ToList());
 
         function updateUI() {
             const arr = Array.from(selectedSeats);
