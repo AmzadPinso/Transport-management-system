@@ -62,6 +62,14 @@ namespace Transport_Management_System.Controllers
             return View(routes);
         }
 
+        // GET: Routes/Calculator
+        public async Task<IActionResult> Calculator()
+        {
+            var stations = (await _stationRepo.GetAllAsync()).Where(s => s.IsActive).OrderBy(s => s.StationName).ToList();
+            ViewBag.Stations = new SelectList(stations, "StationId", "StationName");
+            return View();
+        }
+
         // GET: Routes/Details/5
         public async Task<IActionResult> Details(int id)
         {

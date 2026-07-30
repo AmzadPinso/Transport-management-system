@@ -48,9 +48,15 @@
         </a>
         <a asp-controller="Routes" asp-action="Index"
            title="Routes"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" ? "active" : "")">
+           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" && ViewContext.RouteData.Values["Action"]?.ToString() != "Calculator" ? "active" : "")">
             <i class="fa-solid fa-route"></i>
             <span>Routes</span>
+        </a>
+        <a asp-controller="Routes" asp-action="Calculator"
+           title="Distance Calculator"
+           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" && ViewContext.RouteData.Values["Action"]?.ToString() == "Calculator" ? "active" : "")">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Distance Map</span>
         </a>
         <a asp-controller="Trips" asp-action="Index"
            title="Trips"
