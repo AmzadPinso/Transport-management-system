@@ -8,7 +8,7 @@ using Transport_Management_System.Repository.Interface;
 
 namespace Transport_Management_System.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class DriverIssuesController : Controller
     {
         private readonly IDriverIssueRepository _driverIssueRepo;

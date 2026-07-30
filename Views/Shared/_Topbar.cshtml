@@ -3,14 +3,17 @@
         <button id="sidebar-toggle" class="sidebar-toggle">
             <i class="fa-solid fa-bars-staggered"></i>
         </button>
-        <form asp-controller="Search" asp-action="Index" method="get" class="search-form position-relative d-none d-md-block" style="min-width: 320px;">
-            <div class="search-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" name="query" class="search-input" placeholder="Search for vehicles, drivers, routes..." autocomplete="off">
-                <div class="search-suggestions-dropdown position-absolute bg-white shadow rounded-3 mt-1 py-2 d-none" style="width: 100%; max-height: 300px; overflow-y: auto; z-index: 1050; left: 0;">
+        @if (User.IsInRole("Admin"))
+        {
+            <form asp-controller="Search" asp-action="Index" method="get" class="search-form position-relative d-none d-md-block" style="min-width: 320px;">
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" name="query" class="search-input" placeholder="Search for vehicles, drivers, routes..." autocomplete="off">
+                    <div class="search-suggestions-dropdown position-absolute bg-white shadow rounded-3 mt-1 py-2 d-none" style="width: 100%; max-height: 300px; overflow-y: auto; z-index: 1050; left: 0;">
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        }
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -126,7 +129,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end dropdown-modern border-0 mt-2 p-2">
                 <li><a class="dropdown-item rounded-2 py-2" asp-controller="Profile" asp-action="Index"><i class="fa-solid fa-user-circle me-2"></i>My Profile</a></li>
-                <li><a class="dropdown-item rounded-2 py-2" href="#"><i class="fa-solid fa-cog me-2"></i>Settings</a></li>
+                <li><a class="dropdown-item rounded-2 py-2" asp-controller="Profile" asp-action="Index"><i class="fa-solid fa-cog me-2"></i>Settings</a></li>
                 <li><hr class="dropdown-divider"></li>
                 @if (User.Identity.IsAuthenticated)
                 {

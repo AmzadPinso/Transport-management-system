@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Transport_Management_System.Data;
 using Transport_Management_System.Models;
+using Transport_Management_System.Models.ViewModels;
 using Transport_Management_System.Repository.Interface;
 using Transport_Management_System.Services;
 
@@ -51,6 +53,52 @@ namespace Transport_Management_System.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (!User.IsInRole("Admin"))
+            {
+                ViewData["Title"] = "My Dashboard";
+                var claimStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("UserId");
+                int.TryParse(claimStr, out var currentUserId);
+
+                var userProfile = await _context.Users.FindAsync(currentUserId);
+
+                var userBookings = await _context.Bookings
+                    .Include(b => b.Trip)
+                        .ThenInclude(t => t!.Route)
+                            .ThenInclude(r => r!.OriginStation)
+                    .Include(b => b.Trip)
+                        .ThenInclude(t => t!.Route)
+                            .ThenInclude(r => r!.DestinationStation)
+                    .Include(b => b.Trip)
+                        .ThenInclude(t => t!.Vehicle)
+                    .Where(b => b.UserId == currentUserId)
+                    .OrderByDescending(b => b.BookingDate)
+                    .ToListAsync();
+
+                var availableTrips = await _context.Trips
+                    .Include(t => t.Route)
+                        .ThenInclude(r => r!.OriginStation)
+                    .Include(t => t.Route)
+                        .ThenInclude(r => r!.DestinationStation)
+                    .Include(t => t.Vehicle)
+                    .Where(t => t.DepartureDate >= DateTime.Today && (t.Status == TripStatus.Scheduled || t.Status == TripStatus.ReadyForDispatch) && t.AvailableCapacity > 0)
+                    .OrderBy(t => t.DepartureDate)
+                    .Take(5)
+                    .ToListAsync();
+
+                var userVm = new UserDashboardViewModel
+                {
+                    UserProfile = userProfile,
+                    RecentBookings = userBookings.Take(10).ToList(),
+                    UpcomingBookings = userBookings.Where(b => b.Trip != null && b.Trip.DepartureDate >= DateTime.Today && b.Status == BookingStatus.Confirmed).OrderBy(b => b.Trip!.DepartureDate).Take(5).ToList(),
+                    AvailableTrips = availableTrips,
+                    TotalBookingsCount = userBookings.Count,
+                    ConfirmedBookingsCount = userBookings.Count(b => b.Status == BookingStatus.Confirmed),
+                    TotalSpent = userBookings.Where(b => b.Status == BookingStatus.Confirmed && b.PaymentStatus == PaymentStatus.Paid).Sum(b => b.TotalAmount)
+                };
+
+                return View("UserDashboard", userVm);
+            }
+
             ViewData["Title"] = "Dashboard Overview";
 
             var now = DateTime.Now;

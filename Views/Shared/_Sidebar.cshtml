@@ -12,62 +12,56 @@
            title="Dashboard"
            class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
             <i class="fa-solid fa-chart-line"></i>
-            <span>Dashboard</span>
+            <span>@(User.IsInRole("Admin") ? "Admin Dashboard" : "Home Dashboard")</span>
         </a>
 
-        <div class="nav-group-label">Operations</div>
-        <a asp-controller="Vehicles" asp-action="Index"
-           title="Fleet"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vehicles" ? "active" : "")">
-            <i class="fa-solid fa-truck-moving"></i>
-            <span>Fleet</span>
-        </a>
-        <a asp-controller="Roles" asp-action="Index"
-           title="Role Management"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Roles" ? "active" : "")">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>Role Management</span>
-        </a>
-        <a asp-controller="Drivers" asp-action="Index"
-           title="Drivers"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Drivers" ? "active" : "")">
-            <i class="fa-solid fa-id-card"></i>
-            <span>Drivers</span>
-        </a>
-        <a asp-controller="Shipments" asp-action="Index"
-           title="Shipments"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Shipments" ? "active" : "")">
-            <i class="fa-solid fa-box-archive"></i>
-            <span>Shipments</span>
-        </a>
-        <a asp-controller="Stations" asp-action="Index"
-           title="Stations"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stations" ? "active" : "")">
-            <i class="fa-solid fa-location-dot"></i>
-            <span>Stations</span>
-        </a>
-        <a asp-controller="Routes" asp-action="Index"
-           title="Routes"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" && ViewContext.RouteData.Values["Action"]?.ToString() != "Calculator" ? "active" : "")">
-            <i class="fa-solid fa-route"></i>
-            <span>Routes</span>
-        </a>
-        <a asp-controller="Routes" asp-action="Calculator"
-           title="Distance Calculator"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" && ViewContext.RouteData.Values["Action"]?.ToString() == "Calculator" ? "active" : "")">
-            <i class="fa-solid fa-map-location-dot"></i>
-            <span>Distance Map</span>
-        </a>
-        <a asp-controller="Trips" asp-action="Index"
-           title="Trips"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Trips" ? "active" : "")">
-            <i class="fa-solid fa-calendar-days"></i>
-            <span>Trips</span>
-        </a>
-
-        <div class="nav-group-label">Management</div>
         @if (User.IsInRole("Admin"))
         {
+            <div class="nav-group-label">Operations</div>
+            <a asp-controller="Vehicles" asp-action="Index"
+               title="Fleet"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vehicles" ? "active" : "")">
+                <i class="fa-solid fa-truck-moving"></i>
+                <span>Fleet</span>
+            </a>
+            <a asp-controller="Roles" asp-action="Index"
+               title="Role Management"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Roles" ? "active" : "")">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Role Management</span>
+            </a>
+            <a asp-controller="Drivers" asp-action="Index"
+               title="Drivers"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Drivers" ? "active" : "")">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Drivers</span>
+            </a>
+            <a asp-controller="Shipments" asp-action="Index"
+               title="Shipments"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Shipments" ? "active" : "")">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Shipments</span>
+            </a>
+            <a asp-controller="Stations" asp-action="Index"
+               title="Stations"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stations" ? "active" : "")">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Stations</span>
+            </a>
+            <a asp-controller="Routes" asp-action="Index"
+               title="Routes"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" && ViewContext.RouteData.Values["Action"]?.ToString() != "Calculator" ? "active" : "")">
+                <i class="fa-solid fa-route"></i>
+                <span>Routes</span>
+            </a>
+            <a asp-controller="Trips" asp-action="Index"
+               title="Trips"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Trips" ? "active" : "")">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Trips</span>
+            </a>
+
+            <div class="nav-group-label">Management</div>
             <a asp-controller="Maintenance" asp-action="Index"
                title="Maintenance"
                class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Maintenance" ? "active" : "")">
@@ -80,19 +74,35 @@
                 <i class="fa-solid fa-wallet"></i>
                 <span>Expenses</span>
             </a>
+            <a asp-controller="DriverIssues" asp-action="Index"
+               title="Driver Issues"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "DriverIssues" ? "active" : "")">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>Driver Issues</span>
+            </a>
+            <a asp-controller="Users" asp-action="Index"
+               title="Employees"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")">
+                <i class="fa-solid fa-users"></i>
+                <span>Employees</span>
+            </a>
+            <a asp-controller="AdminBookings" asp-action="Index"
+               title="Manage Bookings"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "AdminBookings" ? "active" : "")">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Manage Bookings</span>
+            </a>
+
+            <div class="nav-group-label">Insights</div>
+            <a asp-controller="Reports" asp-action="Index"
+               title="Reports & Analytics"
+               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Reports &amp; Analytics</span>
+            </a>
         }
-        <a asp-controller="DriverIssues" asp-action="Index"
-           title="Driver Issues"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "DriverIssues" ? "active" : "")">
-            <i class="fa-solid fa-bullhorn"></i>
-            <span>Driver Issues</span>
-        </a>
-        <a asp-controller="Users" asp-action="Index"
-           title="Employees"
-           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")">
-            <i class="fa-solid fa-users"></i>
-            <span>Employees</span>
-        </a>
+
+        <div class="nav-group-label">Services &amp; Travel</div>
         <a asp-controller="Bookings" asp-action="Index"
            title="Book Trip"
            class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Bookings" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
@@ -105,33 +115,19 @@
             <i class="fa-solid fa-clock-rotate-left"></i>
             <span>My Bookings</span>
         </a>
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-controller="AdminBookings" asp-action="Index"
-               title="Manage Bookings"
-               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "AdminBookings" ? "active" : "")">
-                <i class="fa-solid fa-calendar-check"></i>
-                <span>Manage Bookings</span>
-            </a>
-        }
-
-        @if (User.IsInRole("Admin"))
-        {
-            <div class="nav-group-label">Insights</div>
-            <a asp-controller="Reports" asp-action="Index"
-               title="Reports & Analytics"
-               class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Reports &amp; Analytics</span>
-            </a>
-        }
+        <a asp-controller="Routes" asp-action="Calculator"
+           title="Distance Calculator"
+           class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" && ViewContext.RouteData.Values["Action"]?.ToString() == "Calculator" ? "active" : "")">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Distance Map</span>
+        </a>
 
         <div class="nav-group-label">System</div>
         <a asp-controller="Profile" asp-action="Index"
-           title="Settings"
+           title="Profile & Settings"
            class="sidebar-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Profile" ? "active" : "")">
             <i class="fa-solid fa-gears"></i>
-            <span>Settings</span>
+            <span>Profile &amp; Settings</span>
         </a>
     </div>
 </aside>

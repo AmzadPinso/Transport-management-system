@@ -10,7 +10,7 @@ using Route = Transport_Management_System.Models.Route;
 
 namespace Transport_Management_System.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class RoutesController : Controller
     {
         private readonly IRouteRepository _routeRepo;
@@ -25,6 +25,7 @@ namespace Transport_Management_System.Controllers
         }
 
         // GET: Routes
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(
             string? search,
             int? originStationId,
@@ -71,6 +72,7 @@ namespace Transport_Management_System.Controllers
         }
 
         // GET: Routes/Details/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
             var route = await _routeRepo.GetRouteWithDetailsAsync(id);
@@ -83,6 +85,7 @@ namespace Transport_Management_System.Controllers
         }
 
         // GET: Routes/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             var stations = (await _stationRepo.GetAllAsync()).Where(s => s.IsActive).OrderBy(s => s.StationName).ToList();
@@ -92,6 +95,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/Create
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RouteFormViewModel model)
         {
@@ -127,6 +131,7 @@ namespace Transport_Management_System.Controllers
         }
 
         // GET: Routes/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var route = await _routeRepo.GetByIdAsync(id);
@@ -153,6 +158,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/Edit/5
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, RouteFormViewModel model)
         {
@@ -196,6 +202,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/Delete/5
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
@@ -213,6 +220,7 @@ namespace Transport_Management_System.Controllers
         }
 
         // GET: Routes/ManageStops/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ManageStops(int id)
         {
             var route = await _routeRepo.GetRouteWithDetailsAsync(id);
@@ -232,6 +240,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/AddStop
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddStop(int routeId, int stationId, int sequenceOrder)
         {
@@ -272,6 +281,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/RemoveStop
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveStop(int stopId, int routeId)
         {
@@ -301,6 +311,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/UpdateStopsOrder
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStopsOrder(int routeId, Dictionary<int, int> stopOrders)
         {
@@ -324,6 +335,7 @@ namespace Transport_Management_System.Controllers
         }
 
         // GET: Routes/ManagePoints/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ManagePoints(int id)
         {
             var route = await _routeRepo.GetRouteWithDetailsAsync(id);
@@ -348,6 +360,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/AddPoint
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPoint(int routeId, int stationId, string pointName, string pointType)
         {
@@ -390,6 +403,7 @@ namespace Transport_Management_System.Controllers
 
         // POST: Routes/RemovePoint
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemovePoint(int pointId, string pointType, int routeId)
         {
