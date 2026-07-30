@@ -191,7 +191,7 @@ namespace Transport_Management_System.Repository.Application
 
         public async Task<decimal> GetTotalRevenueAsync()
             => await _context.Bookings
-                .Where(b => b.PaymentStatus == PaymentStatus.Paid)
+                .Where(b => b.Status != BookingStatus.Cancelled)
                 .SumAsync(b => b.TotalAmount);
     }
 }

@@ -285,35 +285,40 @@
             var distLabels = @Html.Raw(Json.Serialize(Model.Distribution.Select(d => d.Category)));
             var distValues = @Html.Raw(Json.Serialize(Model.Distribution.Select(d => d.Value)));
 
-            var distOptions = {
-                series: distValues,
-                chart: {
-                    height: 350,
-                    type: 'donut',
-                    fontFamily: 'Inter, sans-serif'
-                },
-                labels: distLabels,
-                colors: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'],
-                legend: { position: 'bottom' },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '70%',
-                            labels: {
-                                show: true,
-                                total: {
+            if (distValues && distValues.length > 0 && distValues.some(function(v) { return v > 0; })) {
+                var distOptions = {
+                    series: distValues,
+                    chart: {
+                        height: 350,
+                        type: 'donut',
+                        fontFamily: 'Inter, sans-serif'
+                    },
+                    labels: distLabels,
+                    colors: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'],
+                    legend: { position: 'bottom' },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '70%',
+                                labels: {
                                     show: true,
-                                    label: 'Total Revenue',
-                                    formatter: () => '৳' + @Model.Summary.TotalIncome.ToString("N0")
+                                    total: {
+                                        show: true,
+                                        label: 'Total Revenue',
+                                        formatter: function() { return '৳' + (@((double)Model.Summary.TotalIncome)).toLocaleString(); }
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            };
+                };
 
-            var distChart = new ApexCharts(document.querySelector("#revenue-distribution-chart"), distOptions);
-            distChart.render();
+                var distChart = new ApexCharts(document.querySelector("#revenue-distribution-chart"), distOptions);
+                distChart.render();
+            } else {
+                document.querySelector("#revenue-distribution-chart").innerHTML =
+                    '<div class="d-flex align-items-center justify-content-center h-100 text-muted" style="min-height:350px;"><div class="text-center"><i class="fa-solid fa-chart-pie fa-3x mb-3 opacity-25"></i><p class="mb-0">No revenue data available<br><small>Add bookings to see vehicle type distribution</small></p></div></div>';
+            }
 
             // 3. Route Revenue Bar Chart
             var routeLabels = @Html.Raw(Json.Serialize(Model.RouteRevenue.Select(r => r.RouteName)));

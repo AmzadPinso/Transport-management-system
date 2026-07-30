@@ -65,37 +65,49 @@ namespace Transport_Management_System.Services
 
         public async Task<List<RevenueTrendPoint>> GetRevenueTrendAsync(DateTime? startDate, DateTime? endDate)
         {
-            var points = new List<RevenueTrendPoint>();
             var today = DateTime.Today;
 
             // Default to last 6 months if not specified
-            var start = startDate ?? today.AddMonths(-5).AddDays(-today.Day + 1); // Start of 6 months ago
+            var start = startDate ?? new DateTime(today.Year, today.Month, 1).AddMonths(-5);
             var end = endDate ?? today;
 
-            // Loop through each month in the range
-            var currentMonth = new DateTime(start.Year, start.Month, 1);
-            var endMonth = new DateTime(end.Year, end.Month, 1);
+            var rangeStart = new DateTime(start.Year, start.Month, 1);
+            var rangeEnd   = new DateTime(end.Year, end.Month, 1).AddMonths(1); // exclusive upper bound
 
-            while (currentMonth <= endMonth)
+            // Bulk-fetch bookings and expenses in the full range — single query each
+            var bookingData = await _context.Bookings
+                .Where(b => b.Status != BookingStatus.Cancelled
+                         && b.BookingDate >= rangeStart
+                         && b.BookingDate < rangeEnd)
+                .Select(b => new { b.BookingDate, b.TotalAmount })
+                .ToListAsync();
+
+            var expenseData = await _context.Expenses
+                .Where(e => e.ExpenseDate >= rangeStart && e.ExpenseDate < rangeEnd)
+                .Select(e => new { e.ExpenseDate, e.Amount })
+                .ToListAsync();
+
+            // Aggregate in memory — one pass per month label
+            var points = new List<RevenueTrendPoint>();
+            var currentMonth = rangeStart;
+
+            while (currentMonth < rangeEnd)
             {
                 var nextMonth = currentMonth.AddMonths(1);
-                var label = currentMonth.ToString("MMM yyyy");
 
-                // Booking revenue in this month
-                var monthlyIncome = await _context.Bookings
-                    .Where(b => b.Status != BookingStatus.Cancelled && b.BookingDate >= currentMonth && b.BookingDate < nextMonth)
-                    .SumAsync(b => b.TotalAmount);
+                var monthlyIncome = bookingData
+                    .Where(b => b.BookingDate >= currentMonth && b.BookingDate < nextMonth)
+                    .Sum(b => b.TotalAmount);
 
-                // Expenses in this month
-                var monthlyOpExpenses = await _context.Expenses
+                var monthlyExpenses = expenseData
                     .Where(e => e.ExpenseDate >= currentMonth && e.ExpenseDate < nextMonth)
-                    .SumAsync(e => e.Amount);
+                    .Sum(e => e.Amount);
 
                 points.Add(new RevenueTrendPoint
                 {
-                    Period = label,
-                    Income = monthlyIncome,
-                    Expenses = monthlyOpExpenses
+                    Period  = currentMonth.ToString("MMM yyyy"),
+                    Income   = monthlyIncome,
+                    Expenses = monthlyExpenses
                 });
 
                 currentMonth = nextMonth;
@@ -132,25 +144,39 @@ namespace Transport_Management_System.Services
 
         public async Task<List<RevenueDistributionPoint>> GetRevenueDistributionAsync(DateTime? startDate, DateTime? endDate)
         {
-            // Distribution of booking revenue by Vehicle Type
-            var bookingsQuery = _context.Bookings
-                .Include(b => b.Trip)
-                    .ThenInclude(t => t!.Vehicle)
-                .Where(b => b.Status != BookingStatus.Cancelled && b.Trip != null && b.Trip.Vehicle != null);
+            // EF Core cannot translate GroupBy on a nested navigation property (b.Trip!.Vehicle!.VehicleType)
+            // to a single SQL GROUP BY. Fix: project to a flat DTO first, then group in LINQ-to-Objects.
+            var query = _context.Bookings
+                .Where(b => b.Status != BookingStatus.Cancelled);
 
             if (startDate.HasValue)
-                bookingsQuery = bookingsQuery.Where(b => b.BookingDate >= startDate.Value);
+                query = query.Where(b => b.BookingDate >= startDate.Value);
             if (endDate.HasValue)
-                bookingsQuery = bookingsQuery.Where(b => b.BookingDate <= endDate.Value);
+                query = query.Where(b => b.BookingDate <= endDate.Value);
 
-            var grouped = await bookingsQuery
-                .GroupBy(b => b.Trip!.Vehicle!.VehicleType)
+            // Join Trips and Vehicles inline via navigation in a projection
+            // Project only what we need — avoids loading full entities
+            var rawData = await query
+                .Join(_context.Trips,
+                      b => b.TripId,
+                      t => t.TripId,
+                      (b, t) => new { b.TotalAmount, t.VehicleId })
+                .Join(_context.Vehicles,
+                      bt => bt.VehicleId,
+                      v => v.VehicleId,
+                      (bt, v) => new { bt.TotalAmount, v.VehicleType })
+                .ToListAsync();
+
+            // Group in memory (LINQ-to-Objects) — no EF Core translation issues
+            var grouped = rawData
+                .GroupBy(x => x.VehicleType)
                 .Select(g => new RevenueDistributionPoint
                 {
                     Category = g.Key.ToString(),
-                    Value = g.Sum(b => b.TotalAmount)
+                    Value    = g.Sum(x => x.TotalAmount)
                 })
-                .ToListAsync();
+                .OrderByDescending(x => x.Value)
+                .ToList();
 
             return grouped;
         }
